@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\SocialGraph.Application\SocialGraph.Application.csproj" />
+    <ProjectReference Include="..\SocialGraph.Infrastructure\SocialGraph.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

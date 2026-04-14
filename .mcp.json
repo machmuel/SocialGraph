@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "guido": {
+      "type": "http",
+      "url": "https://mcp-guido.stephan-derkowski.de/"
+    }
+  }
+}
