@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SocialGraph Workbench</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <span class="eyebrow">Entity Workbench</span>
+          <h1>SocialGraph</h1>
+        </div>
+        <div id="entitiesLoading" class="spinner" hidden aria-hidden="true"></div>
+      </div>
+      <p class="muted">Create, edit, delete, and focus entities without leaving the graph surface.</p>
+
+      <label class="inline-grid">
+        <span>Search entities</span>
+        <input id="entitySearch" type="search" placeholder="Filter by name">
+      </label>
+
+      <div id="entityList" class="entity-list" aria-live="polite"></div>
+
+      <form id="entityForm" class="inline-grid">
+        <h2 id="entityFormTitle">Create entity</h2>
+        <label class="inline-grid">
+          <span>Name</span>
+          <input id="entityName" name="name" required maxlength="120" placeholder="Ada Lovelace">
+        </label>
+        <label class="inline-grid">
+          <span>Note</span>
+          <textarea id="entityNote" name="note" placeholder="Key skills, context, or achievements"></textarea>
+        </label>
+        <div class="actions">
+          <button id="entitySubmit" type="submit">Create entity</button>
+          <button id="entityReset" class="ghost" type="button">Clear form</button>
+          <button id="entityDelete" class="danger" type="button" hidden>Delete selected</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel graph-panel">
+      <div class="panel-header">
+        <div>
+          <span class="eyebrow">Focused Exploration</span>
+          <h2>Graph canvas</h2>
+        </div>
+        <div id="graphLoading" class="spinner" hidden aria-hidden="true"></div>
+      </div>
+
+      <div id="errorBanner" class="notice error" hidden role="alert"></div>
+
+      <div class="graph-toolbar">
+        <div class="graph-meta">
+          <span id="statusSummary">Loading graph…</span>
+          <span id="focusTag" class="tag" hidden></span>
+        </div>
+        <div class="actions">
+          <button id="focusSelected" class="ghost" type="button" disabled>Focus selected</button>
+          <button id="showFullGraph" class="ghost" type="button" disabled>Show full graph</button>
+          <button id="reloadAll" class="textual" type="button">Reload everything</button>
+        </div>
+      </div>
+
+      <div class="graph-frame">
+        <svg id="graph" role="img" aria-label="SocialGraph relationship graph"></svg>
+      </div>
+    </section>
+
+    <section class="panel right-column">
+      <div class="panel-header">
+        <div>
+          <span class="eyebrow">Relationship Explorer</span>
+          <h2>Browse and inspect</h2>
+        </div>
+        <div id="relationshipsLoading" class="spinner" hidden aria-hidden="true"></div>
+      </div>
+      <p id="selectionSummary" class="muted">Browse all relationships or narrow the list around a selected entity.</p>
+
+      <div class="filter-stack">
+        <div class="filter-header">
+          <span id="relationshipModeTag" class="tag">Global browse</span>
+          <span id="relationshipResultsSummary" class="muted">Loading relationships…</span>
+        </div>
+        <label class="inline-grid">
+          <span>Filter relationships</span>
+          <input
+            id="relationshipSearch"
+            type="search"
+            placeholder="Search by id, endpoints, kind, or note">
+        </label>
+        <div class="two-up">
+          <label class="inline-grid">
+            <span>Kind</span>
+            <select id="relationshipKindFilter">
+              <option value="">All kinds</option>
+            </select>
+          </label>
+          <label class="inline-grid">
+            <span>Direction</span>
+            <select id="relationshipDirectionFilter">
+              <option value="all">All directions</option>
+              <option value="incoming">Incoming</option>
+              <option value="outgoing">Outgoing</option>
+            </select>
+          </label>
+        </div>
+        <div class="actions">
+          <button id="relationshipClearFilters" class="ghost" type="button">Clear filters</button>
+        </div>
+      </div>
+
+      <div id="relationshipList" class="relationship-list" aria-live="polite"></div>
+
+      <form id="relationshipForm" class="inline-grid">
+        <h3 id="relationshipFormTitle">Relationship inspector</h3>
+        <p id="relationshipInspectorMeta" class="muted">Select a relationship from the list or graph to edit it. Clear the selection to create a new one.</p>
+        <div id="relationshipFocusNotice" class="notice" hidden></div>
+        <div class="two-up">
+          <label class="inline-grid">
+            <span>Source</span>
+            <select id="relationshipSource" name="sourceEntityId"></select>
+          </label>
+          <label class="inline-grid">
+            <span>Target</span>
+            <select id="relationshipTarget" name="targetEntityId"></select>
+          </label>
+        </div>
+        <label class="inline-grid">
+          <span>Kind</span>
+          <input id="relationshipKind" name="kind" required maxlength="120" placeholder="mentors">
+        </label>
+        <label class="inline-grid">
+          <span>Note</span>
+          <textarea id="relationshipNote" name="note" placeholder="Describe how this connection matters"></textarea>
+        </label>
+        <div class="actions">
+          <button id="relationshipSubmit" type="submit">Create relationship</button>
+          <button id="relationshipReset" class="ghost" type="button">Clear selection</button>
+          <button id="relationshipDelete" class="danger" type="button" hidden>Delete selected</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

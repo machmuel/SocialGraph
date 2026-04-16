@@ -1,0 +1,12 @@
+[
+  {
+    "Name": "html",
+    "Projects": [
+      {
+        "Path": "src\\SocialGraph.Api\\SocialGraph.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "html"
+      }
+    ]
+  }
+]

@@ -11,4 +11,6 @@ public interface IEntityRepository
     Task<EntityRecord> CreateAsync(string name, string note, CancellationToken cancellationToken);
 
     Task<EntityRecord?> UpdateAsync(string id, string name, string note, CancellationToken cancellationToken);
+
+    Task<bool> DeleteAsync(string id, CancellationToken cancellationToken);
 }

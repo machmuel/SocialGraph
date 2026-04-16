@@ -46,6 +46,9 @@ public sealed class EntityService(IEntityRepository repository)
         return record is null ? (null, null) : (ToDto(record), null);
     }
 
+    public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken) =>
+        repository.DeleteAsync(id, cancellationToken);
+
     private static string? Validate(UpsertEntityRequest request)
     {
         return string.IsNullOrWhiteSpace(request.Name) ? "validation:name is required" : null;
