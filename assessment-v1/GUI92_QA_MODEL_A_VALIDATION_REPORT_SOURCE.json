@@ -1,0 +1,31 @@
+{
+  "metricSourceIssue": "GUI-92",
+  "observationWindowStart": "2026-04-20",
+  "observationWindowEnd": "2026-04-17",
+  "earliestCheckpointDate": "2026-05-20",
+  "preparedAt": "2026-04-17T22:45:00+02:00",
+  "evidenceNote": "T-2 preflight source added to make the GUI-92 report path executable from the SocialGraph workspace before the true day-30 window is available.",
+  "acknowledgementSlaPercent": null,
+  "acknowledgementMetCount": null,
+  "acknowledgementSampleCount": null,
+  "completionSlaPercent": null,
+  "completionMetCount": null,
+  "completionSampleCount": null,
+  "medianReviewBusinessHours": null,
+  "medianDeliveryLeadTimeHours": null,
+  "escapedDefectsCurrent30DayCount": null,
+  "escapedDefectsPrior30DayCount": null,
+  "missingFields": [
+    "qa_requested_at",
+    "qa_acknowledged_at",
+    "qa_completed_at",
+    "risk_level",
+    "submitted_before_noon_local",
+    "delivery_id",
+    "escaped_defect_discovered_at",
+    "severity",
+    "delivery_ready_for_qa_at",
+    "delivery_completed_at",
+    "lead_time_hours"
+  ]
+}

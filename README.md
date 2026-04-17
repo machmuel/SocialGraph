@@ -16,6 +16,11 @@ The solution-level MCP config is stored in `.mcp.json` and points to:
 
 - `https://mcp-guido.stephan-derkowski.de/`
 
+Operational note:
+
+- the bare Guido MCP root can respond with `404`; for this repo that still counts as "online" because the remote HTTP endpoint answered
+- use `./scripts/check-guido-mcp.sh` to verify transport reachability from the current workspace and print the observed HTTP status line
+
 ## First Slice
 
 The initial delivery slice implements:
@@ -32,6 +37,7 @@ The initial delivery slice implements:
 - `POST /api/relationship-edges`
 - `PUT /api/relationship-edges/{id}`
 - `DELETE /api/relationship-edges/{id}`
+- `GET /api/cto/weekly-monitor/qa-model-a-validation`
 
 `/api/relationships` is also supported as an alias for the relationship edge endpoints.
 
@@ -39,9 +45,18 @@ Deleting an entity also removes any incident relationship edges in the same pers
 
 `GET /api/graph` returns a frontend-ready snapshot with `nodes` and `links`. Add `?entityId=alpha` to return only the selected entity, directly connected neighbors, and incident relationships. The API returns `404` for an unknown focus entity.
 
+`GET /api/cto/weekly-monitor/qa-model-a-validation` is the `GUI-92` checkpoint report path used by the day-30 QA Model A preflight. It reads from `assessment-v1/GUI92_QA_MODEL_A_VALIDATION_REPORT_SOURCE.json` by default and returns a structured `PASS`, `FAIL`, or `NO_READOUT` result using the frozen thresholds from the assessment docs. Override the source file with either:
+
+- `SOCIALGRAPH_QA_VALIDATION_REPORT_PATH=/absolute/or/relative/path.json`
+- ASP.NET configuration key `QaValidation:ReportPath`
+
 The API host also serves an interactive single-page workbench at `/`. It loads entities, relationship edges, and the graph snapshot directly from the API so an operator can:
 
 - browse and filter entities
+- see each entity's incident relationship count before selecting it
+- inspect a selected entity's neighborhood summary with incident, incoming, outgoing, and distinct-neighbor counts
+- drill into neighboring entities from the selected-entity summary and optionally refocus the graph on that neighbor
+- use incident relationship kind chips from the selected entity to drive the existing relationship explorer filters
 - browse all relationship edges even when no entity is selected
 - filter relationships by free text and kind from the right-side explorer
 - switch selected-entity relationship browsing between all, incoming, and outgoing incident edges
@@ -49,6 +64,7 @@ The API host also serves an interactive single-page workbench at `/`. It loads e
 - inspect a relationship directly from the graph even when no entity is selected
 - create, edit, and delete relationship edges
 - focus the graph on a selected entity's one-hop neighborhood and reset back to the full graph
+- spotlight matching nodes when entity search is active and emphasize matching edges when relationship filters are active without forcing a graph refetch
 - see relationship result counts and explicit empty states as filters change
 - see the selected relationship highlighted in both the inspector list and graph canvas
 - see a notice when a selected relationship is outside the currently focused graph
@@ -59,8 +75,8 @@ The workbench intentionally stays framework-free for this slice: the UI is deliv
 Current workbench asset layout:
 
 - `src/SocialGraph.Api/wwwroot/index.html`: page structure and static asset references
-- `src/SocialGraph.Api/wwwroot/app.css`: extracted workbench styles
-- `src/SocialGraph.Api/wwwroot/app.js`: extracted browser state, rendering, and event wiring
+- `src/SocialGraph.Api/wwwroot/app.css`: extracted workbench styles, neighborhood cards, and graph spotlight states
+- `src/SocialGraph.Api/wwwroot/app.js`: browser state, derived entity metrics, relationship filtering, and graph spotlight wiring
 
 ## Storage
 
@@ -83,10 +99,13 @@ Manual smoke flow:
 1. Run the API host.
 2. Open `/`.
 3. Browse all relationships with no entity selected and confirm the global list is populated.
-4. Filter relationships by text and by kind, then confirm the result count and empty state update.
-5. Select an entity and confirm the relationship panel switches into entity-context mode.
-6. Switch between incoming, outgoing, and all relationship filters for that entity.
-7. Select a relationship from the filtered list, edit its kind or note, and confirm the persisted change survives refresh.
-8. Click a graph edge directly and confirm the inspector loads the same relationship.
-9. Focus the graph on an entity, then inspect a relationship outside that focus and confirm the notice explains why it is not visible.
-10. Clear the relationship selection, create a new relationship edge, then delete it.
+4. Confirm the entity list shows incident relationship counts before any entity is selected.
+5. Select an entity and confirm the summary card shows incoming, outgoing, total incident, and distinct neighbor counts.
+6. Click a neighbor from the summary card and confirm the workbench selects that entity; use the neighbor focus action and confirm the graph refetches into one-hop mode.
+7. Click an incident relationship kind chip and confirm the relationship explorer kind filter updates to match.
+8. Filter relationships by text and by kind, then confirm the result count and empty state update.
+9. Apply an entity search term and confirm matching nodes are spotlighted while non-matches are visually muted.
+10. Select a relationship from the filtered list, edit its kind or note, and confirm the persisted change survives refresh.
+11. Click a graph edge directly and confirm the inspector loads the same relationship.
+12. Focus the graph on an entity, then inspect a relationship outside that focus and confirm the notice explains why it is not visible.
+13. Clear the relationship selection, create a new relationship edge, then delete it.

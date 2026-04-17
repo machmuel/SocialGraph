@@ -17,9 +17,20 @@ builder.Services.AddSingleton(storageOptions);
 builder.Services.AddSingleton<JsonGraphRepository>();
 builder.Services.AddSingleton<IEntityRepository>(provider => provider.GetRequiredService<JsonGraphRepository>());
 builder.Services.AddSingleton<IRelationshipEdgeRepository>(provider => provider.GetRequiredService<JsonGraphRepository>());
+var qaValidationOptions = new QaModelAValidationReportOptions();
+var configuredQaValidationPath = Environment.GetEnvironmentVariable("SOCIALGRAPH_QA_VALIDATION_REPORT_PATH")
+                                ?? builder.Configuration["QaValidation:ReportPath"];
+if (!string.IsNullOrWhiteSpace(configuredQaValidationPath))
+{
+    qaValidationOptions.ReportPath = configuredQaValidationPath;
+}
+
+builder.Services.AddSingleton(qaValidationOptions);
+builder.Services.AddSingleton<IQaModelAValidationReportSource, JsonQaModelAValidationReportSource>();
 builder.Services.AddSingleton<EntityService>();
 builder.Services.AddSingleton<RelationshipEdgeService>();
 builder.Services.AddSingleton<GraphService>();
+builder.Services.AddSingleton<QaModelAValidationReportService>();
 
 var app = builder.Build();
 
@@ -39,6 +50,13 @@ app.MapGet("/api/entities", async (string? q, EntityService service, Cancellatio
     var entities = await service.ListAsync(q, cancellationToken);
     return Results.Ok(entities);
 });
+
+app.MapGet("/api/cto/weekly-monitor/qa-model-a-validation",
+    async (QaModelAValidationReportService service, CancellationToken cancellationToken) =>
+    {
+        var report = await service.GetAsync(cancellationToken);
+        return Results.Ok(report);
+    });
 
 app.MapGet("/api/entities/{id}", async (string id, EntityService service, CancellationToken cancellationToken) =>
 {

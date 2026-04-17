@@ -22,6 +22,12 @@ const state = {
 
 const dom = {
   entityList: document.getElementById("entityList"),
+  entitySummaryTitle: document.getElementById("entitySummaryTitle"),
+  entitySummaryModeTag: document.getElementById("entitySummaryModeTag"),
+  entitySummaryText: document.getElementById("entitySummaryText"),
+  entityMetricGrid: document.getElementById("entityMetricGrid"),
+  entityNeighborList: document.getElementById("entityNeighborList"),
+  entityKindChips: document.getElementById("entityKindChips"),
   relationshipList: document.getElementById("relationshipList"),
   statusSummary: document.getElementById("statusSummary"),
   selectionSummary: document.getElementById("selectionSummary"),
@@ -32,6 +38,7 @@ const dom = {
   relationshipDirectionFilter: document.getElementById("relationshipDirectionFilter"),
   relationshipClearFilters: document.getElementById("relationshipClearFilters"),
   focusTag: document.getElementById("focusTag"),
+  spotlightTag: document.getElementById("spotlightTag"),
   errorBanner: document.getElementById("errorBanner"),
   graph: document.getElementById("graph"),
   entitySearch: document.getElementById("entitySearch"),
@@ -77,6 +84,10 @@ function relationshipMode() {
   return state.selectedEntityId ? "entity" : "global";
 }
 
+function normalizeText(value) {
+  return (value || "").trim().toLowerCase();
+}
+
 function relationshipMatchesText(edge, query) {
   if (!query) {
     return true;
@@ -88,7 +99,24 @@ function relationshipMatchesText(edge, query) {
     edge.targetEntityId,
     edge.kind,
     edge.note
-  ].some(value => (value || "").toLowerCase().includes(query));
+  ].some(value => normalizeText(value).includes(query));
+}
+
+function entityMatchesSearch(entity, query) {
+  if (!query) {
+    return true;
+  }
+
+  return [entity.id, entity.name, entity.note].some(value => normalizeText(value).includes(query));
+}
+
+function getIncidentRelationships(entityId) {
+  if (!entityId) {
+    return [];
+  }
+
+  return state.relationships.filter(edge =>
+    edge.sourceEntityId === entityId || edge.targetEntityId === entityId);
 }
 
 function relationshipMatchesDirection(edge) {
@@ -107,13 +135,83 @@ function relationshipMatchesDirection(edge) {
   return true;
 }
 
-function getFilteredRelationships() {
-  const query = state.relationshipFilters.text.trim().toLowerCase();
+function getScopedRelationships() {
+  if (!state.selectedEntityId) {
+    return state.relationships;
+  }
 
-  return state.relationships.filter(edge =>
+  return getIncidentRelationships(state.selectedEntityId);
+}
+
+function getFilteredRelationships() {
+  const query = normalizeText(state.relationshipFilters.text);
+
+  return getScopedRelationships().filter(edge =>
     relationshipMatchesText(edge, query) &&
     (!state.relationshipFilters.kind || edge.kind === state.relationshipFilters.kind) &&
     relationshipMatchesDirection(edge));
+}
+
+function getEntityMetrics(entityId) {
+  const incident = getIncidentRelationships(entityId);
+  const incoming = incident.filter(edge => edge.targetEntityId === entityId);
+  const outgoing = incident.filter(edge => edge.sourceEntityId === entityId);
+  const neighborIds = [...new Set(incident.map(edge =>
+    edge.sourceEntityId === entityId ? edge.targetEntityId : edge.sourceEntityId))];
+  const kinds = [...new Set(incident.map(edge => edge.kind).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+
+  return {
+    incidentCount: incident.length,
+    incomingCount: incoming.length,
+    outgoingCount: outgoing.length,
+    neighborCount: neighborIds.length,
+    neighborIds,
+    kinds
+  };
+}
+
+function getNeighborSummaries(entityId) {
+  return getEntityMetrics(entityId).neighborIds
+    .map(neighborId => {
+      const entity = state.entities.find(item => item.id === neighborId);
+      return entity
+        ? { ...entity, incidentCount: getIncidentRelationships(neighborId).length }
+        : null;
+    })
+    .filter(Boolean)
+    .sort((left, right) => left.name.localeCompare(right.name));
+}
+
+function getGraphSpotlight() {
+  const nodeQuery = normalizeText(state.searchQuery);
+  const filteredEdges = getFilteredRelationships();
+  const isEntitySearchActive = Boolean(nodeQuery);
+  const areRelationshipFiltersActive =
+    Boolean(normalizeText(state.relationshipFilters.text)) ||
+    Boolean(state.relationshipFilters.kind) ||
+    (state.selectedEntityId && state.relationshipFilters.direction !== "all");
+
+  const matchingNodeIds = new Set(
+    state.entities
+      .filter(entity => entityMatchesSearch(entity, nodeQuery))
+      .map(entity => entity.id));
+  const matchingEdgeIds = new Set(filteredEdges.map(edge => edge.id));
+  const connectedNodeIds = new Set();
+
+  for (const edge of filteredEdges) {
+    connectedNodeIds.add(edge.sourceEntityId);
+    connectedNodeIds.add(edge.targetEntityId);
+  }
+
+  return {
+    isEntitySearchActive,
+    areRelationshipFiltersActive,
+    matchingNodeIds,
+    matchingEdgeIds,
+    connectedNodeIds,
+    hasSpotlight: isEntitySearchActive || areRelationshipFiltersActive
+  };
 }
 
 function setError(message) {
@@ -124,7 +222,7 @@ function setError(message) {
 
 function setLoading(key, value) {
   state.loading[key] = value;
-  const indicator = dom[key + "Loading"];
+  const indicator = dom[`${key}Loading`];
   if (indicator) {
     indicator.hidden = !value;
   }
@@ -156,6 +254,7 @@ async function requestJson(url, options) {
 }
 
 function render() {
+  renderEntitySummary();
   renderEntityList();
   renderEntityForm();
   renderRelationshipControls();
@@ -164,46 +263,184 @@ function render() {
   renderGraph(state.graph);
 }
 
+function renderEntitySummary() {
+  const entity = selectedEntity();
+  const spotlight = getGraphSpotlight();
+
+  dom.entityMetricGrid.innerHTML = "";
+  dom.entityNeighborList.innerHTML = "";
+  dom.entityKindChips.innerHTML = "";
+
+  if (!entity) {
+    dom.entitySummaryTitle.textContent = "No entity selected";
+    dom.entitySummaryModeTag.textContent = state.focusedEntityId ? "Focused graph context" : "Full graph context";
+    dom.entitySummaryText.textContent =
+      "Select an entity to inspect incident counts, neighboring entities, and quick relationship filters.";
+    appendEmpty(dom.entityMetricGrid, "Entity metrics appear here after you select an entity.");
+    appendEmpty(dom.entityNeighborList, "Neighbor drilldown becomes available once an entity is selected.");
+    appendEmpty(dom.entityKindChips, "Quick kind chips appear after an entity is selected.");
+    return;
+  }
+
+  const metrics = getEntityMetrics(entity.id);
+  const modeParts = [];
+  modeParts.push(state.focusedEntityId ? "Focused graph" : "Full graph");
+  modeParts.push(spotlight.hasSpotlight ? "Spotlight active" : "No spotlight");
+
+  dom.entitySummaryTitle.textContent = `${entity.name} neighborhood`;
+  dom.entitySummaryModeTag.textContent = modeParts.join(" + ");
+  dom.entitySummaryText.textContent = state.focusedEntityId === entity.id
+    ? `${entity.name} is currently driving the one-hop graph focus. Spotlighting can still mute or emphasize nodes and edges without changing the fetched graph.`
+    : `${entity.name} is selected for local context. Use Focus selected to refetch the one-hop graph, or stay in the full graph and use spotlighting only.`;
+
+  const metricsToRender = [
+    { label: "Incident", value: metrics.incidentCount },
+    { label: "Incoming", value: metrics.incomingCount },
+    { label: "Outgoing", value: metrics.outgoingCount },
+    { label: "Neighbors", value: metrics.neighborCount }
+  ];
+
+  for (const metric of metricsToRender) {
+    const card = document.createElement("article");
+    card.className = "metric-card";
+
+    const value = document.createElement("strong");
+    value.className = "metric-value";
+    value.textContent = String(metric.value);
+
+    const label = document.createElement("span");
+    label.className = "muted";
+    label.textContent = metric.label;
+
+    card.append(value, label);
+    dom.entityMetricGrid.appendChild(card);
+  }
+
+  const neighbors = getNeighborSummaries(entity.id);
+  if (!neighbors.length) {
+    appendEmpty(dom.entityNeighborList, "No neighbors connected to the selected entity yet.");
+  } else {
+    for (const neighbor of neighbors) {
+      const chip = document.createElement("div");
+      chip.className = "chip-card";
+
+      const label = document.createElement("strong");
+      label.textContent = neighbor.name;
+
+      const meta = document.createElement("span");
+      meta.className = "muted";
+      meta.textContent = `${neighbor.id} · ${neighbor.incidentCount} incident`;
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      const selectButton = document.createElement("button");
+      selectButton.className = "ghost";
+      selectButton.type = "button";
+      selectButton.textContent = "Select";
+      selectButton.addEventListener("click", () => selectEntity(neighbor.id));
+
+      const focusButton = document.createElement("button");
+      focusButton.className = "ghost";
+      focusButton.type = "button";
+      focusButton.textContent = "Focus";
+      focusButton.addEventListener("click", async () => {
+        await selectEntity(neighbor.id);
+        await focusGraph(neighbor.id);
+      });
+
+      actions.append(selectButton, focusButton);
+      chip.append(label, meta, actions);
+      dom.entityNeighborList.appendChild(chip);
+    }
+  }
+
+  if (!metrics.kinds.length) {
+    appendEmpty(dom.entityKindChips, "No incident relationship kinds available for the selected entity.");
+    return;
+  }
+
+  for (const kind of metrics.kinds) {
+    const button = document.createElement("button");
+    button.className = state.relationshipFilters.kind === kind ? "chip-button active" : "chip-button";
+    button.type = "button";
+    button.textContent = kind;
+    button.addEventListener("click", () => {
+      state.relationshipFilters.kind = state.relationshipFilters.kind === kind ? "" : kind;
+      dom.relationshipKindFilter.value = state.relationshipFilters.kind;
+      render();
+    });
+    dom.entityKindChips.appendChild(button);
+  }
+}
+
 function renderEntityList() {
   dom.entityList.innerHTML = "";
 
-  const query = state.searchQuery.trim().toLowerCase();
-  const entities = state.entities.filter(entity =>
-    !query || entity.name.toLowerCase().includes(query) || entity.note.toLowerCase().includes(query));
+  const query = normalizeText(state.searchQuery);
+  const entities = state.entities.filter(entity => entityMatchesSearch(entity, query));
 
   if (!entities.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty";
-    empty.textContent = query ? "No entities match the current filter." : "No entities yet. Create the first one below.";
-    dom.entityList.appendChild(empty);
+    appendEmpty(
+      dom.entityList,
+      query ? "No entities match the current filter." : "No entities yet. Create the first one below.");
     return;
   }
 
   for (const entity of entities) {
+    const metrics = getEntityMetrics(entity.id);
     const card = document.createElement("article");
     card.className = "entity-card";
     if (entity.id === state.selectedEntityId) {
       card.classList.add("active");
     }
 
+    const headingRow = document.createElement("div");
+    headingRow.className = "entity-row";
+
     const heading = document.createElement("strong");
     heading.textContent = entity.name;
+
+    const count = document.createElement("span");
+    count.className = "tag";
+    count.textContent = `${metrics.incidentCount} incident`;
+
+    headingRow.append(heading, count);
 
     const note = document.createElement("p");
     note.className = "muted";
     note.textContent = entity.note || "No note";
 
-    const meta = document.createElement("span");
-    meta.className = "tag";
-    meta.textContent = entity.id;
+    const meta = document.createElement("div");
+    meta.className = "entity-meta";
 
-    const button = document.createElement("button");
-    button.className = "ghost";
-    button.type = "button";
-    button.textContent = entity.id === state.selectedEntityId ? "Selected" : "Select entity";
-    button.addEventListener("click", () => selectEntity(entity.id));
+    const idTag = document.createElement("span");
+    idTag.className = "tag";
+    idTag.textContent = entity.id;
 
-    card.append(heading, note, meta, button);
+    const neighborTag = document.createElement("span");
+    neighborTag.className = "tag";
+    neighborTag.textContent = `${metrics.neighborCount} neighbors`;
+
+    meta.append(idTag, neighborTag);
+
+    const buttonRow = document.createElement("div");
+    buttonRow.className = "actions";
+
+    const selectButton = document.createElement("button");
+    selectButton.className = "ghost";
+    selectButton.type = "button";
+    selectButton.textContent = entity.id === state.selectedEntityId ? "Selected" : "Select entity";
+    selectButton.addEventListener("click", () => selectEntity(entity.id));
+
+    const focusButton = document.createElement("button");
+    focusButton.className = "ghost";
+    focusButton.type = "button";
+    focusButton.textContent = state.focusedEntityId === entity.id ? "Focused" : "Focus";
+    focusButton.addEventListener("click", () => focusGraph(entity.id));
+
+    buttonRow.append(selectButton, focusButton);
+    card.append(headingRow, note, meta, buttonRow);
     dom.entityList.appendChild(card);
   }
 }
@@ -250,7 +487,7 @@ function syncEntityOptions(select, preferredId) {
 
 function syncRelationshipKindOptions() {
   const currentValue = dom.relationshipKindFilter.value;
-  const kinds = [...new Set(state.relationships.map(edge => edge.kind).filter(Boolean))]
+  const kinds = [...new Set(getScopedRelationships().map(edge => edge.kind).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right));
 
   dom.relationshipKindFilter.innerHTML = "";
@@ -269,9 +506,13 @@ function syncRelationshipKindOptions() {
 
   if (currentValue && kinds.includes(currentValue)) {
     dom.relationshipKindFilter.value = currentValue;
+  } else if (state.relationshipFilters.kind && kinds.includes(state.relationshipFilters.kind)) {
+    dom.relationshipKindFilter.value = state.relationshipFilters.kind;
   } else {
     dom.relationshipKindFilter.value = "";
-    state.relationshipFilters.kind = "";
+    if (state.relationshipFilters.kind && !kinds.length) {
+      state.relationshipFilters.kind = "";
+    }
   }
 }
 
@@ -284,10 +525,12 @@ function renderRelationshipControls() {
   const hasEntities = state.entities.length > 0;
   const entity = selectedEntity();
   const relationship = selectedRelationship();
+  const scopedRelationships = getScopedRelationships();
   const filteredRelationships = getFilteredRelationships();
   const selectedRelationshipVisibleInGraph = relationship
     ? state.graph.links.some(link => link.id === relationship.id)
     : true;
+  const spotlight = getGraphSpotlight();
 
   syncEntityOptions(dom.relationshipSource, relationship?.sourceEntityId || entity?.id || null);
   syncEntityOptions(
@@ -320,7 +563,7 @@ function renderRelationshipControls() {
 
   dom.relationshipModeTag.textContent = entity ? `Entity context: ${entity.name}` : "Global browse";
   dom.relationshipResultsSummary.textContent = entity
-    ? `${filteredRelationships.length} of ${state.relationships.length} incident relationships shown`
+    ? `${filteredRelationships.length} of ${scopedRelationships.length} incident relationships shown`
     : `${filteredRelationships.length} of ${state.relationships.length} relationships shown`;
 
   if (relationship) {
@@ -339,16 +582,20 @@ function renderRelationshipControls() {
 
   if (relationship && entity) {
     dom.selectionSummary.textContent =
-      `${entity.name} is selected. Filtering ${state.relationships.length} incident relationships and editing ${relationship.id}.`;
+      `${entity.name} is selected. Filtering ${scopedRelationships.length} incident relationships and editing ${relationship.id}.`;
   } else if (relationship) {
     dom.selectionSummary.textContent =
       `Global relationship browsing is active. Inspecting ${relationship.id} directly from the graph or filtered list.`;
   } else if (entity) {
     dom.selectionSummary.textContent =
-      `${entity.name} is selected. Use filters to narrow incoming, outgoing, or all incident relationships.`;
+      `${entity.name} is selected. Use quick kind chips or explorer filters to narrow the visible incident relationships.`;
   } else {
     dom.selectionSummary.textContent =
       "Global relationship browsing is active. Filter all relationships, then inspect one without selecting an entity first.";
+  }
+
+  if (spotlight.areRelationshipFiltersActive) {
+    dom.selectionSummary.textContent += " Relationship spotlighting is active on the graph.";
   }
 }
 
@@ -358,20 +605,16 @@ function renderRelationshipList() {
   const edges = getFilteredRelationships();
 
   if (!state.relationships.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty";
-    empty.textContent = relationshipMode() === "entity"
-      ? "No relationships for the selected entity yet."
-      : "No relationships yet. Create the first relationship in the inspector below.";
-    dom.relationshipList.appendChild(empty);
+    appendEmpty(
+      dom.relationshipList,
+      relationshipMode() === "entity"
+        ? "No relationships for the selected entity yet."
+        : "No relationships yet. Create the first relationship in the inspector below.");
     return;
   }
 
   if (!edges.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty";
-    empty.textContent = "No relationships match the current filters.";
-    dom.relationshipList.appendChild(empty);
+    appendEmpty(dom.relationshipList, "No relationships match the current filters.");
     return;
   }
 
@@ -441,6 +684,8 @@ function renderRelationshipList() {
 
 function renderGraphMeta() {
   const counts = `${state.graph.nodes.length} nodes, ${state.graph.links.length} relationships`;
+  const spotlight = getGraphSpotlight();
+
   dom.statusSummary.textContent = state.focusedEntityId
     ? `Focused graph loaded: ${counts}`
     : `Full graph loaded: ${counts}`;
@@ -451,6 +696,18 @@ function renderGraphMeta() {
     dom.focusTag.textContent = `Focused on ${entity?.name || state.focusedEntityId}`;
   } else {
     dom.focusTag.hidden = true;
+  }
+
+  dom.spotlightTag.hidden = !spotlight.hasSpotlight;
+  if (spotlight.hasSpotlight) {
+    const parts = [];
+    if (spotlight.isEntitySearchActive) {
+      parts.push("Node spotlight");
+    }
+    if (spotlight.areRelationshipFiltersActive) {
+      parts.push("Edge spotlight");
+    }
+    dom.spotlightTag.textContent = parts.join(" + ");
   }
 }
 
@@ -472,10 +729,7 @@ async function loadEntities() {
 async function loadRelationships() {
   setLoading("relationships", true);
   try {
-    const suffix = state.selectedEntityId
-      ? `?entityId=${encodeURIComponent(state.selectedEntityId)}`
-      : "";
-    state.relationships = await requestJson(`/api/relationship-edges${suffix}`);
+    state.relationships = await requestJson("/api/relationship-edges");
   } finally {
     setLoading("relationships", false);
   }
@@ -679,10 +933,18 @@ function clearRelationshipFilters() {
   render();
 }
 
+function appendEmpty(container, text) {
+  const empty = document.createElement("div");
+  empty.className = "empty";
+  empty.textContent = text;
+  container.appendChild(empty);
+}
+
 function renderGraph(graph) {
   const svg = dom.graph;
   const width = svg.clientWidth || 960;
   const height = svg.clientHeight || 640;
+  const spotlight = getGraphSpotlight();
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svg.innerHTML = "";
 
@@ -721,19 +983,26 @@ function renderGraph(graph) {
       continue;
     }
 
-    appendLink(svg, source, target, link);
+    appendLink(svg, source, target, link, spotlight);
   }
 
   for (const node of nodes) {
-    appendNode(svg, node);
+    appendNode(svg, node, spotlight);
   }
 }
 
-function appendLink(svg, source, target, link) {
+function appendLink(svg, source, target, link, spotlight) {
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
   group.setAttribute("class", "link-shell");
   if (link.id === state.selectedRelationshipId) {
     group.classList.add("active");
+  }
+  if (spotlight.areRelationshipFiltersActive) {
+    if (spotlight.matchingEdgeIds.has(link.id)) {
+      group.classList.add("spotlight");
+    } else {
+      group.classList.add("muted");
+    }
   }
   group.addEventListener("click", async event => {
     event.stopPropagation();
@@ -764,11 +1033,24 @@ function appendLink(svg, source, target, link) {
   svg.appendChild(group);
 }
 
-function appendNode(svg, node) {
+function appendNode(svg, node, spotlight) {
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
   group.setAttribute("class", "node-shell");
   if (node.id === state.selectedEntityId || node.id === state.focusedEntityId) {
     group.classList.add("active");
+  }
+  if (spotlight.isEntitySearchActive) {
+    if (spotlight.matchingNodeIds.has(node.id)) {
+      group.classList.add("spotlight");
+    } else {
+      group.classList.add("muted");
+    }
+  } else if (spotlight.areRelationshipFiltersActive) {
+    if (spotlight.connectedNodeIds.has(node.id)) {
+      group.classList.add("spotlight");
+    } else {
+      group.classList.add("muted");
+    }
   }
   group.addEventListener("click", () => selectEntity(node.id));
   group.addEventListener("dblclick", () => focusGraph(node.id));
@@ -801,7 +1083,7 @@ function appendNode(svg, node) {
 
 dom.entitySearch.addEventListener("input", event => {
   state.searchQuery = event.target.value;
-  renderEntityList();
+  render();
 });
 
 dom.relationshipSearch.addEventListener("input", event => {

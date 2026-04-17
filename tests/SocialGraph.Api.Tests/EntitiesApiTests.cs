@@ -27,6 +27,66 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
     }
 
     [Fact]
+    public async Task QaModelAValidationReport_DefaultSourceReturnsNoReadout()
+    {
+        var response = await _client.GetAsync("/api/cto/weekly-monitor/qa-model-a-validation");
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("\"overallStatus\":\"NO_READOUT\"", body, StringComparison.Ordinal);
+        Assert.Contains("\"recommendedDecision\":\"no readout - evidence incomplete\"", body, StringComparison.Ordinal);
+        Assert.Contains("\"metricSourcePath\":\"/api/cto/weekly-monitor/qa-model-a-validation\"", body, StringComparison.Ordinal);
+        Assert.Contains("Observation window is incomplete", body, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task QaModelAValidationReport_CompleteFixtureReturnsPass()
+    {
+        var reportPath = Path.Combine(Path.GetTempPath(), "SocialGraph.Api.Tests", $"{Guid.NewGuid():N}-qa-validation.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(reportPath)!);
+        await File.WriteAllTextAsync(
+            reportPath,
+            """
+            {
+              "metricSourceIssue": "GUI-92",
+              "observationWindowStart": "2026-04-20",
+              "observationWindowEnd": "2026-05-20",
+              "earliestCheckpointDate": "2026-05-20",
+              "preparedAt": "2026-05-20T09:00:00+02:00",
+              "evidenceNote": "Synthetic passing fixture for API regression coverage.",
+              "acknowledgementSlaPercent": 98.2,
+              "acknowledgementMetCount": 55,
+              "acknowledgementSampleCount": 56,
+              "completionSlaPercent": 94.6,
+              "completionMetCount": 53,
+              "completionSampleCount": 56,
+              "medianReviewBusinessHours": 6.5,
+              "medianDeliveryLeadTimeHours": 61.0,
+              "escapedDefectsCurrent30DayCount": 1,
+              "escapedDefectsPrior30DayCount": 2,
+              "missingFields": []
+            }
+            """);
+
+        using var factory = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+                builder.UseSetting("Storage:DataPath", Path.Combine(Path.GetTempPath(), "SocialGraph.Api.Tests", $"{Guid.NewGuid():N}.json"));
+                builder.UseSetting("QaValidation:ReportPath", reportPath);
+            });
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/cto/weekly-monitor/qa-model-a-validation");
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("\"overallStatus\":\"PASS\"", body, StringComparison.Ordinal);
+        Assert.Contains("\"recommendedDecision\":\"continue model A\"", body, StringComparison.Ordinal);
+        Assert.Contains("\"key\":\"delivery_lead_time_impact\"", body, StringComparison.Ordinal);
+        Assert.Contains("\"status\":\"PASS\"", body, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task List_FiltersByQuery()
     {
         var response = await _client.GetAsync("/api/entities?q=alp");
@@ -270,6 +330,8 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("<title>SocialGraph Workbench</title>", body, StringComparison.Ordinal);
         Assert.Contains("Entity Workbench", body, StringComparison.Ordinal);
+        Assert.Contains("Entity neighborhood summary", body, StringComparison.Ordinal);
+        Assert.Contains("Neighbor drilldown", body, StringComparison.Ordinal);
         Assert.Contains("Focused Exploration", body, StringComparison.Ordinal);
         Assert.Contains("Relationship Explorer", body, StringComparison.Ordinal);
         Assert.Contains("Global browse", body, StringComparison.Ordinal);
@@ -295,11 +357,15 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Contains(".graph-frame", stylesheetBody, StringComparison.Ordinal);
         Assert.Contains(".relationship-card.active", stylesheetBody, StringComparison.Ordinal);
         Assert.Contains(".filter-stack", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".node-shell.spotlight", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".chip-button.active", stylesheetBody, StringComparison.Ordinal);
 
         Assert.Equal(HttpStatusCode.OK, script.StatusCode);
         Assert.Contains("requestJson(\"/api/entities\")", scriptBody, StringComparison.Ordinal);
-        Assert.Contains("requestJson(`/api/relationship-edges${suffix}`)", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("requestJson(\"/api/relationship-edges\")", scriptBody, StringComparison.Ordinal);
         Assert.Contains("requestJson(`/api/graph${suffix}`)", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function getEntityMetrics(entityId)", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function getGraphSpotlight()", scriptBody, StringComparison.Ordinal);
         Assert.Contains("selectRelationship(link.id)", scriptBody, StringComparison.Ordinal);
         Assert.Contains("state.relationshipFilters.direction", scriptBody, StringComparison.Ordinal);
     }

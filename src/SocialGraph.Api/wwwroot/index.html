@@ -24,6 +24,26 @@
         <input id="entitySearch" type="search" placeholder="Filter by name">
       </label>
 
+      <section class="context-card">
+        <div class="context-card-header">
+          <div>
+            <span class="eyebrow">Entity neighborhood summary</span>
+            <h2 id="entitySummaryTitle">No entity selected</h2>
+          </div>
+          <span id="entitySummaryModeTag" class="tag">Full graph context</span>
+        </div>
+        <p id="entitySummaryText" class="muted">Select an entity to inspect incident counts, neighboring entities, and quick relationship filters.</p>
+        <div id="entityMetricGrid" class="metric-grid" aria-live="polite"></div>
+        <div class="inline-grid">
+          <span class="section-label">Neighbor drilldown</span>
+          <div id="entityNeighborList" class="chip-grid" aria-live="polite"></div>
+        </div>
+        <div class="inline-grid">
+          <span class="section-label">Incident relationship kinds</span>
+          <div id="entityKindChips" class="chip-grid" aria-live="polite"></div>
+        </div>
+      </section>
+
       <div id="entityList" class="entity-list" aria-live="polite"></div>
 
       <form id="entityForm" class="inline-grid">
@@ -59,6 +79,7 @@
         <div class="graph-meta">
           <span id="statusSummary">Loading graph…</span>
           <span id="focusTag" class="tag" hidden></span>
+          <span id="spotlightTag" class="tag" hidden></span>
         </div>
         <div class="actions">
           <button id="focusSelected" class="ghost" type="button" disabled>Focus selected</button>
