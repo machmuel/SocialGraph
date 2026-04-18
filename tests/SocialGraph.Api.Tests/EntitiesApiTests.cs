@@ -339,6 +339,9 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Contains("Direction", body, StringComparison.Ordinal);
         Assert.Contains("Relationship inspector", body, StringComparison.Ordinal);
         Assert.Contains("Clear selection", body, StringComparison.Ordinal);
+        Assert.Contains("Select a node or relationship to inspect it locally.", body, StringComparison.Ordinal);
+        Assert.Contains("aria-describedby=\"graphInteractionHint\"", body, StringComparison.Ordinal);
+        Assert.Contains("role=\"group\"", body, StringComparison.Ordinal);
         Assert.Contains("href=\"/app.css\"", body, StringComparison.Ordinal);
         Assert.Contains("src=\"/app.js\"", body, StringComparison.Ordinal);
         Assert.DoesNotContain("<style>", body, StringComparison.Ordinal);
@@ -359,6 +362,9 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Contains(".filter-stack", stylesheetBody, StringComparison.Ordinal);
         Assert.Contains(".node-shell.spotlight", stylesheetBody, StringComparison.Ordinal);
         Assert.Contains(".chip-button.active", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains("button:focus-visible", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".link-shell:focus-visible .link", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".node-shell:focus-visible .node-circle", stylesheetBody, StringComparison.Ordinal);
 
         Assert.Equal(HttpStatusCode.OK, script.StatusCode);
         Assert.Contains("requestJson(\"/api/entities\")", scriptBody, StringComparison.Ordinal);
@@ -368,6 +374,10 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Contains("function getGraphSpotlight()", scriptBody, StringComparison.Ordinal);
         Assert.Contains("selectRelationship(link.id)", scriptBody, StringComparison.Ordinal);
         Assert.Contains("state.relationshipFilters.direction", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("indicator.setAttribute(\"aria-hidden\", String(!value));", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function renderSelection()", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("state.selectedRelationship = state.relationships.find", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("text.textContent = edgeLabel;", scriptBody, StringComparison.Ordinal);
     }
 
     [Fact]

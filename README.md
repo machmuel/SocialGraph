@@ -64,11 +64,13 @@ The API host also serves an interactive single-page workbench at `/`. It loads e
 - inspect a relationship directly from the graph even when no entity is selected
 - create, edit, and delete relationship edges
 - focus the graph on a selected entity's one-hop neighborhood and reset back to the full graph
+- inspect entities and relationships locally without triggering a full workbench reload on every selection
 - spotlight matching nodes when entity search is active and emphasize matching edges when relationship filters are active without forcing a graph refetch
 - see relationship result counts and explicit empty states as filters change
 - see the selected relationship highlighted in both the inspector list and graph canvas
 - see a notice when a selected relationship is outside the currently focused graph
 - see inline loading and error states when API requests fail
+- see visible graph guidance for inspect-versus-focus behavior plus keyboard focus rings on interactive controls
 
 The workbench intentionally stays framework-free for this slice: the UI is delivered as static `wwwroot` assets with plain browser-side JavaScript.
 
@@ -100,12 +102,13 @@ Manual smoke flow:
 2. Open `/`.
 3. Browse all relationships with no entity selected and confirm the global list is populated.
 4. Confirm the entity list shows incident relationship counts before any entity is selected.
-5. Select an entity and confirm the summary card shows incoming, outgoing, total incident, and distinct neighbor counts.
-6. Click a neighbor from the summary card and confirm the workbench selects that entity; use the neighbor focus action and confirm the graph refetches into one-hop mode.
+5. Select an entity and confirm the summary card shows incoming, outgoing, total incident, and distinct neighbor counts without triggering global loading churn.
+6. Click a neighbor from the summary card and confirm the workbench selects that entity locally; use the neighbor focus action and confirm only the graph refetches into one-hop mode.
 7. Click an incident relationship kind chip and confirm the relationship explorer kind filter updates to match.
 8. Filter relationships by text and by kind, then confirm the result count and empty state update.
 9. Apply an entity search term and confirm matching nodes are spotlighted while non-matches are visually muted.
-10. Select a relationship from the filtered list, edit its kind or note, and confirm the persisted change survives refresh.
-11. Click a graph edge directly and confirm the inspector loads the same relationship.
+10. Select a relationship from the filtered list or graph and confirm the inspector updates immediately without a full workbench reload.
+11. Confirm the graph hint explains inspect versus focus behavior, including the visible Focus controls.
 12. Focus the graph on an entity, then inspect a relationship outside that focus and confirm the notice explains why it is not visible.
-13. Clear the relationship selection, create a new relationship edge, then delete it.
+13. Tab through buttons, inputs, selects, graph nodes, and graph links and confirm visible focus treatment is present.
+14. Clear the relationship selection, create a new relationship edge, then delete it.

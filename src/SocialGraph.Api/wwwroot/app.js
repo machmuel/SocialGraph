@@ -229,6 +229,7 @@ function setLoading(key, value) {
   const indicator = dom[`${key}Loading`];
   if (indicator) {
     indicator.hidden = !value;
+    indicator.setAttribute("aria-hidden", String(!value));
   }
 }
 
@@ -784,6 +785,11 @@ async function refreshAll() {
   }
 }
 
+function renderSelection() {
+  setError("");
+  render();
+}
+
 async function selectEntity(entityId) {
   state.selectedEntityId = entityId;
   state.selectedRelationshipId = null;
@@ -793,17 +799,28 @@ async function selectEntity(entityId) {
     dom.entityName.value = entity.name;
     dom.entityNote.value = entity.note;
   }
-  await refreshAll();
+  renderSelection();
 }
 
 async function selectRelationship(relationshipId) {
   state.selectedRelationshipId = relationshipId;
-  await refreshAll();
+  state.selectedRelationship = state.relationships.find(edge => edge.id === relationshipId) ?? null;
+  renderSelection();
 }
 
 async function focusGraph(entityId) {
+  const previousFocusedEntityId = state.focusedEntityId;
   state.focusedEntityId = entityId;
-  await refreshAll();
+  renderSelection();
+
+  try {
+    await loadGraph();
+    render();
+  } catch (error) {
+    state.focusedEntityId = previousFocusedEntityId;
+    setError(error instanceof Error ? error.message : "Unable to focus graph");
+    render();
+  }
 }
 
 async function submitEntity(event) {
@@ -837,9 +854,10 @@ async function submitEntity(event) {
 
 function clearEntitySelection() {
   state.selectedEntityId = null;
+  state.selectedRelationshipId = null;
+  state.selectedRelationship = null;
   dom.entityForm.reset();
   render();
-  refreshAll();
 }
 
 async function deleteSelectedEntity() {
@@ -940,8 +958,7 @@ async function clearRelationshipSelection() {
   state.selectedRelationship = null;
   dom.relationshipKind.value = "";
   dom.relationshipNote.value = "";
-  render();
-  await refreshAll();
+  renderSelection();
 }
 
 function clearRelationshipFilters() {
@@ -1065,7 +1082,7 @@ function appendLink(svg, source, target, link, spotlight) {
   text.setAttribute("class", "link-label");
   text.setAttribute("x", (source.x + target.x) / 2);
   text.setAttribute("y", (source.y + target.y) / 2 - 10);
-  text.textContent = link.label;
+  text.textContent = edgeLabel;
 
   group.append(line, hitbox, text);
   svg.appendChild(group);
@@ -1162,8 +1179,18 @@ dom.relationshipDelete.addEventListener("click", async () => {
 });
 dom.focusSelected.addEventListener("click", () => focusGraph(state.selectedEntityId));
 dom.showFullGraph.addEventListener("click", async () => {
+  const previousFocusedEntityId = state.focusedEntityId;
   state.focusedEntityId = null;
-  await refreshAll();
+  renderSelection();
+
+  try {
+    await loadGraph();
+    render();
+  } catch (error) {
+    state.focusedEntityId = previousFocusedEntityId;
+    setError(error instanceof Error ? error.message : "Unable to load full graph");
+    render();
+  }
 });
 dom.reloadAll.addEventListener("click", refreshAll);
 window.addEventListener("resize", () => renderGraph(state.graph));
