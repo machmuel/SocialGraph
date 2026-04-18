@@ -88,6 +88,10 @@ function normalizeText(value) {
   return (value || "").trim().toLowerCase();
 }
 
+function pluralize(count, singular, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 function relationshipMatchesText(edge, query) {
   if (!query) {
     return true;
@@ -329,7 +333,7 @@ function renderEntitySummary() {
 
       const meta = document.createElement("span");
       meta.className = "muted";
-      meta.textContent = `${neighbor.id} · ${neighbor.incidentCount} incident`;
+      meta.textContent = `${neighbor.id} · ${pluralize(neighbor.incidentCount, "incident")}`;
 
       const actions = document.createElement("div");
       actions.className = "actions";
@@ -403,7 +407,7 @@ function renderEntityList() {
 
     const count = document.createElement("span");
     count.className = "tag";
-    count.textContent = `${metrics.incidentCount} incident`;
+    count.textContent = pluralize(metrics.incidentCount, "incident");
 
     headingRow.append(heading, count);
 
@@ -420,7 +424,7 @@ function renderEntityList() {
 
     const neighborTag = document.createElement("span");
     neighborTag.className = "tag";
-    neighborTag.textContent = `${metrics.neighborCount} neighbors`;
+    neighborTag.textContent = pluralize(metrics.neighborCount, "neighbor");
 
     meta.append(idTag, neighborTag);
 
@@ -563,8 +567,8 @@ function renderRelationshipControls() {
 
   dom.relationshipModeTag.textContent = entity ? `Entity context: ${entity.name}` : "Global browse";
   dom.relationshipResultsSummary.textContent = entity
-    ? `${filteredRelationships.length} of ${scopedRelationships.length} incident relationships shown`
-    : `${filteredRelationships.length} of ${state.relationships.length} relationships shown`;
+    ? `${pluralize(filteredRelationships.length, "relationship")} shown of ${pluralize(scopedRelationships.length, "incident relationship")}`
+    : `${pluralize(filteredRelationships.length, "relationship")} shown of ${pluralize(state.relationships.length, "relationship")}`;
 
   if (relationship) {
     dom.relationshipInspectorMeta.textContent =
@@ -582,7 +586,7 @@ function renderRelationshipControls() {
 
   if (relationship && entity) {
     dom.selectionSummary.textContent =
-      `${entity.name} is selected. Filtering ${scopedRelationships.length} incident relationships and editing ${relationship.id}.`;
+      `${entity.name} is selected. Filtering ${pluralize(scopedRelationships.length, "incident relationship")} and editing ${relationship.id}.`;
   } else if (relationship) {
     dom.selectionSummary.textContent =
       `Global relationship browsing is active. Inspecting ${relationship.id} directly from the graph or filtered list.`;
@@ -843,6 +847,14 @@ async function deleteSelectedEntity() {
     return;
   }
 
+  const entity = selectedEntity();
+  const displayName = entity?.name || state.selectedEntityId;
+  const confirmed = window.confirm(
+    `Delete entity "${displayName}"? This also removes connected relationships.`);
+  if (!confirmed) {
+    return;
+  }
+
   setError("");
 
   try {
@@ -900,6 +912,15 @@ async function submitRelationship(event) {
 }
 
 async function deleteRelationship(id) {
+  const relationship = state.relationships.find(item => item.id === id);
+  const relationshipLabel = relationship
+    ? `${relationship.sourceEntityId} → ${relationship.targetEntityId} (${relationship.kind || "relationship"})`
+    : id;
+  const confirmed = window.confirm(`Delete relationship "${relationshipLabel}"?`);
+  if (!confirmed) {
+    return;
+  }
+
   setError("");
 
   try {
@@ -938,6 +959,18 @@ function appendEmpty(container, text) {
   empty.className = "empty";
   empty.textContent = text;
   container.appendChild(empty);
+}
+
+function makeInteractiveShell(element, label, activate) {
+  element.setAttribute("role", "button");
+  element.setAttribute("tabindex", "0");
+  element.setAttribute("aria-label", label);
+  element.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      activate();
+    }
+  });
 }
 
 function renderGraph(graph) {
@@ -994,6 +1027,11 @@ function renderGraph(graph) {
 function appendLink(svg, source, target, link, spotlight) {
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
   group.setAttribute("class", "link-shell");
+  const edgeLabel = link.label || "relationship";
+  makeInteractiveShell(
+    group,
+    `${edgeLabel} from ${source.label} to ${target.label}. Press Enter to inspect relationship.`,
+    () => selectRelationship(link.id));
   if (link.id === state.selectedRelationshipId) {
     group.classList.add("active");
   }
@@ -1004,9 +1042,9 @@ function appendLink(svg, source, target, link, spotlight) {
       group.classList.add("muted");
     }
   }
-  group.addEventListener("click", async event => {
+  group.addEventListener("click", event => {
     event.stopPropagation();
-    await selectRelationship(link.id);
+    selectRelationship(link.id);
   });
 
   const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -1036,6 +1074,16 @@ function appendLink(svg, source, target, link, spotlight) {
 function appendNode(svg, node, spotlight) {
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
   group.setAttribute("class", "node-shell");
+  makeInteractiveShell(
+    group,
+    `${node.label}. Press Enter to select. Press F to focus graph on this node.`,
+    () => selectEntity(node.id));
+  group.addEventListener("keydown", event => {
+    if (event.key.toLowerCase() === "f") {
+      event.preventDefault();
+      focusGraph(node.id);
+    }
+  });
   if (node.id === state.selectedEntityId || node.id === state.focusedEntityId) {
     group.classList.add("active");
   }

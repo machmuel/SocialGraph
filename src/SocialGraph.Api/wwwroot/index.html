@@ -87,9 +87,16 @@
           <button id="reloadAll" class="textual" type="button">Reload everything</button>
         </div>
       </div>
+      <p id="graphInteractionHint" class="muted">
+        Keyboard: Tab to graph nodes or links, Enter to inspect/select, and F to focus graph on a selected node.
+      </p>
 
       <div class="graph-frame">
-        <svg id="graph" role="img" aria-label="SocialGraph relationship graph"></svg>
+        <svg
+          id="graph"
+          role="img"
+          aria-label="SocialGraph relationship graph"
+          aria-describedby="graphInteractionHint"></svg>
       </div>
     </section>
 

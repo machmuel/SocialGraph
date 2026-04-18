@@ -57,6 +57,14 @@ button:disabled {
   transform: none;
 }
 
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(16, 109, 128, 0.38);
+  outline-offset: 2px;
+}
+
 button.ghost {
   background: rgba(16, 109, 128, 0.1);
   color: var(--accent-strong);
@@ -227,6 +235,11 @@ svg {
   transition: opacity 140ms ease;
 }
 
+.link-shell:focus-visible .link {
+  stroke: #0b5361;
+  stroke-width: 4;
+}
+
 .link-hitbox {
   stroke: transparent;
   stroke-width: 18;
@@ -264,6 +277,11 @@ svg {
 .node-shell {
   cursor: pointer;
   transition: opacity 140ms ease;
+}
+
+.node-shell:focus-visible .node-circle {
+  stroke: #0b5361;
+  stroke-width: 4.5;
 }
 
 .node-circle {
