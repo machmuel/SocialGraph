@@ -71,5 +71,9 @@ public sealed class JsonQaModelAValidationReportSource : IQaModelAValidationRepo
             null,
             null,
             null,
+            null,
+            null,
+            null,
+            null,
             ["qa_requested_at", "qa_acknowledged_at", "qa_completed_at", "lead_time_hours"]);
 }

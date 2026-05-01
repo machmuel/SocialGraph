@@ -45,10 +45,12 @@ Deleting an entity also removes any incident relationship edges in the same pers
 
 `GET /api/graph` returns a frontend-ready snapshot with `nodes` and `links`. Add `?entityId=alpha` to return only the selected entity, directly connected neighbors, and incident relationships. The API returns `404` for an unknown focus entity.
 
-`GET /api/cto/weekly-monitor/qa-model-a-validation` is the `GUI-92` checkpoint report path used by the day-30 QA Model A preflight. It reads from `assessment-v1/GUI92_QA_MODEL_A_VALIDATION_REPORT_SOURCE.json` by default and returns a structured `PASS`, `FAIL`, or `NO_READOUT` result using the frozen thresholds from the assessment docs. Override the source file with either:
+`GET /api/cto/weekly-monitor/qa-model-a-validation` is the `GUI-92` checkpoint report path used by the day-30 QA Model A preflight. It reads from `assessment-v1/GUI92_QA_MODEL_A_VALIDATION_REPORT_SOURCE.json` by default and returns a structured `PASS`, `FAIL`, or `NO_READOUT` result using the frozen thresholds from the assessment docs. The response carries both `recommendedDecision` and a top-level `explanation` so downstream consumers do not need to infer the rationale from `summary` or individual metric notes. Override the source file with either:
 
 - `SOCIALGRAPH_QA_VALIDATION_REPORT_PATH=/absolute/or/relative/path.json`
 - ASP.NET configuration key `QaValidation:ReportPath`
+
+Use `./scripts/run-gui92-checkpoint.sh` to execute the full build, test, local host startup, and checkpoint curl flow with the selected source artifact. The script blocks production-style scoring before the source reaches its `earliestCheckpointDate` unless `--allow-early-window` is passed for preflight validation.
 
 The API host also serves an interactive single-page workbench at `/`. It loads entities, relationship edges, and the graph snapshot directly from the API so an operator can:
 
@@ -63,13 +65,23 @@ The API host also serves an interactive single-page workbench at `/`. It loads e
 - create, edit, and delete entities
 - inspect a relationship directly from the graph even when no entity is selected
 - create, edit, and delete relationship edges
+- preview entity and relationship delete impact in-app instead of relying on browser confirm dialogs
+- undo a recent relationship delete by replaying the previous edge payload
+- undo a recent entity delete by replaying the entity plus its captured incident relationships
+- zoom in, zoom out, reset the graph view, and fit the current graph back into frame
+- drag empty graph space to pan without breaking node, relationship, or keyboard inspection
 - focus the graph on a selected entity's one-hop neighborhood and reset back to the full graph
 - inspect entities and relationships locally without triggering a full workbench reload on every selection
+- tab directly to entity and relationship cards instead of hunting for nested action buttons first
+- move through explorer cards with arrow keys and trigger primary inspection with Enter or Space
+- use `F` on a focused entity card to refetch the graph around that entity without leaving the explorer
 - spotlight matching nodes when entity search is active and emphasize matching edges when relationship filters are active without forcing a graph refetch
 - see relationship result counts and explicit empty states as filters change
 - see the selected relationship highlighted in both the inspector list and graph canvas
 - see a notice when a selected relationship is outside the currently focused graph
-- see inline loading and error states when API requests fail
+- reload or share the current browser URL and restore entity selection, focused one-hop mode, and active explorer filters when the referenced items still exist
+- clear stale deep-linked entity or relationship state softly when the dataset has changed instead of leaving the workbench broken
+- see inline loading, delete recovery, success, and error states when API requests fail or deletes are replayed
 - see visible graph guidance for inspect-versus-focus behavior plus keyboard focus rings on interactive controls
 
 The workbench intentionally stays framework-free for this slice: the UI is delivered as static `wwwroot` assets with plain browser-side JavaScript.
@@ -77,8 +89,8 @@ The workbench intentionally stays framework-free for this slice: the UI is deliv
 Current workbench asset layout:
 
 - `src/SocialGraph.Api/wwwroot/index.html`: page structure and static asset references
-- `src/SocialGraph.Api/wwwroot/app.css`: extracted workbench styles, neighborhood cards, and graph spotlight states
-- `src/SocialGraph.Api/wwwroot/app.js`: browser state, derived entity metrics, relationship filtering, and graph spotlight wiring
+- `src/SocialGraph.Api/wwwroot/app.css`: extracted workbench styles, neighborhood cards, graph spotlight states, delete recovery notices, and viewport affordances
+- `src/SocialGraph.Api/wwwroot/app.js`: browser state, derived entity metrics, relationship filtering, graph spotlight wiring, delete undo replay, and viewport controls
 
 ## Storage
 
@@ -111,4 +123,14 @@ Manual smoke flow:
 11. Confirm the graph hint explains inspect versus focus behavior, including the visible Focus controls.
 12. Focus the graph on an entity, then inspect a relationship outside that focus and confirm the notice explains why it is not visible.
 13. Tab through buttons, inputs, selects, graph nodes, and graph links and confirm visible focus treatment is present.
-14. Clear the relationship selection, create a new relationship edge, then delete it.
+14. Clear the relationship selection, create a new relationship edge, and confirm delete impact preview appears inside the workbench instead of using a browser modal.
+15. Delete that relationship, use the undo affordance, and confirm the edge returns to both the explorer and the graph.
+16. Delete an entity with at least one incident relationship, confirm the impact preview reports the cascade count, then use undo and verify the entity plus its incident relationships return.
+17. Use Zoom in, Zoom out, Reset view, and Fit graph and confirm the outer ring stays visible without clipping under a normal desktop viewport.
+18. Drag empty graph space to pan, then confirm node selection, relationship inspection, double-click focus, and `F` keyboard focus still work.
+19. Tab into the entity explorer, confirm each card receives focus directly, use arrow keys to move between cards, then press Enter or Space to update the selected entity locally.
+20. While an entity card is focused, press `F` and confirm the graph refetches to that entity's one-hop neighborhood.
+21. Tab into the relationship explorer, confirm each card receives focus directly, and use Enter or Space to inspect a relationship without changing the active filters.
+22. Apply an entity search term plus relationship filters, select an entity, focus the graph, reload the page, and confirm the same workbench context is restored from the URL.
+23. Copy the resulting URL into a fresh tab and confirm the same filtered or focused context reopens without adding noisy back-stack entries during normal interactions.
+24. Reopen a saved URL after removing the referenced entity or relationship from the dataset and confirm the workbench clears the stale deep link with a soft recovery notice instead of failing hard.

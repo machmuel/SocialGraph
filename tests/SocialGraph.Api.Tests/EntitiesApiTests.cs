@@ -35,8 +35,11 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("\"overallStatus\":\"NO_READOUT\"", body, StringComparison.Ordinal);
         Assert.Contains("\"recommendedDecision\":\"no readout - evidence incomplete\"", body, StringComparison.Ordinal);
+        Assert.Contains("\"explanation\":\"Checkpoint cannot be scored yet because Observation window is incomplete through 2026-04-29; earliest checkpoint date is 2026-05-20.\"", body, StringComparison.Ordinal);
         Assert.Contains("\"metricSourcePath\":\"/api/cto/weekly-monitor/qa-model-a-validation\"", body, StringComparison.Ordinal);
         Assert.Contains("Observation window is incomplete", body, StringComparison.Ordinal);
+        Assert.Contains("\"key\":\"instrumentation_completeness\"", body, StringComparison.Ordinal);
+        Assert.Contains("Required-fields sign-off: Senior SWE (GUI-194)", body, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -54,6 +57,10 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
               "earliestCheckpointDate": "2026-05-20",
               "preparedAt": "2026-05-20T09:00:00+02:00",
               "evidenceNote": "Synthetic passing fixture for API regression coverage.",
+              "requiredFieldsSignOffStatus": "complete",
+              "requiredFieldsSignOffBy": "Senior SWE (GUI-194)",
+              "requiredFieldsSignOffAt": "2026-05-20T09:00:00+02:00",
+              "requiredFieldsSignOffNote": "Synthetic sign-off for API regression coverage.",
               "acknowledgementSlaPercent": 98.2,
               "acknowledgementMetCount": 55,
               "acknowledgementSampleCount": 56,
@@ -82,6 +89,7 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("\"overallStatus\":\"PASS\"", body, StringComparison.Ordinal);
         Assert.Contains("\"recommendedDecision\":\"continue model A\"", body, StringComparison.Ordinal);
+        Assert.Contains("\"explanation\":\"All checkpoint thresholds passed and no data-quality blockers remain.\"", body, StringComparison.Ordinal);
         Assert.Contains("\"key\":\"delivery_lead_time_impact\"", body, StringComparison.Ordinal);
         Assert.Contains("\"status\":\"PASS\"", body, StringComparison.Ordinal);
     }
@@ -143,6 +151,30 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         var response = await _client.DeleteAsync("/api/entities/missing");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Delete_AllowsEntityAndIncidentRelationshipsToBeRecreated()
+    {
+        var delete = await _client.DeleteAsync("/api/entities/alpha");
+        Assert.Equal(HttpStatusCode.NoContent, delete.StatusCode);
+
+        var recreateEntity = await _client.PostAsJsonAsync("/api/entities", new { name = "Alpha", note = "Restored" });
+        var recreateEntityBody = await recreateEntity.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.Created, recreateEntity.StatusCode);
+        Assert.Contains("\"id\":\"alpha\"", recreateEntityBody, StringComparison.Ordinal);
+
+        var recreateRelationship = await _client.PostAsJsonAsync(
+            "/api/relationship-edges",
+            new { sourceEntityId = "alpha", targetEntityId = "beta", kind = "knows", note = "Restored edge" });
+        var recreateRelationshipBody = await recreateRelationship.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.Created, recreateRelationship.StatusCode);
+        Assert.Contains("\"id\":\"alpha-knows-beta\"", recreateRelationshipBody, StringComparison.Ordinal);
+
+        var detail = await _client.GetAsync("/api/relationship-edges/alpha-knows-beta");
+        var detailBody = await detail.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.OK, detail.StatusCode);
+        Assert.Contains("Restored edge", detailBody, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -276,6 +308,26 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
     }
 
     [Fact]
+    public async Task RelationshipEdges_Delete_AllowsRelationshipToBeRecreated()
+    {
+        var delete = await _client.DeleteAsync("/api/relationships/alpha-knows-beta");
+        Assert.Equal(HttpStatusCode.NoContent, delete.StatusCode);
+
+        var recreate = await _client.PostAsJsonAsync(
+            "/api/relationship-edges",
+            new { sourceEntityId = "alpha", targetEntityId = "beta", kind = "knows", note = "Restored relationship" });
+        var recreateBody = await recreate.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.Created, recreate.StatusCode);
+        Assert.Contains("\"id\":\"alpha-knows-beta\"", recreateBody, StringComparison.Ordinal);
+
+        var detail = await _client.GetAsync("/api/relationship-edges/alpha-knows-beta");
+        var detailBody = await detail.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.OK, detail.StatusCode);
+        Assert.Contains("Restored relationship", detailBody, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task GraphSnapshot_ReturnsSeededNodesAndLinks()
     {
         var response = await _client.GetAsync("/api/graph");
@@ -339,7 +391,20 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Contains("Direction", body, StringComparison.Ordinal);
         Assert.Contains("Relationship inspector", body, StringComparison.Ordinal);
         Assert.Contains("Clear selection", body, StringComparison.Ordinal);
+        Assert.Contains("Delete impact preview", body, StringComparison.Ordinal);
+        Assert.Contains("Confirm delete", body, StringComparison.Ordinal);
+        Assert.Contains("Recovery window", body, StringComparison.Ordinal);
+        Assert.Contains("Undo delete", body, StringComparison.Ordinal);
+        Assert.Contains("Zoom in", body, StringComparison.Ordinal);
+        Assert.Contains("Zoom out", body, StringComparison.Ordinal);
+        Assert.Contains("Reset view", body, StringComparison.Ordinal);
+        Assert.Contains("Fit graph", body, StringComparison.Ordinal);
+        Assert.Contains("Keyboard: Tab to an entity card", body, StringComparison.Ordinal);
+        Assert.Contains("Keyboard: Tab to a relationship card", body, StringComparison.Ordinal);
+        Assert.Contains("Drag empty graph space to pan.", body, StringComparison.Ordinal);
         Assert.Contains("Select a node or relationship to inspect it locally.", body, StringComparison.Ordinal);
+        Assert.Contains("aria-describedby=\"entityExplorerHint\"", body, StringComparison.Ordinal);
+        Assert.Contains("aria-describedby=\"relationshipExplorerHint\"", body, StringComparison.Ordinal);
         Assert.Contains("aria-describedby=\"graphInteractionHint\"", body, StringComparison.Ordinal);
         Assert.Contains("role=\"group\"", body, StringComparison.Ordinal);
         Assert.Contains("href=\"/app.css\"", body, StringComparison.Ordinal);
@@ -361,6 +426,13 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Contains(".relationship-card.active", stylesheetBody, StringComparison.Ordinal);
         Assert.Contains(".filter-stack", stylesheetBody, StringComparison.Ordinal);
         Assert.Contains(".node-shell.spotlight", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".confirm-card", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".undo-card", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".graph-frame.pannable", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".graph-surface", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".explorer-card:focus-visible", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".entity-card.active:focus-visible", stylesheetBody, StringComparison.Ordinal);
+        Assert.Contains(".explorer-hint", stylesheetBody, StringComparison.Ordinal);
         Assert.Contains(".chip-button.active", stylesheetBody, StringComparison.Ordinal);
         Assert.Contains("button:focus-visible", stylesheetBody, StringComparison.Ordinal);
         Assert.Contains(".link-shell:focus-visible .link", stylesheetBody, StringComparison.Ordinal);
@@ -372,12 +444,24 @@ public sealed class EntitiesApiTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Contains("requestJson(`/api/graph${suffix}`)", scriptBody, StringComparison.Ordinal);
         Assert.Contains("function getEntityMetrics(entityId)", scriptBody, StringComparison.Ordinal);
         Assert.Contains("function getGraphSpotlight()", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function queueEntityDelete()", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function restoreDeletedItem()", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function fitViewportToGraph(bounds, width, height)", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function beginGraphPan(event)", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function handleExplorerCardKeydown(event, options)", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function moveExplorerFocus(listType, itemId, direction)", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function readWorkbenchStateFromUrl()", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("function writeWorkbenchStateToUrl()", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("window.history.replaceState(null, \"\", nextUrl);", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("Saved relationship selection was cleared because it is outside the restored filters.", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("Press Enter or Space to select. Press F to focus the graph.", scriptBody, StringComparison.Ordinal);
         Assert.Contains("selectRelationship(link.id)", scriptBody, StringComparison.Ordinal);
         Assert.Contains("state.relationshipFilters.direction", scriptBody, StringComparison.Ordinal);
         Assert.Contains("indicator.setAttribute(\"aria-hidden\", String(!value));", scriptBody, StringComparison.Ordinal);
         Assert.Contains("function renderSelection()", scriptBody, StringComparison.Ordinal);
         Assert.Contains("state.selectedRelationship = state.relationships.find", scriptBody, StringComparison.Ordinal);
         Assert.Contains("text.textContent = edgeLabel;", scriptBody, StringComparison.Ordinal);
+        Assert.Contains("dom.graphZoomIn.addEventListener(\"click\", () => zoomGraph(0.18));", scriptBody, StringComparison.Ordinal);
     }
 
     [Fact]

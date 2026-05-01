@@ -3,6 +3,7 @@ namespace SocialGraph.Application.Contracts;
 public sealed record QaModelAValidationReportDto(
     string OverallStatus,
     string RecommendedDecision,
+    string Explanation,
     string MetricSourceIssue,
     string MetricSourcePath,
     DateOnly ObservationWindowStart,

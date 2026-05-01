@@ -12,12 +12,37 @@ const state = {
   selectedRelationshipId: null,
   selectedRelationship: null,
   focusedEntityId: null,
+  pendingDelete: null,
+  undoAction: null,
+  undoTimerId: null,
+  activityMessage: "",
+  viewport: {
+    scale: 1,
+    minScale: 0.55,
+    maxScale: 2.4,
+    translateX: 0,
+    translateY: 0,
+    pointerId: null,
+    dragStartX: 0,
+    dragStartY: 0,
+    originX: 0,
+    originY: 0,
+    didPan: false,
+    graphSignature: "",
+    needsFit: true
+  },
   loading: {
     entities: false,
     relationships: false,
     graph: false
   },
   error: ""
+};
+
+const urlState = {
+  hydrated: false,
+  suppressSync: false,
+  pendingNotice: ""
 };
 
 const dom = {
@@ -40,7 +65,23 @@ const dom = {
   focusTag: document.getElementById("focusTag"),
   spotlightTag: document.getElementById("spotlightTag"),
   errorBanner: document.getElementById("errorBanner"),
+  activityBanner: document.getElementById("activityBanner"),
+  deleteConfirm: document.getElementById("deleteConfirm"),
+  deleteConfirmTitle: document.getElementById("deleteConfirmTitle"),
+  deleteConfirmBody: document.getElementById("deleteConfirmBody"),
+  deleteConfirmSubmit: document.getElementById("deleteConfirmSubmit"),
+  deleteConfirmCancel: document.getElementById("deleteConfirmCancel"),
+  undoBanner: document.getElementById("undoBanner"),
+  undoBannerTitle: document.getElementById("undoBannerTitle"),
+  undoBannerBody: document.getElementById("undoBannerBody"),
+  undoBannerAction: document.getElementById("undoBannerAction"),
+  undoBannerDismiss: document.getElementById("undoBannerDismiss"),
+  graphFrame: document.getElementById("graphFrame"),
   graph: document.getElementById("graph"),
+  graphZoomIn: document.getElementById("graphZoomIn"),
+  graphZoomOut: document.getElementById("graphZoomOut"),
+  graphResetView: document.getElementById("graphResetView"),
+  graphFitView: document.getElementById("graphFitView"),
   entitySearch: document.getElementById("entitySearch"),
   entityForm: document.getElementById("entityForm"),
   entityFormTitle: document.getElementById("entityFormTitle"),
@@ -68,6 +109,16 @@ const dom = {
   graphLoading: document.getElementById("graphLoading")
 };
 
+const URL_STATE_KEYS = {
+  selectedEntityId: "entity",
+  selectedRelationshipId: "relationship",
+  focusedEntityId: "focus",
+  entitySearch: "q",
+  relationshipSearch: "relq",
+  relationshipKind: "relkind",
+  relationshipDirection: "reldir"
+};
+
 function selectedEntity() {
   return state.entities.find(entity => entity.id === state.selectedEntityId) ?? null;
 }
@@ -82,6 +133,24 @@ function selectedRelationship() {
 
 function relationshipMode() {
   return state.selectedEntityId ? "entity" : "global";
+}
+
+function copyEntity(entity) {
+  return entity
+    ? { id: entity.id, name: entity.name, note: entity.note || "" }
+    : null;
+}
+
+function copyRelationship(edge) {
+  return edge
+    ? {
+      id: edge.id,
+      sourceEntityId: edge.sourceEntityId,
+      targetEntityId: edge.targetEntityId,
+      kind: edge.kind,
+      note: edge.note || ""
+    }
+    : null;
 }
 
 function normalizeText(value) {
@@ -218,10 +287,169 @@ function getGraphSpotlight() {
   };
 }
 
+function describeRelationship(edge) {
+  return `${edge.sourceEntityId} -> ${edge.targetEntityId} (${edge.kind || "relationship"})`;
+}
+
+function findRelationshipByIdentity(sourceEntityId, targetEntityId, kind) {
+  return state.relationships.find(edge =>
+    edge.sourceEntityId === sourceEntityId &&
+    edge.targetEntityId === targetEntityId &&
+    edge.kind === kind) ?? null;
+}
+
 function setError(message) {
   state.error = message || "";
   dom.errorBanner.hidden = !state.error;
   dom.errorBanner.textContent = state.error;
+}
+
+function setActivityMessage(message) {
+  state.activityMessage = message || "";
+  dom.activityBanner.hidden = !state.activityMessage;
+  dom.activityBanner.textContent = state.activityMessage;
+}
+
+function clearUndoTimer() {
+  if (state.undoTimerId) {
+    window.clearTimeout(state.undoTimerId);
+    state.undoTimerId = null;
+  }
+}
+
+function setUndoAction(action) {
+  clearUndoTimer();
+  state.undoAction = action;
+  if (!action) {
+    return;
+  }
+
+  state.undoTimerId = window.setTimeout(() => {
+    state.undoAction = null;
+    state.undoTimerId = null;
+    render();
+  }, 12000);
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function roundViewportValue(value) {
+  return Math.round(value * 1000) / 1000;
+}
+
+function getGraphSignature(graph) {
+  return JSON.stringify({
+    nodes: graph.nodes.map(node => node.id),
+    links: graph.links.map(link => link.id)
+  });
+}
+
+function getViewportScale() {
+  return clamp(state.viewport.scale, state.viewport.minScale, state.viewport.maxScale);
+}
+
+function setViewportScale(nextScale, anchorX, anchorY) {
+  const viewport = state.viewport;
+  const currentScale = getViewportScale();
+  const targetScale = clamp(nextScale, viewport.minScale, viewport.maxScale);
+  if (Math.abs(targetScale - currentScale) < 0.001) {
+    return false;
+  }
+
+  const frame = dom.graphFrame.getBoundingClientRect();
+  const focusX = anchorX ?? frame.width / 2;
+  const focusY = anchorY ?? frame.height / 2;
+
+  viewport.translateX = focusX - ((focusX - viewport.translateX) * (targetScale / currentScale));
+  viewport.translateY = focusY - ((focusY - viewport.translateY) * (targetScale / currentScale));
+  viewport.scale = roundViewportValue(targetScale);
+  return true;
+}
+
+function getGraphBounds(nodes) {
+  if (!nodes.length) {
+    return { minX: 0, minY: 0, maxX: 0, maxY: 0, width: 0, height: 0 };
+  }
+
+  const paddingX = 104;
+  const paddingTop = 98;
+  const paddingBottom = 76;
+  const xs = [];
+  const ys = [];
+
+  for (const node of nodes) {
+    xs.push(node.x - paddingX, node.x + paddingX);
+    ys.push(node.y - paddingTop, node.y + paddingBottom);
+  }
+
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: maxX - minX,
+    height: maxY - minY
+  };
+}
+
+function fitViewportToGraph(bounds, width, height) {
+  const viewport = state.viewport;
+  if (!bounds.width || !bounds.height) {
+    viewport.scale = 1;
+    viewport.translateX = 0;
+    viewport.translateY = 0;
+    viewport.needsFit = false;
+    return;
+  }
+
+  const padding = 32;
+  const availableWidth = Math.max(120, width - padding * 2);
+  const availableHeight = Math.max(120, height - padding * 2);
+  const scale = clamp(
+    Math.min(availableWidth / bounds.width, availableHeight / bounds.height),
+    viewport.minScale,
+    viewport.maxScale
+  );
+
+  const centerX = bounds.minX + bounds.width / 2;
+  const centerY = bounds.minY + bounds.height / 2;
+
+  viewport.scale = roundViewportValue(scale);
+  viewport.translateX = roundViewportValue(width / 2 - centerX * viewport.scale);
+  viewport.translateY = roundViewportValue(height / 2 - centerY * viewport.scale);
+  viewport.needsFit = false;
+}
+
+function resetViewport(width, height, bounds) {
+  const viewport = state.viewport;
+  viewport.scale = 1;
+  if (bounds?.width && bounds?.height) {
+    const centerX = bounds.minX + bounds.width / 2;
+    const centerY = bounds.minY + bounds.height / 2;
+    viewport.translateX = roundViewportValue(width / 2 - centerX);
+    viewport.translateY = roundViewportValue(height / 2 - centerY);
+  } else {
+    viewport.translateX = 0;
+    viewport.translateY = 0;
+  }
+  viewport.needsFit = false;
+}
+
+function cancelPan() {
+  const viewport = state.viewport;
+  if (viewport.pointerId !== null && dom.graph.hasPointerCapture?.(viewport.pointerId)) {
+    dom.graph.releasePointerCapture(viewport.pointerId);
+  }
+  viewport.pointerId = null;
+  viewport.didPan = false;
+  dom.graphFrame.classList.remove("is-panning");
 }
 
 function setLoading(key, value) {
@@ -258,7 +486,147 @@ async function requestJson(url, options) {
   return response.json();
 }
 
+function readWorkbenchStateFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    selectedEntityId: params.get(URL_STATE_KEYS.selectedEntityId),
+    selectedRelationshipId: params.get(URL_STATE_KEYS.selectedRelationshipId),
+    focusedEntityId: params.get(URL_STATE_KEYS.focusedEntityId),
+    searchQuery: params.get(URL_STATE_KEYS.entitySearch) ?? "",
+    relationshipText: params.get(URL_STATE_KEYS.relationshipSearch) ?? "",
+    relationshipKind: params.get(URL_STATE_KEYS.relationshipKind) ?? "",
+    relationshipDirection: params.get(URL_STATE_KEYS.relationshipDirection) ?? "all"
+  };
+}
+
+function writeWorkbenchStateToUrl() {
+  if (urlState.suppressSync) {
+    return;
+  }
+
+  const params = new URLSearchParams();
+  if (state.selectedEntityId) {
+    params.set(URL_STATE_KEYS.selectedEntityId, state.selectedEntityId);
+  }
+  if (state.selectedRelationshipId) {
+    params.set(URL_STATE_KEYS.selectedRelationshipId, state.selectedRelationshipId);
+  }
+  if (state.focusedEntityId) {
+    params.set(URL_STATE_KEYS.focusedEntityId, state.focusedEntityId);
+  }
+  if (state.searchQuery.trim()) {
+    params.set(URL_STATE_KEYS.entitySearch, state.searchQuery.trim());
+  }
+  if (state.relationshipFilters.text.trim()) {
+    params.set(URL_STATE_KEYS.relationshipSearch, state.relationshipFilters.text.trim());
+  }
+  if (state.relationshipFilters.kind) {
+    params.set(URL_STATE_KEYS.relationshipKind, state.relationshipFilters.kind);
+  }
+  if (state.selectedEntityId && state.relationshipFilters.direction !== "all") {
+    params.set(URL_STATE_KEYS.relationshipDirection, state.relationshipFilters.direction);
+  }
+
+  const nextQuery = params.toString();
+  const nextUrl = nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname;
+  const currentUrl = `${window.location.pathname}${window.location.search}`;
+  if (nextUrl !== currentUrl) {
+    window.history.replaceState(null, "", nextUrl);
+  }
+}
+
+function applyUrlStateToInputs() {
+  dom.entitySearch.value = state.searchQuery;
+  dom.relationshipSearch.value = state.relationshipFilters.text;
+  dom.relationshipDirectionFilter.value = state.relationshipFilters.direction;
+}
+
+function queueUrlStateNotice(message) {
+  if (!message) {
+    return;
+  }
+
+  urlState.pendingNotice = urlState.pendingNotice
+    ? `${urlState.pendingNotice} ${message}`
+    : message;
+}
+
+function hydrateWorkbenchStateFromUrl() {
+  if (urlState.hydrated) {
+    return;
+  }
+
+  const snapshot = readWorkbenchStateFromUrl();
+  state.selectedEntityId = snapshot.selectedEntityId || null;
+  state.selectedRelationshipId = snapshot.selectedRelationshipId || null;
+  state.focusedEntityId = snapshot.focusedEntityId || null;
+  state.searchQuery = snapshot.searchQuery;
+  state.relationshipFilters.text = snapshot.relationshipText;
+  state.relationshipFilters.kind = snapshot.relationshipKind;
+  state.relationshipFilters.direction =
+    ["all", "incoming", "outgoing"].includes(snapshot.relationshipDirection)
+      ? snapshot.relationshipDirection
+      : "all";
+  applyUrlStateToInputs();
+  urlState.hydrated = true;
+}
+
+function reconcileWorkbenchStateAfterLoad() {
+  const entityIds = new Set(state.entities.map(entity => entity.id));
+  const relationshipIds = new Set(state.relationships.map(edge => edge.id));
+
+  if (state.selectedEntityId && !entityIds.has(state.selectedEntityId)) {
+    state.selectedEntityId = null;
+    queueUrlStateNotice("Saved entity selection was cleared because it no longer exists.");
+  }
+
+  if (state.focusedEntityId && !entityIds.has(state.focusedEntityId)) {
+    state.focusedEntityId = null;
+    queueUrlStateNotice("Saved graph focus was cleared because that entity is no longer available.");
+  }
+
+  if (!state.selectedEntityId) {
+    state.relationshipFilters.direction = "all";
+  }
+
+  const availableKinds = new Set(getScopedRelationships().map(edge => edge.kind).filter(Boolean));
+  if (state.relationshipFilters.kind && !availableKinds.has(state.relationshipFilters.kind)) {
+    state.relationshipFilters.kind = "";
+    queueUrlStateNotice("Saved relationship kind filter was cleared because it no longer matches the active result set.");
+  }
+
+  if (state.selectedRelationshipId && !relationshipIds.has(state.selectedRelationshipId)) {
+    state.selectedRelationshipId = null;
+    state.selectedRelationship = null;
+    queueUrlStateNotice("Saved relationship selection was cleared because it no longer exists.");
+  } else if (state.selectedRelationshipId) {
+    const restoredRelationship = state.relationships.find(edge => edge.id === state.selectedRelationshipId) ?? null;
+    state.selectedRelationship = restoredRelationship;
+    const visibleRelationshipIds = new Set(getFilteredRelationships().map(edge => edge.id));
+    if (!visibleRelationshipIds.has(state.selectedRelationshipId)) {
+      state.selectedRelationshipId = null;
+      state.selectedRelationship = null;
+      queueUrlStateNotice("Saved relationship selection was cleared because it is outside the restored filters.");
+    }
+  } else {
+    state.selectedRelationship = null;
+  }
+
+  applyUrlStateToInputs();
+}
+
+function flushUrlStateNotice() {
+  if (!urlState.pendingNotice) {
+    return;
+  }
+
+  setActivityMessage(urlState.pendingNotice);
+  urlState.pendingNotice = "";
+}
+
 function render() {
+  renderDeleteConfirm();
+  renderUndoBanner();
   renderEntitySummary();
   renderEntityList();
   renderEntityForm();
@@ -266,6 +634,31 @@ function render() {
   renderRelationshipList();
   renderGraphMeta();
   renderGraph(state.graph);
+  writeWorkbenchStateToUrl();
+}
+
+function renderDeleteConfirm() {
+  const pendingDelete = state.pendingDelete;
+  dom.deleteConfirm.hidden = !pendingDelete;
+  if (!pendingDelete) {
+    return;
+  }
+
+  dom.deleteConfirmTitle.textContent = pendingDelete.title;
+  dom.deleteConfirmBody.textContent = pendingDelete.body;
+  dom.deleteConfirmSubmit.textContent = pendingDelete.confirmLabel;
+}
+
+function renderUndoBanner() {
+  const undoAction = state.undoAction;
+  dom.undoBanner.hidden = !undoAction;
+  if (!undoAction) {
+    return;
+  }
+
+  dom.undoBannerTitle.textContent = undoAction.title;
+  dom.undoBannerBody.textContent = undoAction.body;
+  dom.undoBannerAction.textContent = undoAction.actionLabel;
 }
 
 function renderEntitySummary() {
@@ -395,10 +788,30 @@ function renderEntityList() {
   for (const entity of entities) {
     const metrics = getEntityMetrics(entity.id);
     const card = document.createElement("article");
-    card.className = "entity-card";
+    card.className = "entity-card explorer-card";
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-describedby", "entityExplorerHint");
+    card.setAttribute("aria-label", `${entity.name}. Press Enter or Space to select. Press F to focus the graph.`);
+    card.setAttribute("aria-pressed", String(entity.id === state.selectedEntityId));
+    card.dataset.explorerCard = "entity";
+    card.dataset.entityId = entity.id;
     if (entity.id === state.selectedEntityId) {
       card.classList.add("active");
     }
+    card.addEventListener("click", event => {
+      if (shouldIgnoreExplorerCardActivation(event)) {
+        return;
+      }
+
+      selectEntity(entity.id);
+    });
+    card.addEventListener("keydown", event => handleExplorerCardKeydown(event, {
+      listType: "entity",
+      itemId: entity.id,
+      activate: () => selectEntity(entity.id),
+      alternateActivate: () => focusGraph(entity.id)
+    }));
 
     const headingRow = document.createElement("div");
     headingRow.className = "entity-row";
@@ -625,11 +1038,32 @@ function renderRelationshipList() {
 
   for (const edge of edges) {
     const card = document.createElement("article");
-    card.className = "relationship-card";
+    card.className = "relationship-card explorer-card";
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-describedby", "relationshipExplorerHint");
+    card.setAttribute(
+      "aria-label",
+      `${edge.sourceEntityId} to ${edge.targetEntityId} (${edge.kind}). Press Enter or Space to inspect.`
+    );
+    card.setAttribute("aria-pressed", String(edge.id === state.selectedRelationshipId));
+    card.dataset.explorerCard = "relationship";
+    card.dataset.relationshipId = edge.id;
     if (edge.id === state.selectedRelationshipId) {
       card.classList.add("active");
     }
-    card.addEventListener("click", () => selectRelationship(edge.id));
+    card.addEventListener("click", event => {
+      if (shouldIgnoreExplorerCardActivation(event)) {
+        return;
+      }
+
+      selectRelationship(edge.id);
+    });
+    card.addEventListener("keydown", event => handleExplorerCardKeydown(event, {
+      listType: "relationship",
+      itemId: edge.id,
+      activate: () => selectRelationship(edge.id)
+    }));
 
     const row = document.createElement("div");
     row.className = "relationship-row";
@@ -678,7 +1112,7 @@ function renderRelationshipList() {
     deleteButton.textContent = "Delete";
     deleteButton.addEventListener("click", event => {
       event.stopPropagation();
-      deleteRelationship(edge.id);
+      queueRelationshipDelete(edge.id);
     });
 
     actions.append(selectButton, focusButton, deleteButton);
@@ -776,12 +1210,21 @@ async function loadGraph() {
 async function refreshAll() {
   setError("");
   try {
+    urlState.suppressSync = true;
+    hydrateWorkbenchStateFromUrl();
     await loadEntities();
-    await Promise.all([loadRelationships(), loadGraph(), loadSelectedRelationship()]);
+    await loadRelationships();
+    reconcileWorkbenchStateAfterLoad();
+    await loadGraph();
+    await loadSelectedRelationship();
+    flushUrlStateNotice();
     render();
   } catch (error) {
     setError(error instanceof Error ? error.message : "Unable to refresh the workbench");
     render();
+  } finally {
+    urlState.suppressSync = false;
+    writeWorkbenchStateToUrl();
   }
 }
 
@@ -791,6 +1234,7 @@ function renderSelection() {
 }
 
 async function selectEntity(entityId) {
+  state.pendingDelete = null;
   state.selectedEntityId = entityId;
   state.selectedRelationshipId = null;
   state.selectedRelationship = null;
@@ -803,12 +1247,14 @@ async function selectEntity(entityId) {
 }
 
 async function selectRelationship(relationshipId) {
+  state.pendingDelete = null;
   state.selectedRelationshipId = relationshipId;
   state.selectedRelationship = state.relationships.find(edge => edge.id === relationshipId) ?? null;
   renderSelection();
 }
 
 async function focusGraph(entityId) {
+  state.pendingDelete = null;
   const previousFocusedEntityId = state.focusedEntityId;
   state.focusedEntityId = entityId;
   renderSelection();
@@ -825,7 +1271,9 @@ async function focusGraph(entityId) {
 
 async function submitEntity(event) {
   event.preventDefault();
+  state.pendingDelete = null;
   setError("");
+  setActivityMessage("");
 
   const payload = {
     name: dom.entityName.value.trim(),
@@ -853,6 +1301,7 @@ async function submitEntity(event) {
 }
 
 function clearEntitySelection() {
+  state.pendingDelete = null;
   state.selectedEntityId = null;
   state.selectedRelationshipId = null;
   state.selectedRelationship = null;
@@ -860,44 +1309,286 @@ function clearEntitySelection() {
   render();
 }
 
-async function deleteSelectedEntity() {
+function queueEntityDelete() {
   if (!state.selectedEntityId) {
     return;
   }
 
   const entity = selectedEntity();
-  const displayName = entity?.name || state.selectedEntityId;
-  const confirmed = window.confirm(
-    `Delete entity "${displayName}"? This also removes connected relationships.`);
-  if (!confirmed) {
+  if (!entity) {
+    return;
+  }
+
+  const incidentRelationships = getIncidentRelationships(entity.id).map(copyRelationship);
+  state.pendingDelete = {
+    type: "entity",
+    title: `Delete entity ${entity.name}?`,
+    body:
+      `${entity.name} will be removed together with ${pluralize(incidentRelationships.length, "incident relationship")}. ` +
+      "Undo remains available for a short recovery window.",
+    confirmLabel: "Delete entity",
+    snapshot: {
+      entity: copyEntity(entity),
+      incidentRelationships,
+      wasFocused: state.focusedEntityId === entity.id
+    }
+  };
+  render();
+}
+
+function queueRelationshipDelete(id) {
+  const relationship = state.relationships.find(item => item.id === id);
+  if (!relationship) {
+    return;
+  }
+
+  state.pendingDelete = {
+    type: "relationship",
+    title: "Delete relationship?",
+    body:
+      `${describeRelationship(relationship)} will be removed from the explorer and graph. ` +
+      "Undo remains available for a short recovery window.",
+    confirmLabel: "Delete relationship",
+    snapshot: {
+      relationship: copyRelationship(relationship)
+    }
+  };
+  render();
+}
+
+async function confirmPendingDelete() {
+  if (!state.pendingDelete) {
     return;
   }
 
   setError("");
+  setActivityMessage("");
 
   try {
-    await requestJson(`/api/entities/${encodeURIComponent(state.selectedEntityId)}`, { method: "DELETE" });
-    if (state.focusedEntityId === state.selectedEntityId) {
-      state.focusedEntityId = null;
+    if (state.pendingDelete.type === "entity") {
+      await confirmEntityDelete(state.pendingDelete.snapshot);
+    } else {
+      await confirmRelationshipDelete(state.pendingDelete.snapshot);
     }
-    const relationship = selectedRelationship();
-    if (relationship &&
-      (relationship.sourceEntityId === state.selectedEntityId ||
-        relationship.targetEntityId === state.selectedEntityId)) {
-      state.selectedRelationshipId = null;
-      state.selectedRelationship = null;
+  } catch (error) {
+    setError(error instanceof Error ? error.message : "Unable to delete selection");
+  } finally {
+    state.pendingDelete = null;
+    render();
+  }
+}
+
+async function confirmEntityDelete(snapshot) {
+  await requestJson(`/api/entities/${encodeURIComponent(snapshot.entity.id)}`, { method: "DELETE" });
+  if (state.focusedEntityId === snapshot.entity.id) {
+    state.focusedEntityId = null;
+  }
+
+  const relationship = selectedRelationship();
+  if (relationship &&
+    (relationship.sourceEntityId === snapshot.entity.id ||
+      relationship.targetEntityId === snapshot.entity.id)) {
+    state.selectedRelationshipId = null;
+    state.selectedRelationship = null;
+  }
+
+  state.selectedEntityId = null;
+  dom.entityForm.reset();
+  setActivityMessage(
+    `Deleted ${snapshot.entity.name} and ${pluralize(snapshot.incidentRelationships.length, "incident relationship")}.`);
+  setUndoAction({
+    type: "entity",
+    title: `Deleted entity ${snapshot.entity.name}`,
+    body: `${pluralize(snapshot.incidentRelationships.length, "incident relationship")} can be restored briefly.`,
+    actionLabel: "Undo entity delete",
+    snapshot
+  });
+  await refreshAll();
+}
+
+async function confirmRelationshipDelete(snapshot) {
+  await requestJson(`/api/relationship-edges/${encodeURIComponent(snapshot.relationship.id)}`, { method: "DELETE" });
+  if (state.selectedRelationshipId === snapshot.relationship.id) {
+    state.selectedRelationshipId = null;
+    state.selectedRelationship = null;
+  }
+
+  setActivityMessage(`Deleted relationship ${describeRelationship(snapshot.relationship)}.`);
+  setUndoAction({
+    type: "relationship",
+    title: "Deleted relationship",
+    body: `${describeRelationship(snapshot.relationship)} can be restored briefly.`,
+    actionLabel: "Undo relationship delete",
+    snapshot
+  });
+  await refreshAll();
+}
+
+function wasConflict(error) {
+  return error instanceof Error && error.message.startsWith("409 ");
+}
+
+async function restoreDeletedItem() {
+  if (!state.undoAction) {
+    return;
+  }
+
+  setError("");
+  setActivityMessage("");
+
+  try {
+    if (state.undoAction.type === "relationship") {
+      await restoreRelationship(state.undoAction.snapshot);
+    } else {
+      await restoreEntity(state.undoAction.snapshot);
     }
-    state.selectedEntityId = null;
-    dom.entityForm.reset();
+
+    clearUndoTimer();
+    state.undoAction = null;
     await refreshAll();
   } catch (error) {
-    setError(error instanceof Error ? error.message : "Unable to delete entity");
+    setError(error instanceof Error ? error.message : "Unable to restore deleted item");
+    render();
   }
+}
+
+async function restoreRelationship(snapshot) {
+  const existing = findRelationshipByIdentity(
+    snapshot.relationship.sourceEntityId,
+    snapshot.relationship.targetEntityId,
+    snapshot.relationship.kind);
+
+  if (existing) {
+    state.selectedEntityId = existing.sourceEntityId;
+    state.selectedRelationshipId = existing.id;
+    state.selectedRelationship = existing;
+    setActivityMessage(`Relationship ${describeRelationship(existing)} was already present.`);
+    return;
+  }
+
+  let restored;
+  try {
+    restored = await requestJson("/api/relationship-edges", {
+      method: "POST",
+      body: JSON.stringify({
+        sourceEntityId: snapshot.relationship.sourceEntityId,
+        targetEntityId: snapshot.relationship.targetEntityId,
+        kind: snapshot.relationship.kind,
+        note: snapshot.relationship.note
+      })
+    });
+  } catch (error) {
+    if (!wasConflict(error)) {
+      throw error;
+    }
+
+    restored = {
+      id: snapshot.relationship.id,
+      sourceEntityId: snapshot.relationship.sourceEntityId,
+      targetEntityId: snapshot.relationship.targetEntityId,
+      kind: snapshot.relationship.kind,
+      note: snapshot.relationship.note
+    };
+  }
+
+  state.selectedEntityId = restored.sourceEntityId;
+  state.selectedRelationshipId = restored.id;
+  state.selectedRelationship = restored;
+  setActivityMessage(`Restored relationship ${describeRelationship(restored)}.`);
+}
+
+async function restoreEntity(snapshot) {
+  let restoredEntity = state.entities.find(entity => entity.id === snapshot.entity.id) ?? null;
+
+  if (!restoredEntity) {
+    restoredEntity = await requestJson("/api/entities", {
+      method: "POST",
+      body: JSON.stringify({
+        name: snapshot.entity.name,
+        note: snapshot.entity.note
+      })
+    });
+  }
+
+  let restoredCount = 0;
+  let alreadyPresentCount = 0;
+
+  for (const edge of snapshot.incidentRelationships) {
+    const sourceEntityId = edge.sourceEntityId === snapshot.entity.id ? restoredEntity.id : edge.sourceEntityId;
+    const targetEntityId = edge.targetEntityId === snapshot.entity.id ? restoredEntity.id : edge.targetEntityId;
+
+    const existingRelationship = findRelationshipByIdentity(sourceEntityId, targetEntityId, edge.kind);
+    if (existingRelationship) {
+      alreadyPresentCount += 1;
+      continue;
+    }
+
+    try {
+      await requestJson("/api/relationship-edges", {
+        method: "POST",
+        body: JSON.stringify({
+          sourceEntityId,
+          targetEntityId,
+          kind: edge.kind,
+          note: edge.note
+        })
+      });
+      restoredCount += 1;
+    } catch (error) {
+      if (!wasConflict(error)) {
+        throw error;
+      }
+
+      alreadyPresentCount += 1;
+    }
+  }
+
+  state.selectedEntityId = restoredEntity.id;
+  state.selectedRelationshipId = null;
+  state.selectedRelationship = null;
+  if (snapshot.wasFocused) {
+    state.focusedEntityId = restoredEntity.id;
+  }
+
+  let message = `Restored entity ${restoredEntity.name}`;
+  if (restoredEntity.id !== snapshot.entity.id) {
+    message += ` as ${restoredEntity.id}`;
+  }
+  message += ` with ${restoredCount} recreated relationship`;
+  if (restoredCount !== 1) {
+    message += "s";
+  }
+  if (alreadyPresentCount) {
+    message += ` and ${alreadyPresentCount} already present`;
+  }
+  message += ".";
+  setActivityMessage(message);
+}
+
+function cancelPendingDelete() {
+  state.pendingDelete = null;
+  render();
+}
+
+async function deleteSelectedEntity() {
+  queueEntityDelete();
+}
+
+async function deleteRelationship(id) {
+  queueRelationshipDelete(id);
+}
+
+function dismissUndoBanner() {
+  clearUndoTimer();
+  state.undoAction = null;
+  render();
 }
 
 async function submitRelationship(event) {
   event.preventDefault();
+  state.pendingDelete = null;
   setError("");
+  setActivityMessage("");
 
   const payload = {
     sourceEntityId: dom.relationshipSource.value,
@@ -929,31 +1620,8 @@ async function submitRelationship(event) {
   }
 }
 
-async function deleteRelationship(id) {
-  const relationship = state.relationships.find(item => item.id === id);
-  const relationshipLabel = relationship
-    ? `${relationship.sourceEntityId} → ${relationship.targetEntityId} (${relationship.kind || "relationship"})`
-    : id;
-  const confirmed = window.confirm(`Delete relationship "${relationshipLabel}"?`);
-  if (!confirmed) {
-    return;
-  }
-
-  setError("");
-
-  try {
-    await requestJson(`/api/relationship-edges/${encodeURIComponent(id)}`, { method: "DELETE" });
-    if (state.selectedRelationshipId === id) {
-      state.selectedRelationshipId = null;
-      state.selectedRelationship = null;
-    }
-    await refreshAll();
-  } catch (error) {
-    setError(error instanceof Error ? error.message : "Unable to delete relationship");
-  }
-}
-
 async function clearRelationshipSelection() {
+  state.pendingDelete = null;
   state.selectedRelationshipId = null;
   state.selectedRelationship = null;
   dom.relationshipKind.value = "";
@@ -962,6 +1630,7 @@ async function clearRelationshipSelection() {
 }
 
 function clearRelationshipFilters() {
+  state.pendingDelete = null;
   state.relationshipFilters.text = "";
   state.relationshipFilters.kind = "";
   state.relationshipFilters.direction = "all";
@@ -976,6 +1645,187 @@ function appendEmpty(container, text) {
   empty.className = "empty";
   empty.textContent = text;
   container.appendChild(empty);
+}
+
+function shouldIgnoreExplorerCardActivation(event) {
+  return event.target instanceof HTMLElement && Boolean(event.target.closest("button"));
+}
+
+function getExplorerCards(listType) {
+  const selector = listType === "entity"
+    ? "[data-explorer-card=\"entity\"]"
+    : "[data-explorer-card=\"relationship\"]";
+  const container = listType === "entity" ? dom.entityList : dom.relationshipList;
+  return Array.from(container.querySelectorAll(selector));
+}
+
+function moveExplorerFocus(listType, itemId, direction) {
+  const cards = getExplorerCards(listType);
+  if (!cards.length) {
+    return;
+  }
+
+  const currentIndex = cards.findIndex(card =>
+    listType === "entity"
+      ? card.dataset.entityId === itemId
+      : card.dataset.relationshipId === itemId);
+  if (currentIndex < 0) {
+    return;
+  }
+
+  const targetIndex = clamp(currentIndex + direction, 0, cards.length - 1);
+  if (targetIndex !== currentIndex) {
+    cards[targetIndex].focus();
+  }
+}
+
+function focusExplorerBoundary(listType, itemId, boundary) {
+  const cards = getExplorerCards(listType);
+  if (!cards.length) {
+    return;
+  }
+
+  const targetCard = boundary === "start" ? cards[0] : cards[cards.length - 1];
+  const targetId = listType === "entity" ? targetCard.dataset.entityId : targetCard.dataset.relationshipId;
+  if (targetId !== itemId) {
+    targetCard.focus();
+  }
+}
+
+function handleExplorerCardKeydown(event, options) {
+  if (event.target !== event.currentTarget) {
+    return;
+  }
+
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    options.activate();
+    return;
+  }
+
+  if (options.listType === "entity" && event.key.toLowerCase() === "f") {
+    event.preventDefault();
+    options.alternateActivate?.();
+    return;
+  }
+
+  if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+    event.preventDefault();
+    moveExplorerFocus(options.listType, options.itemId, 1);
+    return;
+  }
+
+  if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
+    event.preventDefault();
+    moveExplorerFocus(options.listType, options.itemId, -1);
+    return;
+  }
+
+  if (event.key === "Home") {
+    event.preventDefault();
+    focusExplorerBoundary(options.listType, options.itemId, "start");
+    return;
+  }
+
+  if (event.key === "End") {
+    event.preventDefault();
+    focusExplorerBoundary(options.listType, options.itemId, "end");
+  }
+}
+
+function zoomGraph(delta) {
+  if (setViewportScale(getViewportScale() + delta)) {
+    renderGraph(state.graph);
+  }
+}
+
+function fitGraphViewport() {
+  const width = dom.graph.clientWidth || 960;
+  const height = dom.graph.clientHeight || 640;
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const radialExtent = Math.max(120, (Math.min(width, height) - 220) / 2);
+  const radius = Math.max(110, radialExtent);
+  const nodes = state.graph.nodes.map((node, index) => {
+    const angle = state.graph.nodes.length === 1
+      ? 0
+      : (Math.PI * 2 * index) / state.graph.nodes.length - Math.PI / 2;
+
+    return {
+      ...node,
+      x: state.graph.nodes.length === 1 ? centerX : centerX + Math.cos(angle) * radius,
+      y: state.graph.nodes.length === 1 ? centerY : centerY + Math.sin(angle) * radius
+    };
+  });
+
+  fitViewportToGraph(getGraphBounds(nodes), width, height);
+  renderGraph(state.graph);
+}
+
+function resetGraphViewport() {
+  const width = dom.graph.clientWidth || 960;
+  const height = dom.graph.clientHeight || 640;
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const radialExtent = Math.max(120, (Math.min(width, height) - 220) / 2);
+  const radius = Math.max(110, radialExtent);
+  const nodes = state.graph.nodes.map((node, index) => {
+    const angle = state.graph.nodes.length === 1
+      ? 0
+      : (Math.PI * 2 * index) / state.graph.nodes.length - Math.PI / 2;
+
+    return {
+      ...node,
+      x: state.graph.nodes.length === 1 ? centerX : centerX + Math.cos(angle) * radius,
+      y: state.graph.nodes.length === 1 ? centerY : centerY + Math.sin(angle) * radius
+    };
+  });
+
+  resetViewport(width, height, getGraphBounds(nodes));
+  renderGraph(state.graph);
+}
+
+function beginGraphPan(event) {
+  if (
+    event.button !== 0 ||
+    !(event.target instanceof SVGElement) ||
+    !event.target.classList.contains("graph-surface")
+  ) {
+    return;
+  }
+
+  const viewport = state.viewport;
+  viewport.pointerId = event.pointerId;
+  viewport.dragStartX = event.clientX;
+  viewport.dragStartY = event.clientY;
+  viewport.originX = viewport.translateX;
+  viewport.originY = viewport.translateY;
+  viewport.didPan = false;
+  dom.graph.setPointerCapture?.(event.pointerId);
+  dom.graphFrame.classList.add("is-panning");
+}
+
+function updateGraphPan(event) {
+  const viewport = state.viewport;
+  if (viewport.pointerId !== event.pointerId) {
+    return;
+  }
+
+  const deltaX = event.clientX - viewport.dragStartX;
+  const deltaY = event.clientY - viewport.dragStartY;
+  viewport.didPan = viewport.didPan || Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3;
+  viewport.translateX = roundViewportValue(viewport.originX + deltaX);
+  viewport.translateY = roundViewportValue(viewport.originY + deltaY);
+  renderGraph(state.graph);
+}
+
+function endGraphPan(event) {
+  if (state.viewport.pointerId !== event.pointerId) {
+    return;
+  }
+
+  cancelPan();
+  renderGraph(state.graph);
 }
 
 function makeInteractiveShell(element, label, activate) {
@@ -995,10 +1845,15 @@ function renderGraph(graph) {
   const width = svg.clientWidth || 960;
   const height = svg.clientHeight || 640;
   const spotlight = getGraphSpotlight();
+  const graphSignature = getGraphSignature(graph);
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.dataset.scale = String(getViewportScale());
   svg.innerHTML = "";
 
   if (!graph.nodes.length) {
+    dom.graphFrame.classList.remove("pannable", "is-panning");
+    state.viewport.graphSignature = graphSignature;
+    state.viewport.needsFit = true;
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     text.setAttribute("x", width / 2);
     text.setAttribute("y", height / 2);
@@ -1012,7 +1867,8 @@ function renderGraph(graph) {
 
   const centerX = width / 2;
   const centerY = height / 2;
-  const radius = Math.max(110, Math.min(width, height) * 0.3);
+  const radialExtent = Math.max(120, (Math.min(width, height) - 220) / 2);
+  const radius = Math.max(110, radialExtent);
   const nodes = graph.nodes.map((node, index) => {
     const angle = graph.nodes.length === 1
       ? 0
@@ -1024,6 +1880,35 @@ function renderGraph(graph) {
       y: graph.nodes.length === 1 ? centerY : centerY + Math.sin(angle) * radius
     };
   });
+  const bounds = getGraphBounds(nodes);
+  const viewportChanged = state.viewport.graphSignature !== graphSignature;
+  if (viewportChanged) {
+    state.viewport.graphSignature = graphSignature;
+    state.viewport.needsFit = true;
+  }
+  if (state.viewport.needsFit) {
+    fitViewportToGraph(bounds, width, height);
+  }
+
+  dom.graphFrame.classList.add("pannable");
+  dom.graphFrame.classList.toggle("is-panning", state.viewport.pointerId !== null);
+
+  const surface = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  surface.setAttribute("class", "graph-surface");
+  surface.setAttribute("x", "0");
+  surface.setAttribute("y", "0");
+  surface.setAttribute("width", String(width));
+  surface.setAttribute("height", String(height));
+  surface.setAttribute("aria-hidden", "true");
+  svg.appendChild(surface);
+
+  const viewportGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  viewportGroup.setAttribute(
+    "transform",
+    `translate(${state.viewport.translateX} ${state.viewport.translateY}) scale(${getViewportScale()})`
+  );
+  svg.appendChild(viewportGroup);
+
   const nodeById = new Map(nodes.map(node => [node.id, node]));
 
   for (const link of graph.links) {
@@ -1033,11 +1918,11 @@ function renderGraph(graph) {
       continue;
     }
 
-    appendLink(svg, source, target, link, spotlight);
+    appendLink(viewportGroup, source, target, link, spotlight);
   }
 
   for (const node of nodes) {
-    appendNode(svg, node, spotlight);
+    appendNode(viewportGroup, node, spotlight);
   }
 }
 
@@ -1045,6 +1930,7 @@ function appendLink(svg, source, target, link, spotlight) {
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
   group.setAttribute("class", "link-shell");
   const edgeLabel = link.label || "relationship";
+  const scale = getViewportScale();
   makeInteractiveShell(
     group,
     `${edgeLabel} from ${source.label} to ${target.label}. Press Enter to inspect relationship.`,
@@ -1070,6 +1956,7 @@ function appendLink(svg, source, target, link, spotlight) {
   line.setAttribute("y1", source.y);
   line.setAttribute("x2", target.x);
   line.setAttribute("y2", target.y);
+  line.setAttribute("vector-effect", "non-scaling-stroke");
 
   const hitbox = document.createElementNS("http://www.w3.org/2000/svg", "line");
   hitbox.setAttribute("class", "link-hitbox");
@@ -1082,6 +1969,8 @@ function appendLink(svg, source, target, link, spotlight) {
   text.setAttribute("class", "link-label");
   text.setAttribute("x", (source.x + target.x) / 2);
   text.setAttribute("y", (source.y + target.y) / 2 - 10);
+  text.setAttribute("font-size", String(roundViewportValue(12 / scale)));
+  text.setAttribute("stroke-width", String(roundViewportValue(5 / scale)));
   text.textContent = edgeLabel;
 
   group.append(line, hitbox, text);
@@ -1091,6 +1980,7 @@ function appendLink(svg, source, target, link, spotlight) {
 function appendNode(svg, node, spotlight) {
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
   group.setAttribute("class", "node-shell");
+  const scale = getViewportScale();
   makeInteractiveShell(
     group,
     `${node.label}. Press Enter to select. Press F to focus graph on this node.`,
@@ -1125,11 +2015,13 @@ function appendNode(svg, node, spotlight) {
   circle.setAttribute("cx", node.x);
   circle.setAttribute("cy", node.y);
   circle.setAttribute("r", 58);
+  circle.setAttribute("vector-effect", "non-scaling-stroke");
 
   const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
   label.setAttribute("class", "node-label");
   label.setAttribute("x", node.x);
   label.setAttribute("y", node.y + 4);
+  label.setAttribute("font-size", String(roundViewportValue(15 / scale)));
   label.textContent = node.label;
 
   group.append(circle, label);
@@ -1139,6 +2031,7 @@ function appendNode(svg, node, spotlight) {
     note.setAttribute("class", "node-note");
     note.setAttribute("x", node.x);
     note.setAttribute("y", node.y + 24);
+    note.setAttribute("font-size", String(roundViewportValue(12 / scale)));
     note.textContent = node.note;
     group.appendChild(note);
   }
@@ -1172,6 +2065,18 @@ dom.entityReset.addEventListener("click", clearEntitySelection);
 dom.entityDelete.addEventListener("click", deleteSelectedEntity);
 dom.relationshipForm.addEventListener("submit", submitRelationship);
 dom.relationshipReset.addEventListener("click", clearRelationshipSelection);
+dom.deleteConfirmSubmit.addEventListener("click", confirmPendingDelete);
+dom.deleteConfirmCancel.addEventListener("click", cancelPendingDelete);
+dom.undoBannerAction.addEventListener("click", restoreDeletedItem);
+dom.undoBannerDismiss.addEventListener("click", dismissUndoBanner);
+dom.graphZoomIn.addEventListener("click", () => zoomGraph(0.18));
+dom.graphZoomOut.addEventListener("click", () => zoomGraph(-0.18));
+dom.graphResetView.addEventListener("click", resetGraphViewport);
+dom.graphFitView.addEventListener("click", fitGraphViewport);
+dom.graph.addEventListener("pointerdown", beginGraphPan);
+dom.graph.addEventListener("pointermove", updateGraphPan);
+dom.graph.addEventListener("pointerup", endGraphPan);
+dom.graph.addEventListener("pointercancel", endGraphPan);
 dom.relationshipDelete.addEventListener("click", async () => {
   if (state.selectedRelationshipId) {
     await deleteRelationship(state.selectedRelationshipId);
@@ -1179,6 +2084,7 @@ dom.relationshipDelete.addEventListener("click", async () => {
 });
 dom.focusSelected.addEventListener("click", () => focusGraph(state.selectedEntityId));
 dom.showFullGraph.addEventListener("click", async () => {
+  state.pendingDelete = null;
   const previousFocusedEntityId = state.focusedEntityId;
   state.focusedEntityId = null;
   renderSelection();
@@ -1193,6 +2099,9 @@ dom.showFullGraph.addEventListener("click", async () => {
   }
 });
 dom.reloadAll.addEventListener("click", refreshAll);
-window.addEventListener("resize", () => renderGraph(state.graph));
+window.addEventListener("resize", () => {
+  state.viewport.needsFit = true;
+  renderGraph(state.graph);
+});
 
 refreshAll();

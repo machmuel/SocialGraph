@@ -21,10 +21,24 @@ public sealed class QaModelAValidationReportService
     {
         var document = await _source.GetAsync(cancellationToken);
         var dataQualityConcerns = new List<string>();
+        var instrumentationConcerns = new List<string>();
         if (document.MissingFields is { Count: > 0 })
         {
-            dataQualityConcerns.Add($"Missing required fields: {string.Join(", ", document.MissingFields)}");
+            instrumentationConcerns.Add($"Missing required fields: {string.Join(", ", document.MissingFields)}");
         }
+
+        var requiredFieldsSignOffComplete = string.Equals(
+            document.RequiredFieldsSignOffStatus,
+            "complete",
+            StringComparison.OrdinalIgnoreCase);
+        if (!requiredFieldsSignOffComplete ||
+            string.IsNullOrWhiteSpace(document.RequiredFieldsSignOffBy) ||
+            document.RequiredFieldsSignOffAt is null)
+        {
+            instrumentationConcerns.Add("Required-fields sign-off is missing or incomplete.");
+        }
+
+        dataQualityConcerns.AddRange(instrumentationConcerns);
 
         if (document.ObservationWindowEnd is null)
         {
@@ -95,14 +109,24 @@ public sealed class QaModelAValidationReportService
             breachLabel: "Median delivery lead time exceeded 66 hours");
         metrics.Add(leadTime);
 
-        var instrumentationStatus = dataQualityConcerns.Count == 0 ? "PASS" : "NO_READOUT";
+        var instrumentationStatus = instrumentationConcerns.Count == 0 ? "PASS" : "NO_READOUT";
+        var signOffEvidence = requiredFieldsSignOffComplete &&
+                              !string.IsNullOrWhiteSpace(document.RequiredFieldsSignOffBy) &&
+                              document.RequiredFieldsSignOffAt is not null
+            ? $" Required-fields sign-off: {document.RequiredFieldsSignOffBy} at {document.RequiredFieldsSignOffAt:yyyy-MM-ddTHH:mm:sszzz}."
+            : string.Empty;
+        var signOffNote = string.IsNullOrWhiteSpace(document.RequiredFieldsSignOffNote)
+            ? string.Empty
+            : $" {document.RequiredFieldsSignOffNote}";
         metrics.Add(new QaModelAValidationMetricDto(
             "instrumentation_completeness",
             "Instrumentation completeness",
             "all required fields present",
             instrumentationStatus == "PASS" ? "All required fields present" : "Material gaps detected",
             instrumentationStatus,
-            dataQualityConcerns.Count == 0 ? "Required checkpoint fields are present for the measured window." : string.Join(" ", dataQualityConcerns)));
+            instrumentationConcerns.Count == 0
+                ? $"Required checkpoint fields are present for the measured window.{signOffEvidence}{signOffNote}".Trim()
+                : string.Join(" ", instrumentationConcerns)));
 
         var overallStatus = dataQualityConcerns.Count > 0
             ? "NO_READOUT"
@@ -123,10 +147,12 @@ public sealed class QaModelAValidationReportService
             "FAIL" => "At least one hard-gate KPI breached the checkpoint threshold.",
             _ => "Checkpoint evidence is incomplete; do not make a keep-vs-replace decision yet."
         };
+        var explanation = BuildExplanation(overallStatus, hardGateBreaches, dataQualityConcerns);
 
         return new QaModelAValidationReportDto(
             overallStatus,
             recommendedDecision,
+            explanation,
             document.MetricSourceIssue,
             "/api/cto/weekly-monitor/qa-model-a-validation",
             document.ObservationWindowStart,
@@ -138,6 +164,29 @@ public sealed class QaModelAValidationReportService
             hardGateBreaches,
             dataQualityConcerns,
             document.EvidenceNote);
+    }
+
+    private static string BuildExplanation(
+        string overallStatus,
+        IReadOnlyCollection<string> hardGateBreaches,
+        IReadOnlyCollection<string> dataQualityConcerns)
+    {
+        return overallStatus switch
+        {
+            "PASS" => "All checkpoint thresholds passed and no data-quality blockers remain.",
+            "FAIL" => $"Checkpoint failed because {JoinClauses(hardGateBreaches)}.",
+            _ => $"Checkpoint cannot be scored yet because {JoinClauses(dataQualityConcerns)}."
+        };
+    }
+
+    private static string JoinClauses(IReadOnlyCollection<string> clauses)
+    {
+        if (clauses.Count == 0)
+        {
+            return "required rationale details were not captured";
+        }
+
+        return string.Join("; ", clauses.Select(static clause => clause.TrimEnd('.', ';')));
     }
 
     private static QaModelAValidationMetricDto EvaluatePercentMetric(

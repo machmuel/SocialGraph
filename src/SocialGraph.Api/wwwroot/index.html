@@ -44,7 +44,10 @@
         </div>
       </section>
 
-      <div id="entityList" class="entity-list" aria-live="polite"></div>
+      <p id="entityExplorerHint" class="muted explorer-hint">
+        Keyboard: Tab to an entity card, use Enter or Space to select it, use F to focus its graph neighborhood, and use arrow keys to move between cards.
+      </p>
+      <div id="entityList" class="entity-list" aria-live="polite" aria-describedby="entityExplorerHint"></div>
 
       <form id="entityForm" class="inline-grid">
         <h2 id="entityFormTitle">Create entity</h2>
@@ -74,6 +77,29 @@
       </div>
 
       <div id="errorBanner" class="notice error" hidden role="alert"></div>
+      <div id="activityBanner" class="notice success" hidden role="status"></div>
+      <section id="deleteConfirm" class="notice confirm-card" hidden aria-live="polite">
+        <div class="confirm-copy">
+          <span class="section-label">Delete impact preview</span>
+          <strong id="deleteConfirmTitle">Delete selection?</strong>
+          <p id="deleteConfirmBody" class="muted">Review the delete impact before confirming.</p>
+        </div>
+        <div class="actions">
+          <button id="deleteConfirmSubmit" class="danger" type="button">Confirm delete</button>
+          <button id="deleteConfirmCancel" class="ghost" type="button">Cancel</button>
+        </div>
+      </section>
+      <section id="undoBanner" class="notice undo-card" hidden aria-live="polite">
+        <div class="confirm-copy">
+          <span class="section-label">Recovery window</span>
+          <strong id="undoBannerTitle">Deletion completed</strong>
+          <p id="undoBannerBody" class="muted">Undo remains available for a short time.</p>
+        </div>
+        <div class="actions">
+          <button id="undoBannerAction" class="ghost" type="button">Undo delete</button>
+          <button id="undoBannerDismiss" class="textual" type="button">Dismiss</button>
+        </div>
+      </section>
 
       <div class="graph-toolbar">
         <div class="graph-meta">
@@ -82,16 +108,20 @@
           <span id="spotlightTag" class="tag" hidden></span>
         </div>
         <div class="actions">
+          <button id="graphZoomIn" class="ghost" type="button" aria-label="Zoom in on graph">Zoom in</button>
+          <button id="graphZoomOut" class="ghost" type="button" aria-label="Zoom out on graph">Zoom out</button>
+          <button id="graphResetView" class="ghost" type="button">Reset view</button>
+          <button id="graphFitView" class="ghost" type="button">Fit graph</button>
           <button id="focusSelected" class="ghost" type="button" disabled>Focus selected</button>
           <button id="showFullGraph" class="ghost" type="button" disabled>Show full graph</button>
           <button id="reloadAll" class="textual" type="button">Reload everything</button>
         </div>
       </div>
       <p id="graphInteractionHint" class="muted">
-        Select a node or relationship to inspect it locally. Double-click a node, press F on a focused node, or use Focus controls to refetch the one-hop graph.
+        Select a node or relationship to inspect it locally. Drag empty graph space to pan. Use zoom controls, double-click a node, press F on a focused node, or use Focus controls to refetch the one-hop graph.
       </p>
 
-      <div class="graph-frame">
+      <div id="graphFrame" class="graph-frame">
         <svg
           id="graph"
           role="group"
@@ -143,7 +173,10 @@
         </div>
       </div>
 
-      <div id="relationshipList" class="relationship-list" aria-live="polite"></div>
+      <p id="relationshipExplorerHint" class="muted explorer-hint">
+        Keyboard: Tab to a relationship card, use Enter or Space to inspect it, and use arrow keys to move between cards without changing the current filters.
+      </p>
+      <div id="relationshipList" class="relationship-list" aria-live="polite" aria-describedby="relationshipExplorerHint"></div>
 
       <form id="relationshipForm" class="inline-grid">
         <h3 id="relationshipFormTitle">Relationship inspector</h3>
