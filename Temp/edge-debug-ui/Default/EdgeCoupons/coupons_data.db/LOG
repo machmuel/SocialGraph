@@ -1,0 +1,5 @@
+2026/05/03-15:00:13.038 2990 Creating DB I:\VS-Projekte\SocialGraph\Temp\edge-debug-ui\Default\EdgeCoupons/coupons_data.db since it was missing.
+2026/05/03-15:00:13.041 2990 Reusing MANIFEST I:\VS-Projekte\SocialGraph\Temp\edge-debug-ui\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/05/03-15:00:13.186 2cfc Level-0 table #5: started
+2026/05/03-15:00:13.188 2cfc Level-0 table #5: 682129 bytes OK
+2026/05/03-15:00:13.189 2cfc Delete type=0 #3

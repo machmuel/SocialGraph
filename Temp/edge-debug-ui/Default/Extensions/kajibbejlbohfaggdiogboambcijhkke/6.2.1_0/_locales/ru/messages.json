@@ -1,0 +1,2358 @@
+{
+   "action_menu_activate_current_tab": {
+      "description": "Activate on current tab shortcut in the action menu",
+      "message": "Авторизовать этот домен"
+   },
+   "action_menu_all_options": {
+      "description": "All options link in the action menu",
+      "message": "Все функции"
+   },
+   "action_menu_configure_mailvelope": {
+      "description": "Configure Mailvelope label in the action menu",
+      "message": "\u003C0>Настройте Mailvelope\u003C/0> и вперед!"
+   },
+   "action_menu_dashboard_description": {
+      "description": "Dashboard description in the action menu",
+      "message": "Показать все параметры конфигурации."
+   },
+   "action_menu_dashboard_label": {
+      "description": "Dashboard label in the action menu",
+      "message": "Панель управления"
+   },
+   "action_menu_file_encryption_description": {
+      "description": "File encryption description in the action menu",
+      "message": "Шифрование одного или нескольких файлов"
+   },
+   "action_menu_file_encryption_label": {
+      "description": "File encryption label in the action menu",
+      "message": "Шифрование файлов"
+   },
+   "action_menu_help": {
+      "description": "Online help shortcut.",
+      "message": "Помощь"
+   },
+   "action_menu_keyring_description": {
+      "description": "Keyring description in the action menu",
+      "message": "Управление открытыми и закрытыми ключами"
+   },
+   "action_menu_keyring_label": {
+      "description": "Keyring label in the action menu",
+      "message": "Ключи"
+   },
+   "action_menu_primary_menu_aria_label": {
+      "description": "Accessibility, aria label of the primary menu",
+      "message": "Главное меню Mailvelope"
+   },
+   "action_menu_reload_extension_scripts": {
+      "description": "Reload extension scripts shortcut in the action menu",
+      "message": "Перезапустить Mailvelope"
+   },
+   "action_menu_review_security_logs_description": {
+      "description": "Review security logs description in the action menu",
+      "message": "Просмотр действий пользователя, связанных с безопасностью"
+   },
+   "action_menu_review_security_logs_label": {
+      "description": "Review security logs label in the action menu",
+      "message": "Журнал безопасности"
+   },
+   "action_menu_setup_menu_aria_label": {
+      "description": "Accessibility, aria label of the setup menu",
+      "message": "Меню настроек Mailvelope"
+   },
+   "action_menu_setup_start_label": {
+      "description": "Start button label",
+      "message": "Начнем!"
+   },
+   "alert_header_error": {
+      "description": "Alert header of category error.",
+      "message": "Ошибка!"
+   },
+   "alert_header_important": {
+      "description": "Alert header of category important.",
+      "message": "Важно!"
+   },
+   "alert_header_notice": {
+      "description": "Alert header of category notice.",
+      "message": "Внимание:"
+   },
+   "alert_header_success": {
+      "description": "Alert header of category success.",
+      "message": "Успешно!"
+   },
+   "alert_header_warning": {
+      "description": "Alert header of category warning.",
+      "message": "Внимание!"
+   },
+   "alert_invalid_domainmatchpattern_warning": {
+      "description": "Alert header of category warning.",
+      "message": "Домен в виде [*.]host.name.tld[:port]."
+   },
+   "alert_no_domainmatchpattern_warning": {
+      "description": "Alert header of category warning.",
+      "message": "Нужно указать хотя бы одну маску домена."
+   },
+   "analytics_consent_description": {
+      "description": "Consent to share analytics information with mailvelope",
+      "message": "Делиться агрегированной и анонимизированной аналитической информацией с Mailvelope"
+   },
+   "analytics_consent_disabled_tooltip": {
+      "description": "Explanation for why user cannot opt in to analytics",
+      "message": "Мы предлагаем пользователям помочь нам со сбором данных только на этапе установки и на основе случайного выбора."
+   },
+   "analytics_consent_interstitial_Btn_Learn_More": {
+      "description": "Btn FAQ",
+      "message": "Узнать больше"
+   },
+   "analytics_consent_interstitial_Faq": {
+      "description": "FAQ",
+      "message": "Подробнее об аналитике Mailvelope рассказывается в FAQ."
+   },
+   "analytics_consent_interstitial_We_Collect_Minimal_Data": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "Mailvelope отмечает ваши шаги к защищенной почте, но не записывает каждое ваше действие."
+   },
+   "analytics_consent_interstitial_We_Collect_Minimal_Data_Title": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "Мы собираем минимум данных"
+   },
+   "analytics_consent_interstitial_We_Respect_your_Choice": {
+      "description": "We Respect your Choice",
+      "message": "Если вы решите не участвовать, это нигде не будет отмечено. Если вы согласитесь, вы можете в любое время изменить свой выбор в настройках."
+   },
+   "analytics_consent_interstitial_We_Respect_your_Choice_Title": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "Мы уважаем ваш выбор"
+   },
+   "analytics_consent_interstitial_Your_Privacy_is_Preserved_Pt1": {
+      "description": "We Respect your Choice",
+      "message": "Mailvelope использует"
+   },
+   "analytics_consent_interstitial_Your_Privacy_is_Preserved_Pt2": {
+      "description": "We Respect your Choice",
+      "message": "which securely stores data without connecting it to identifiable information. Further, your IP address is not recorded or processed."
+   },
+   "analytics_consent_interstitial_Your_Privacy_is_Preserved_Title": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "Ваша частная жизнь под защитой"
+   },
+   "analytics_consent_interstitial_learn_more": {
+      "description": "Label for expandable section",
+      "message": "Подробнее о безопасности данных"
+   },
+   "analytics_consent_interstitial_learn_more_explanation": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "Если вы согласитесь, данные аналитики будут обобщаться и минимизироваться в соответствии с методологией Clean Insights. Эти данные не будут связаны с идентифицирующей вас информацией. Мы с уважением относимся к вашему выбору, в том числе если вы откажетесь участвовать."
+   },
+   "analytics_consent_interstitial_message": {
+      "description": "Request for consent from selected users.",
+      "message": "Mailvelope просит 1% новых пользователей поучаствовать в анонимном сборе данных. С вашего разрешения мы запишем ваши успешные шаги по установке и настройке Mailvelope. Вы согласны нам помочь?  "
+   },
+   "analytics_interstitial_header": {
+      "description": "Header of analytics consent dialog.",
+      "message": "Помогите нам сделать Mailvelope лучше!"
+   },
+   "auth_domain_api_label": {
+      "description": "Label for API allowed info",
+      "message": "Использовать API"
+   },
+   "auth_domain_description": {
+      "description": "Description in authorize domain dialog",
+      "message": "Разрешить использование Mailvelope с доменом $1?"
+   },
+   "auth_domain_headline": {
+      "description": "Headline of authorize domain dialog.",
+      "message": "Добавить домен"
+   },
+   "button_analyticsconsent_modal": {
+      "description": "button modal analytics consent",
+      "message": "Продолжить"
+   },
+   "change_link": {
+      "description": "Navigation link to change this setting.",
+      "message": "Изменить"
+   },
+   "cleartext_read_error": {
+      "description": "Cleartext message read error message: $1: error message.",
+      "message": "Невозможно прочитать это расшифрованное сообщение: $1"
+   },
+   "dashboard_link_encrypt_decrypt_files": {
+      "description": "Dashboard encrypt decrypt files link",
+      "message": "Шифрование"
+   },
+   "dashboard_link_manage_domains": {
+      "description": "Dashboard manage domains link",
+      "message": "Домены"
+   },
+   "dashboard_link_manage_keys": {
+      "description": "Dashboard manage keys link",
+      "message": "Управление ключами"
+   },
+   "dashboard_link_view_security_log": {
+      "description": "Dashboard view security logs link",
+      "message": "Записи в журнале"
+   },
+   "decrypt_att_frame_help_text": {
+      "description": "Help text on decrypt frame with encrypted attachments or clipped armored message.",
+      "message": "Нажмите, чтобы увидеть сообщение"
+   },
+   "decrypt_attachment_label": {
+      "description": "Label for attachments in decrypted message",
+      "message": "Вложения"
+   },
+   "decrypt_cleartext_warning": {
+      "description": "Warning when cleartext is shown in decrypt component",
+      "message": "Следующий текст не был зашифрован."
+   },
+   "decrypt_decrypted_files_label": {
+      "description": "Decrypted files label on decrypt success page.",
+      "message": "Расшифрованные файлы"
+   },
+   "decrypt_digital_signature": {
+      "description": "Caption digital signature",
+      "message": "Подписано"
+   },
+   "decrypt_digital_signature_failure": {
+      "description": "Caption digital signature",
+      "message": "Некорректная подпись"
+   },
+   "decrypt_digital_signature_inconsistent": {
+      "description": "Warning message if digital signature is inconsistent",
+      "message": "Несовпадающие подписи: сообщение и файл подписаны разными ключами"
+   },
+   "decrypt_digital_signature_missing": {
+      "description": "Digital signature is missing",
+      "message": "Подпись отсутствует"
+   },
+   "decrypt_digital_signature_null": {
+      "description": "Caption digital signature",
+      "message": "Неизвестная подпись"
+   },
+   "decrypt_digital_signature_null_info": {
+      "description": "Digital signature unknown info message",
+      "message": "Ключ с ID $1 не найден."
+   },
+   "decrypt_digital_signature_null_info_short": {
+      "description": "Digital signature unknown short info message",
+      "message": "Ключ не найден."
+   },
+   "decrypt_digital_signature_sender_mismatch": {
+      "description": "Alert label in the case of sender email address mismatch",
+      "message": "Несоответствие адреса отправителя"
+   },
+   "decrypt_digital_signature_sender_mismatch_tooltip": {
+      "description": "Tooltip for alert label in the case of sender email address mismatch",
+      "message": "Данное сообщение содержит цифровую подпись, но обнаружено несоответствие. Сообщение было отправлено с адреса email, который не соответствует открытому ключу подписанта."
+   },
+   "decrypt_digital_signature_uncertain_sender": {
+      "description": "Digital signature link to more information in the case of uncertain sender identity",
+      "message": "Неопределенная личность отправителя"
+   },
+   "decrypt_file_error_header": {
+      "description": "Header of file decryption error on decrypt result page.",
+      "message": "Невозможно расшифровать файл $1."
+   },
+   "decrypt_frame_help_text": {
+      "description": "Help text on decrypt frame.",
+      "message": "Нажмите для расшифровки"
+   },
+   "decrypt_header": {
+      "description": "Header of file/text decrypt page.",
+      "message": "Расшифровка данных"
+   },
+   "decrypt_header_success": {
+      "description": "Header of file/text decrypt result page.",
+      "message": "Успешно расшифровано"
+   },
+   "decrypt_home": {
+      "description": "File/text decrypting navigation: Home.",
+      "message": "Расшифровать"
+   },
+   "decrypt_open_viewer_btn_title": {
+      "description": "Title of open message viewer icon button.",
+      "message": "Открыть в просмотрщике Mailvelope"
+   },
+   "decrypt_show_message_btn": {
+      "description": "Show messsage button label in decrypt message.",
+      "message": "Показать сообщение"
+   },
+   "decrypt_signer_label": {
+      "description": "Label for signature line in decrypted message",
+      "message": "Отправитель"
+   },
+   "decrypt_text_area_label": {
+      "description": "Label of textarea to paste armored block in on decrypt page.",
+      "message": "Текст для расшифровки"
+   },
+   "decrypt_text_decryption_btn": {
+      "description": "Text decryption button label on decrypt page.",
+      "message": "Хотите также расшифровать текст?"
+   },
+   "decrypt_text_error_header": {
+      "description": "Header of text decryption error on decrypt result page.",
+      "message": "Невозможно расшифровать файл."
+   },
+   "dialog_cancel_btn": {
+      "description": "Dialog cancel button label",
+      "message": "Отмена"
+   },
+   "dialog_no_btn": {
+      "description": "Dialog no button label",
+      "message": "Нет"
+   },
+   "dialog_no_button": {
+      "description": "Dialog button no",
+      "message": "Пропустить"
+   },
+   "dialog_popup_close": {
+      "description": "Close decrypt popup.",
+      "message": "Закрыть"
+   },
+   "dialog_save_btn": {
+      "description": "Dialog save button label",
+      "message": "Сохранить"
+   },
+   "dialog_yes_btn": {
+      "description": "Dialog yes button label",
+      "message": "Да"
+   },
+   "dialog_yes_button": {
+      "description": "Dialog button yes",
+      "message": "Да"
+   },
+   "editor_blur_warn": {
+      "description": "Warning for lost focus.",
+      "message": "Внимание: ошибка текстового редактора."
+   },
+   "editor_encrypt_button": {
+      "description": "Encrypt button.",
+      "message": "Зашифровать"
+   },
+   "editor_error_header": {
+      "description": "",
+      "message": "Ошибка"
+   },
+   "editor_extra_key_checkbox": {
+      "description": "Extra key checkbox label.",
+      "message": "Добавить дополнительный ключ"
+   },
+   "editor_extra_key_help": {
+      "description": "Extra key help text.",
+      "message": "Email будет зашифрован с помощью этого дополнительного ключа"
+   },
+   "editor_header": {
+      "description": "Header of editor popup.",
+      "message": "Создание зашифрованного письма"
+   },
+   "editor_key_auto_sign": {
+      "description": "Label for default private key option.",
+      "message": "Добавлять к сообщениям цифровую подпись"
+   },
+   "editor_key_auto_sign_link": {
+      "description": "Test for auto sign link.",
+      "message": "Изменение настроек"
+   },
+   "editor_key_has_extra_msg": {
+      "description": "Label for info message invalid recipients but extra key.",
+      "message": "Email будет зашифрован с помощью альтернативного ключа, введенного ниже."
+   },
+   "editor_key_no_sign_option": {
+      "description": "Label for not sign option in sign key select.",
+      "message": "Не подписано"
+   },
+   "editor_key_not_found": {
+      "description": "Warning for when a recipient key was not found.",
+      "message": "Ключ не найден!"
+   },
+   "editor_key_not_found_msg": {
+      "description": "Warning for when a recipient key was not found.",
+      "message": "Чтобы зашифровать сообщение, у вас должен быть PGP-ключ каждого адресата. Тем не менее, вы можете подписать сообщение."
+   },
+   "editor_label_attachments": {
+      "description": "Label for attachments select/drop area.",
+      "message": "Вложения"
+   },
+   "editor_label_copy_recipient": {
+      "description": "Label for copy recipient text input.",
+      "message": "Cc"
+   },
+   "editor_label_message": {
+      "description": "Label for message textarea.",
+      "message": "Сообщение"
+   },
+   "editor_label_recipient": {
+      "description": "Label for recipient input.",
+      "message": "Получатель"
+   },
+   "editor_label_subject": {
+      "description": "Label for subject text input.",
+      "message": "Тема"
+   },
+   "editor_link_file_encryption": {
+      "description": "Navigation link to file encryption",
+      "message": "Зашифровать файлы"
+   },
+   "editor_no_default_key_caption_long": {
+      "description": "",
+      "message": "Отсутствует основной ключ. Цифровая подпись невозможна."
+   },
+   "editor_no_default_key_caption_short": {
+      "description": "",
+      "message": "Сообщение не может быть подписано"
+   },
+   "editor_remove_upload": {
+      "description": "Remove uploaded attachment",
+      "message": "Удалить"
+   },
+   "editor_sign_button": {
+      "description": "Sign button.",
+      "message": "Только подпись"
+   },
+   "editor_sign_caption_long": {
+      "description": "",
+      "message": "Отправленные сообщения будут снабжены цифровой подписью"
+   },
+   "editor_sign_caption_short": {
+      "description": "",
+      "message": "Сообщение будет снабжено цифровой подписью"
+   },
+   "editor_transfer": {
+      "description": "Transfer button of editor popup.",
+      "message": "Отправить"
+   },
+   "encrypt_change_signer_dialog_signer_label": {
+      "description": "Label for signer select of change signer dialog.",
+      "message": "Выбор подписи"
+   },
+   "encrypt_change_signer_dialog_title": {
+      "description": "Titel of change signer dialog.",
+      "message": "Изменение подписи"
+   },
+   "encrypt_dialog_no_recipient": {
+      "description": "Error message if no recipient selected.",
+      "message": "Пожалуйста, добавьте адресата."
+   },
+   "encrypt_download_all_button": {
+      "description": "Button to download all files",
+      "message": "Скачать все"
+   },
+   "encrypt_encrypted_files_label": {
+      "description": "Encrypted files label on encrypt success page.",
+      "message": "Расшифрованные файлы"
+   },
+   "encrypt_encrypted_for_label": {
+      "description": "Encrypted for label on encrypt success page.",
+      "message": "Зашифровано для"
+   },
+   "encrypt_error": {
+      "description": "Error during encryption process.",
+      "message": "Невозможно зашифровать это сообщение: $1"
+   },
+   "encrypt_file_error_header": {
+      "description": "Header of file decryption error on decrypt result page.",
+      "message": "Невозможно зашифровать файл $1."
+   },
+   "encrypt_frame_btn_label": {
+      "description": "Text on expanded editor button of editable email area",
+      "message": "Написать защищенное письмо"
+   },
+   "encrypt_header": {
+      "description": "Header of file/text encrypt page.",
+      "message": "Шифрование данных"
+   },
+   "encrypt_header_success": {
+      "description": "Header of file/text encrypt result page.",
+      "message": "Успешно зашифровано"
+   },
+   "encrypt_home": {
+      "description": "File/text encrypting navigation: Home.",
+      "message": "Зашифровать"
+   },
+   "encrypt_no_signer_info": {
+      "description": "No signer info text on encrypt page.",
+      "message": "Зашифрованные данные не подписаны"
+   },
+   "encrypt_remove_signer_btn": {
+      "description": "Remove signer button label on encrypt page.",
+      "message": "Удаление подписи"
+   },
+   "encrypt_signed_as_label": {
+      "description": "Signed as label on encrypt success page.",
+      "message": "Подписано:"
+   },
+   "encrypt_signer_info": {
+      "description": "Signer info text on encrypt page.",
+      "message": "Зашифрованные данные подписаны вашим ключом ($1)"
+   },
+   "encrypt_text_encryption_btn": {
+      "description": "Text encryption button label on encrypt page.",
+      "message": "Хотите также зашифровать текст?"
+   },
+   "encrypt_text_error_header": {
+      "description": "Header of text decryption error on decrypt result page.",
+      "message": "Невозможно зашифровать файл."
+   },
+   "encrypt_upload_file_warning_too_big": {
+      "description": ".",
+      "message": "Один из файлов слишком велик."
+   },
+   "ext_description": {
+      "description": "Description of the extension.",
+      "message": "Защитите электронные письма и вложения в Gmail, Nextcloud, Outlook и других почтовых сервисах с помощью PGP и сквозного шифрования."
+   },
+   "ext_name": {
+      "description": "Name of the extension.",
+      "message": "Mailvelope - защита email с помощью PGP"
+   },
+   "feature_banner_new_security_background_btn": {
+      "description": "Button text of feature banner for new security background.",
+      "message": "Персонализируйте"
+   },
+   "feature_banner_new_security_background_text": {
+      "description": "Text of feature banner for new security background.",
+      "message": "Сделайте Mailvelope еще безопаснее: настройте фон безопасности."
+   },
+   "file_invalid_signed": {
+      "description": "Text of signer field of file element.",
+      "message": "Ошибка подписи"
+   },
+   "file_not_signed": {
+      "description": "Text of signer field of file element.",
+      "message": "Файл не подписан"
+   },
+   "file_read_error": {
+      "description": "",
+      "message": "Ошибка расшифровки файла: $1"
+   },
+   "file_signed": {
+      "description": "Text of signer field of file element.",
+      "message": "Файл подписан $1"
+   },
+   "form_back": {
+      "description": "Back form button.",
+      "message": "Назад"
+   },
+   "form_busy": {
+      "description": "Form in busy state.",
+      "message": "Обработка"
+   },
+   "form_cancel": {
+      "description": "Cancel form button.",
+      "message": "Отмена"
+   },
+   "form_clear": {
+      "description": "Clear form button.",
+      "message": "Очистить"
+   },
+   "form_close": {
+      "description": "Close form button.",
+      "message": "Закрыть"
+   },
+   "form_confirm": {
+      "description": "Confirm form button.",
+      "message": "Подтвердить"
+   },
+   "form_continue": {
+      "description": "Continue form button.",
+      "message": "Продолжить"
+   },
+   "form_definition_error_no_recipient_key": {
+      "description": "Error message when recipient key is not in keyring",
+      "message": "Нет подходящего ключа для адресата."
+   },
+   "form_definition_error_signature_invalid": {
+      "description": "Error message when the form signature is not valid",
+      "message": "Ошибка формы подписи."
+   },
+   "form_destination": {
+      "description": "URL the form data will be sent to",
+      "message": "Назначение"
+   },
+   "form_destination_default": {
+      "description": "Behavior when no action is specified in form",
+      "message": "Зашифрованные данные появятся на этой странице."
+   },
+   "form_forward": {
+      "description": "Forward form button.",
+      "message": "Переслать"
+   },
+   "form_import": {
+      "description": "Import form button.",
+      "message": "Импорт"
+   },
+   "form_loading": {
+      "description": "Waiting modal when form is loading.",
+      "message": "Загрузка формы"
+   },
+   "form_next": {
+      "description": "Next form button.",
+      "message": "Далее"
+   },
+   "form_no": {
+      "description": "No form button.",
+      "message": "Нет"
+   },
+   "form_ok": {
+      "description": "Ok form button.",
+      "message": "OK"
+   },
+   "form_recipient": {
+      "description": "The email for which the form will be encrypted for",
+      "message": "Получатель"
+   },
+   "form_save": {
+      "description": "Save form button.",
+      "message": "Сохранить"
+   },
+   "form_sign_error_no_default_key": {
+      "description": "Error message when trying to sign and no primary key is found",
+      "message": "В связке ключей отсутствует закрытый ключ для подписывания формы. Пожалуйста, импортируйте или создайте ключ."
+   },
+   "form_submit": {
+      "description": "Submit form button.",
+      "message": "Отправить"
+   },
+   "form_undo": {
+      "description": "Undo form button.",
+      "message": "Отменить действие"
+   },
+   "form_yes": {
+      "description": "Yes form button.",
+      "message": "Да"
+   },
+   "general_default_key_always": {
+      "description": "Label for default private key option.",
+      "message": "Дополнительно шифровать сообщения моим ключом (позволит расшифровывать отправленные письма)"
+   },
+   "general_default_key_auto_sign": {
+      "description": "Label for default private key option.",
+      "message": "Подписывать все исходящие сообщения"
+   },
+   "general_gnupg_check_availability": {
+      "description": "Button label to check availability of GnuPG",
+      "message": "Проверить доступность"
+   },
+   "general_gnupg_installed_question": {
+      "description": "Status message with available user options",
+      "message": "У вас установлена программа GnuPG? Если нет, \u003C0>скачайте отсюда\u003C/0>. Чтобы изменения вступили в силу, \u003C1>перезапустите Mailvelope\u003C/1>. Если вы уверены, что GnuPG установлена, пожалуйста, убедитесь, что она правильно настроена (загляните на \u003C2>эти вики-страницы\u003C/2>."
+   },
+   "general_gnupg_not_available": {
+      "description": "Indicator if GnuPG is not available",
+      "message": "Программа GnuPG недоступна"
+   },
+   "general_gnupg_prefer": {
+      "description": "Question if user prefers to use GnuPG",
+      "message": "Предпочитаете GnuPG?"
+   },
+   "general_openpgp_current": {
+      "description": "Label for current OpenPGP backend. Sentence continues with either 'OpenPGP.js' or 'GnuPG",
+      "message": "Сейчас вы используете"
+   },
+   "general_openpgp_prefer": {
+      "description": "Label for OpenPGP backend selection.",
+      "message": "Какое средство шифрования предпочитаете?"
+   },
+   "general_openpgp_preferences": {
+      "description": "Headline for OpenPGP settings.",
+      "message": "Настройки OpenPGP"
+   },
+   "general_prefer_gnupg_note": {
+      "description": "Help text for GnuPG as the preferred OpenPGP backend option.",
+      "message": "Обратите внимание: открытые ключи синхронизируются между связками ключей. В зависимости от доступности закрытых ключей Mailvelope может действовать иначе, чем определено в настройках приоритета библиотек шифрования."
+   },
+   "gmail_integration_auth_error_download": {
+      "description": "Error message for components requiring authorization of GMAIL integration",
+      "message": "У Mailvelope нет права скачивать вложения. Вам нужно дать Mailvelope доступ к Gmail API, чтобы использовать эту функцию."
+   },
+   "gmail_integration_auth_error_send": {
+      "description": "Error message for components requiring authorization of GMAIL integration",
+      "message": "У Mailvelope нет права отправлять email. Вам нужно дать Mailvelope доступ к Gmail API, чтобы использовать эту функцию."
+   },
+   "gmail_integration_quoted_mail_header_forward": {
+      "description": "Header for forwarded mail",
+      "message": "---------- Пересланное сообщение ---------\nОт: $1\nДата: $2\nТема: $3\nКому: $4"
+   },
+   "gmail_integration_quoted_mail_header_reply": {
+      "description": "Header for quoted reply mail",
+      "message": " $1 $2 пишет:"
+   },
+   "gmail_integration_sent_success": {
+      "description": "Email sent success notification",
+      "message": "Сообщение успешно отправлено."
+   },
+   "gnupg_connection": {
+      "description": "Header that shows that GnuPG is available on the system.",
+      "message": "Обнаружена программа GnuPG"
+   },
+   "gnupg_error_unusable_pub_key": {
+      "description": "",
+      "message": "Пожалуйста, убедитесь, что в вашей связке GnuPG есть следующие действующие ключи: $1"
+   },
+   "header_analyticsconsent_modal": {
+      "description": "h2 modal analytics consent",
+      "message": "Спасибо за вашу поддержку!"
+   },
+   "import_frame_help_text": {
+      "description": "Help text on import frame.",
+      "message": "Нажмите для импорта ключа"
+   },
+   "install_landing_page_hint": {
+      "description": "Install landing page getting started hint",
+      "message": "Нажмите для открытия расширения."
+   },
+   "key_default_active_btn_title": {
+      "description": "Title for active default key button",
+      "message": "Ключ помечен как основной"
+   },
+   "key_default_disabled_btn_title": {
+      "description": "Title for disabled (invalid) default key button",
+      "message": "Ошибка ключа для шифрования и подписи"
+   },
+   "key_default_inactive_btn_title": {
+      "description": "Title for inactive default key button",
+      "message": "Пометить ключ как основной"
+   },
+   "key_export_btn": {
+      "description": "Export key button label",
+      "message": "Экспорт"
+   },
+   "key_export_btn_title": {
+      "description": "Title for export key button",
+      "message": "Экспортировать ключ"
+   },
+   "key_export_create_file": {
+      "description": "Download file button.",
+      "message": "Сохранить"
+   },
+   "key_export_dialog_copy_to_clipboard": {
+      "description": "Copy to clipboard button label.",
+      "message": "Скопировать в буфер обмена"
+   },
+   "key_export_dialog_question": {
+      "description": "Question in export private key dialog.",
+      "message": "Какой ключ вы хотите экспортировать?"
+   },
+   "key_export_dialog_title": {
+      "description": "Title of export key dialog.",
+      "message": "Экспортировать ключ"
+   },
+   "key_export_filename": {
+      "description": "Label of filename input.",
+      "message": "Имя файла"
+   },
+   "key_export_header": {
+      "description": "Export key dialog header.",
+      "message": "Экспортировать ключ"
+   },
+   "key_export_warning_private": {
+      "description": "Key export warning.",
+      "message": "В этом файле содержатся также закрытые ключи. Храните файл в надежном месте, не давайте к нему доступ другим людям."
+   },
+   "key_gen_advanced_btn": {
+      "description": "Advanced key generation settings.",
+      "message": "Дополнительно"
+   },
+   "key_gen_another": {
+      "description": "Key import button",
+      "message": "Создать другой..."
+   },
+   "key_gen_demail": {
+      "description": "De-Mail address name.",
+      "message": "Адрес De-Mail"
+   },
+   "key_gen_error": {
+      "description": "Key generation error message",
+      "message": "Ошибка создания ключа."
+   },
+   "key_gen_experimental": {
+      "description": "A key algorithm is flagged as experimental",
+      "message": "экспериментальное"
+   },
+   "key_gen_expiration": {
+      "description": "Key expiration date",
+      "message": "Ключ истекает"
+   },
+   "key_gen_future_default": {
+      "description": "Key generation algorithm, the future supported standard.",
+      "message": "По умолчанию в будущем"
+   },
+   "key_gen_generate": {
+      "description": "Key generate button label",
+      "message": "Создать"
+   },
+   "key_gen_invalid_email": {
+      "description": "Error message.",
+      "message": "Ошибка адреса email"
+   },
+   "key_gen_key_size": {
+      "description": "Advanced key generation settings: Key size",
+      "message": "Длина ключа"
+   },
+   "key_gen_name_help": {
+      "description": "Help text for name field.",
+      "message": "Полное имя владельца ключа"
+   },
+   "key_gen_pwd": {
+      "description": "Label for passphrase input field",
+      "message": "Введите пароль"
+   },
+   "key_gen_pwd_empty": {
+      "description": "Passphrase input field status",
+      "message": "В поле пароля ничего нет"
+   },
+   "key_gen_pwd_match": {
+      "description": "Passphrase input field status",
+      "message": "Пароли совпадают"
+   },
+   "key_gen_pwd_reenter": {
+      "description": "Label for passphrase input field",
+      "message": "Повторите пароль"
+   },
+   "key_gen_pwd_unequal": {
+      "description": "Passphrase input field status",
+      "message": "Пароли не совпадают"
+   },
+   "key_gen_success": {
+      "description": "Key generation success message",
+      "message": "Новый ключ создан и импортирован в связку ключей"
+   },
+   "key_gen_upload": {
+      "description": "Upload key to Mailvelope key server checkbox",
+      "message": "Загрузить открытый ключ на сервер ключей Mailvelope (можно удалить в любое время)"
+   },
+   "key_gen_wait_header": {
+      "description": "Wait dialog header",
+      "message": "Создание ключа..."
+   },
+   "key_gen_wait_info": {
+      "description": "Wait dialog info message",
+      "message": "Пожалуйста, подождите. Создание ключа может потребовать нескольких минут. Время зависит от разных факторов, например, длины ключа."
+   },
+   "key_import_bulk_success": {
+      "description": "Import success message for more than 5 keys",
+      "message": "Ключи успешно импортированы/обновлены."
+   },
+   "key_import_contacts_import_btn": {
+      "description": "Contact import button label on key import page.",
+      "message": "Импорт ключей"
+   },
+   "key_import_default_description": {
+      "description": "Key import dialog description.",
+      "message": "После подтверждения этот ключ передается в локальную связку ключей:"
+   },
+   "key_import_default_description_plural": {
+      "description": "Key import dialog description.",
+      "message": "После подтверждения эти ключи появятся в связке ключей:"
+   },
+   "key_import_default_headline": {
+      "description": "Key import dialog header.",
+      "message": "Подтвердить ключ"
+   },
+   "key_import_dialog_header": {
+      "description": "Key import dialog header.",
+      "message": "Добавить ключ в связку ключей"
+   },
+   "key_import_error": {
+      "description": "Import error alert.",
+      "message": "Ошибка импорта."
+   },
+   "key_import_error_no_uid": {
+      "description": "Import error no user id found.",
+      "message": "В ключе $1 нет ID пользователя"
+   },
+   "key_import_error_parse": {
+      "description": "Import parse error.",
+      "message": "Ошибка чтения защищенного PGP-ключа: $1"
+   },
+   "key_import_exception": {
+      "description": "Import error alert.",
+      "message": "Ошибка при работе с ключами"
+   },
+   "key_import_file_label": {
+      "description": "File selection label.",
+      "message": "Выбор файлов"
+   },
+   "key_import_from_text_btn": {
+      "description": "Import keys from clipboard button label on key import page.",
+      "message": "Импорт ключа из буфера"
+   },
+   "key_import_from_text_label": {
+      "description": "Import keys from clipboard textarea label on key import page.",
+      "message": "Текст из буфера"
+   },
+   "key_import_invalid_text": {
+      "description": "Import error alert.",
+      "message": "Не найден текст действующего ключа"
+   },
+   "key_import_invalidated_description": {
+      "description": "",
+      "message": "Предупреждение: срок действия ключа для этого контакта истек. Зашифрованная коммуникация с $1 больше невозможна. Необходимо получить актуальный ключ от этого контакта."
+   },
+   "key_import_number_of_failed": {
+      "description": "Error message with number of failed imports.",
+      "message": "Ошибка импорта ключа."
+   },
+   "key_import_number_of_failed_plural": {
+      "description": "Error message with number of failed imports.",
+      "message": "Ошибка импорта ключей ($1)."
+   },
+   "key_import_private_exists": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "Закрытый ключ, соответствующий открытому ключу $1 пользователя $2, импортирован в связку ключей"
+   },
+   "key_import_private_read": {
+      "description": "Import error message. $1: error message",
+      "message": "Ошибка чтения закрытого ключа: $1"
+   },
+   "key_import_private_success": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "Закрытый ключ $1 пользователя $2 импортирован в связку ключей"
+   },
+   "key_import_private_update": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "Обновлен закрытый ключ $1 пользователя $2"
+   },
+   "key_import_public_read": {
+      "description": "Import error message. $1: error message",
+      "message": "Ошибка чтения открытого ключа: $1"
+   },
+   "key_import_public_success": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "Открытый ключ $1 пользователя $2 импортирован в связку ключей"
+   },
+   "key_import_public_update": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "Открытый ключ $1 пользователя $2 обновлен"
+   },
+   "key_import_rotation_add": {
+      "description": "Key import rotation add button.",
+      "message": "Добавить в связку ключей"
+   },
+   "key_import_rotation_cancel": {
+      "description": "Key import rotation cancel button.",
+      "message": "Не сейчас"
+   },
+   "key_import_rotation_description": {
+      "description": "Key import dialog description.",
+      "message": "Если вы продолжите использовать старый ключ, отправитель, возможно, не сможет расшифровать ваши сообщения. Если у вас возникли подозрения, попросите отправителя подтвердить изменение по другому каналу коммуникации. Позже ключ можно будет добавить или удалить."
+   },
+   "key_import_rotation_headline": {
+      "description": "Key import rotation dialog header.",
+      "message": "Отправитель подписал это сообщение новым ключом."
+   },
+   "key_import_search_btn": {
+      "description": "Key search input button.",
+      "message": "Поиск"
+   },
+   "key_import_search_disabled": {
+      "description": "Key search disabled warning.",
+      "message": "Поиск отключен."
+   },
+   "key_import_search_disabled_descr": {
+      "description": "Key search disabled warning description.",
+      "message": "Активируйте в настройках хотя бы один источник ключей."
+   },
+   "key_import_search_found": {
+      "description": "Key search found label.",
+      "message": "Ключ найден в:"
+   },
+   "key_import_search_found_modified": {
+      "description": "Key search found label.",
+      "message": "последнее изменение:"
+   },
+   "key_import_search_found_source": {
+      "description": "Key search found label.",
+      "message": "Источник:"
+   },
+   "key_import_search_invalid": {
+      "description": "Key search input has invalid content.",
+      "message": "Введите действительный адрес электронной почты, ID ключа (16 цифр) или отпечаток (40 цифр)"
+   },
+   "key_import_search_not_found": {
+      "description": "Key search found no result error message.",
+      "message": "Ключ не доступен ни в одном из каталогов ключей."
+   },
+   "key_import_search_not_found_header": {
+      "description": "Key search found no result header.",
+      "message": "Ключ не найден."
+   },
+   "key_import_search_ph": {
+      "description": "Key search input place holder.",
+      "message": "Адрес электронной почты / Идентификатор ключа / Отпечаток"
+   },
+   "key_import_textarea": {
+      "description": "Key import box.",
+      "message": "Импортировать ключ как текст"
+   },
+   "key_import_too_big": {
+      "description": "Import error alert.",
+      "message": "Текст слишком велик для импорта. Попробуйте импортировать по частям."
+   },
+   "key_import_unable": {
+      "description": "Import error message: $1: error message.",
+      "message": "Ошибка импорта ключа: $1"
+   },
+   "key_keyserver_mod": {
+      "description": "Local key data differs from Mailvelope key server",
+      "message": "Данные ключей на сервере Mailvelope более не актуальны."
+   },
+   "key_keyserver_not": {
+      "description": "Key is not on the the Mailvelope server",
+      "message": "Ключ не синхронизирован с сервером ключей Mailvelope."
+   },
+   "key_keyserver_remove": {
+      "description": "A deletion request has been sent to the Mailvelope key server",
+      "message": "Для окончательного удаления ключа с сервера ключей Mailvelope по всем пользовательским ID ключа было разослано подтверждающее письмо."
+   },
+   "key_keyserver_remove_btn": {
+      "description": "Key server remove existing key button label",
+      "message": "Удалить все пользовательские ID"
+   },
+   "key_keyserver_resend_btn": {
+      "description": "Key server send again button label",
+      "message": "Отправить снова"
+   },
+   "key_keyserver_sync": {
+      "description": "Key data is synchronized with the Mailvelope key server",
+      "message": "Данные ключей на сервере ключей Mailvelope актуальны."
+   },
+   "key_keyserver_update": {
+      "description": "An update request has been sent to the Mailvelope key server",
+      "message": "Данные ключей на сервере ключей Mailvelope были обновлены."
+   },
+   "key_keyserver_update_btn": {
+      "description": "Key server update button label",
+      "message": "Обновление"
+   },
+   "key_keyserver_upload": {
+      "description": "An upload request has been sent to the Mailvelope key server",
+      "message": "Чтобы синхронизировать ключ с сервером ключей Mailvelope, по всем пользовательским ID ключа разослано подтверждающее письмо."
+   },
+   "key_keyserver_upload_btn": {
+      "description": "Key server upload button label",
+      "message": "Синхронизировать"
+   },
+   "key_recovery_failed": {
+      "description": "",
+      "message": "Не получилось восстановить ключ из резервной копии."
+   },
+   "key_remove_btn": {
+      "description": "Remove key button label",
+      "message": "Удалить"
+   },
+   "key_remove_btn_title": {
+      "description": "Title for remove key button",
+      "message": "Удалить ключ из связки"
+   },
+   "key_remove_dialog_title": {
+      "description": "Title of delete key dialog.",
+      "message": "Удалить ключ"
+   },
+   "key_revoke_btn": {
+      "description": "Revoke key button label",
+      "message": "Отозвать"
+   },
+   "key_revoke_btn_title": {
+      "description": "Title for revoke key button",
+      "message": "Отозвать ключ"
+   },
+   "key_revoke_dialog_confirm": {
+      "description": "Confirmation question of revoke key dialog.",
+      "message": "Вы все еще хотите отозвать ключ?"
+   },
+   "key_revoke_dialog_description": {
+      "description": "Text of revoke key dialog.",
+      "message": "После отзыва ключ уже никогда нельзя будет использовать."
+   },
+   "key_revoke_dialog_title": {
+      "description": "Title of revoke key dialog.",
+      "message": "Отозвать ключ"
+   },
+   "key_set_as_default": {
+      "description": "Set as default key for the keyring button",
+      "message": "Сделать основным"
+   },
+   "keybackup_failed": {
+      "description": "",
+      "message": "Ошибка создания резервной копии."
+   },
+   "keybackup_restore_dialog_button": {
+      "description": "",
+      "message": "Восстановить из резервной копии"
+   },
+   "keybackup_restore_dialog_description": {
+      "description": "",
+      "message": "Создайте здесь новый лист восстановления, если:"
+   },
+   "keybackup_restore_dialog_headline": {
+      "description": "",
+      "message": "Совет: создайте резервную копию"
+   },
+   "keybackup_restore_dialog_list_1": {
+      "description": "",
+      "message": "Вы потеряли свой лист восстановления."
+   },
+   "keybackup_restore_dialog_list_2": {
+      "description": "",
+      "message": "Новый лист восстановления нужен по соображениям безопасности."
+   },
+   "keybackup_setup_dialog_button": {
+      "description": "",
+      "message": "Создать резервную копию"
+   },
+   "keybackup_setup_dialog_description": {
+      "description": "",
+      "message": "Резервная копия нужна для вашей зашифрованной переписки:"
+   },
+   "keybackup_setup_dialog_headline": {
+      "description": "",
+      "message": "Совет: настройте резервную копию"
+   },
+   "keybackup_setup_dialog_list_1": {
+      "description": "In order to restore your encrypted communication in case of data loss.",
+      "message": "Для восстановления в случае потери данных"
+   },
+   "keybackup_setup_dialog_list_2": {
+      "description": "In order to transfer your encrypted communication to other devices.",
+      "message": "Для передачи на другие устройства"
+   },
+   "keybackup_waiting_description": {
+      "description": "",
+      "message": "Готовится документ с вашим кодом восстановления."
+   },
+   "keybackup_waiting_headline": {
+      "description": "",
+      "message": "Создание резервной копии"
+   },
+   "keydetails_change_exp_date_dialog_note": {
+      "description": "Important note in change expiration date dialog.",
+      "message": "Дата истечения будет изменена также для всех подключей. Изменения не коснутся истекших и неработающих ключей."
+   },
+   "keydetails_change_exp_date_dialog_title": {
+      "description": "Title of change expiration date dialog.",
+      "message": "Изменить дату окончания срока действия"
+   },
+   "keydetails_change_pwd_dialog_old": {
+      "description": "Old password input label",
+      "message": "Прежний пароль"
+   },
+   "keydetails_change_pwd_dialog_title": {
+      "description": "Title of change password dialog.",
+      "message": "Изменить пароль"
+   },
+   "keydetails_creation_date": {
+      "description": "Creation date of a PGP key.",
+      "message": "Создан"
+   },
+   "keydetails_expiration_date": {
+      "description": "Expiration date of a PGP key.",
+      "message": "Истекает"
+   },
+   "keydetails_key_not_expire": {
+      "description": "Expiration date of a PGP key not set.",
+      "message": "никогда"
+   },
+   "keydetails_password": {
+      "description": "Password of a PGP key.",
+      "message": "Пароль"
+   },
+   "keydetails_title": {
+      "description": "Title of the key details panel",
+      "message": "Подробная информация о ключе"
+   },
+   "keygen_dialog_password_error_length": {
+      "description": "",
+      "message": "В пароле должно быть не меньше $1 знаков"
+   },
+   "keygen_dialog_password_placeholder": {
+      "description": "",
+      "message": "минимум 4 знака"
+   },
+   "keygen_dialog_prolog": {
+      "description": "",
+      "message": "Пожалуйста, придумайте пароль для своего ключа, чтобы защитить шифрованную переписку:"
+   },
+   "keygen_waiting_description": {
+      "description": "",
+      "message": "Иногда на это требуется несколько минут. Браузер может перестать отвечать. Пожалуйста, немного терпения."
+   },
+   "keygen_waiting_headline": {
+      "description": "",
+      "message": "Настройка шифрованной переписки"
+   },
+   "keygrid_algorithm": {
+      "description": "Public-key algorithm of a PGP key.",
+      "message": "Алгоритм"
+   },
+   "keygrid_all_keys": {
+      "description": "Selection of key type.",
+      "message": "Все"
+   },
+   "keygrid_creation_date": {
+      "description": "Creation date of a PGP key.",
+      "message": "Cоздан"
+   },
+   "keygrid_creation_date_short": {
+      "description": "Short creation date of a PGP key. Max. width: 90px",
+      "message": "Создан"
+   },
+   "keygrid_default_key": {
+      "description": "Default key in the keyring.",
+      "message": "Основной ключ"
+   },
+   "keygrid_default_label": {
+      "description": "Label for the default key",
+      "message": "По умолчанию"
+   },
+   "keygrid_delete": {
+      "description": "Max. 6 characters.",
+      "message": "Удал."
+   },
+   "keygrid_delete_confirmation": {
+      "description": "Delete confirmation dialog.",
+      "message": "Действительно удалить этот ключ?"
+   },
+   "keygrid_display_all_keys": {
+      "description": "Export key menu.",
+      "message": "Показать все ключи"
+   },
+   "keygrid_display_priv_key": {
+      "description": "Export key menu.",
+      "message": "Показать закрытый ключ"
+   },
+   "keygrid_display_pub_key": {
+      "description": "Export key menu.",
+      "message": "Показать открытый ключ"
+   },
+   "keygrid_expiration_date": {
+      "description": "Expiration date of a PGP key.",
+      "message": "Истекает"
+   },
+   "keygrid_export": {
+      "description": "Export key.",
+      "message": "Экспорт"
+   },
+   "keygrid_export_title": {
+      "description": "Title for Export key button.",
+      "message": "Экспортировать все ключи из списка в файл"
+   },
+   "keygrid_generate_title": {
+      "description": "Title for generate key button",
+      "message": "Создать ключ"
+   },
+   "keygrid_import_search_title": {
+      "description": "Title for Search key button.",
+      "message": "Поиск открытых ключей во внешних источниках"
+   },
+   "keygrid_import_title": {
+      "description": "Title for Import key button.",
+      "message": "Импортировать ключ"
+   },
+   "keygrid_invalid_userid": {
+      "description": "User ID invalid.",
+      "message": "Ошибка ID пользователя"
+   },
+   "keygrid_key_fingerprint": {
+      "description": "Unique string identifier for a PGP key.",
+      "message": "Отпечаток"
+   },
+   "keygrid_key_length": {
+      "description": "Key length of a PGP key.",
+      "message": "Длина"
+   },
+   "keygrid_key_not_expire": {
+      "description": "Expiration date of a PGP key not set.",
+      "message": "Этот ключ не ограничен по времени"
+   },
+   "keygrid_keyid": {
+      "description": "Key ID of a PGP key.",
+      "message": "ID ключа"
+   },
+   "keygrid_primary_key": {
+      "description": "Main key in the PGP key.",
+      "message": "Ключ"
+   },
+   "keygrid_private_keys": {
+      "description": "Selection of key type.",
+      "message": "Закрытые ключи"
+   },
+   "keygrid_public_keys": {
+      "description": "Selection of key type.",
+      "message": "Открытые ключи"
+   },
+   "keygrid_refresh": {
+      "description": "Refresh keygrid component.",
+      "message": "Обновить"
+   },
+   "keygrid_refresh_title": {
+      "description": "Title for button to refresh keygrid component.",
+      "message": "Перезагрузить связку ключей"
+   },
+   "keygrid_send_pub_key": {
+      "description": "Export key menu.",
+      "message": "Отправить открытый ключ по email"
+   },
+   "keygrid_signer_name": {
+      "description": "User ID of signer.",
+      "message": "Подписант"
+   },
+   "keygrid_signer_unknown": {
+      "description": "Key of signer not available.",
+      "message": "Неизвестный подписант"
+   },
+   "keygrid_sort_type": {
+      "description": "Key grid sort selector.",
+      "message": "Фильтры"
+   },
+   "keygrid_status_expired": {
+      "description": "Validity status of a PGP key.",
+      "message": "просрочен"
+   },
+   "keygrid_status_invalid": {
+      "description": "Validity status of a PGP key.",
+      "message": "недействующий"
+   },
+   "keygrid_status_revoked": {
+      "description": "Validity status of a PGP key.",
+      "message": "отозван"
+   },
+   "keygrid_status_valid": {
+      "description": "Validity status of a PGP key.",
+      "message": "действующий"
+   },
+   "keygrid_subkey": {
+      "description": "Subkey of a PGP key.",
+      "message": "Подключ"
+   },
+   "keygrid_subkeys": {
+      "description": "Subkeys of a PGP key.",
+      "message": "Подключи"
+   },
+   "keygrid_user_email": {
+      "description": "Email address in User ID of a PGP key.",
+      "message": "E-mail"
+   },
+   "keygrid_user_ids": {
+      "description": "User IDs of a PGP key.",
+      "message": "ID пользователя"
+   },
+   "keygrid_user_name": {
+      "description": "Name in User ID of a PGP key.",
+      "message": "Имя"
+   },
+   "keygrid_user_primary": {
+      "description": "Primary status of User ID of a PGP key",
+      "message": "Основной"
+   },
+   "keygrid_userid_signatures": {
+      "description": "Signatures on User ID of a PGP key.",
+      "message": "Подписи"
+   },
+   "keygrid_validity_status": {
+      "description": "Validity status of a PGP key.",
+      "message": "Статус"
+   },
+   "keyring_available_settings": {
+      "description": "Text introducing the availability of further settings.",
+      "message": "См. настройки:"
+   },
+   "keyring_backup": {
+      "description": "Title of keyring backup view",
+      "message": "Резервная копия связки ключей"
+   },
+   "keyring_confirm_deletion": {
+      "description": "Confirmation message prompted when a keyring is deleted",
+      "message": "Хотите удалить связку ключей с ID: $1?"
+   },
+   "keyring_confirm_keys": {
+      "description": "Tab of keyring to import keys.",
+      "message": "Подтверждение ключа для импорта"
+   },
+   "keyring_confirm_keys_plural": {
+      "description": "Tab of keyring to import keys.",
+      "message": "Подтверждение $1 ключей для импорта"
+   },
+   "keyring_export_keys": {
+      "description": "Tab of keyring to export keys.",
+      "message": "Экспортировать связку ключей"
+   },
+   "keyring_generate_key": {
+      "description": "Tab of keyring to generate key.",
+      "message": "Создать ключ"
+   },
+   "keyring_header": {
+      "description": "Header of the key ring.",
+      "message": "Управление ключами"
+   },
+   "keyring_import_description": {
+      "description": "Description of key import for import tab of keyring import.",
+      "message": "Ключ можно добавить как из файла, так и через буфер памяти."
+   },
+   "keyring_import_keys": {
+      "description": "Tab of keyring to import keys.",
+      "message": "Импорт ключей"
+   },
+   "keyring_import_search_description": {
+      "description": "Description of key search for search tab of keyring import.",
+      "message": "Поиск открытых ключей для добавления в связку ключей. Mailvelope сканирует несколько каталогов ключей и предлагает открытый ключ, который, скорее всего, используется."
+   },
+   "keyring_import_search_keys": {
+      "description": "Tab of keyring to search keys.",
+      "message": "Поиск ключей"
+   },
+   "keyring_main": {
+      "description": "Label for the main keyring",
+      "message": "Основная связка ключей"
+   },
+   "keyring_private": {
+      "description": "private key type",
+      "message": "Закрытый"
+   },
+   "keyring_public": {
+      "description": "public key type",
+      "message": "Открытый"
+   },
+   "keyring_public_private": {
+      "description": "public and private key types",
+      "message": "Пары ключей"
+   },
+   "keyring_remove_dialog_title": {
+      "description": "Title of delete keyring dialog.",
+      "message": "Удалить связку ключей"
+   },
+   "keyring_setup": {
+      "description": "Setup keyring for mail provider.",
+      "message": "Настройки"
+   },
+   "keyring_setup_generate_key": {
+      "description": "Generate key",
+      "message": "Создать ключ"
+   },
+   "keyring_setup_generate_key_explanation": {
+      "description": "Generate key",
+      "message": "Если вы используете наше расширение впервые и у вас еще нет пары ключей, пожалуйста, создайте эту пару сейчас."
+   },
+   "keyring_setup_import_key": {
+      "description": "Import key",
+      "message": "Импорт ключа"
+   },
+   "keyring_setup_import_key_explanation": {
+      "description": "Import key",
+      "message": "У вас уже есть пара ключей на другом устройстве? Вы можете импортировать эти ключи. Просто экспортируйте ключи на другом устройстве, а затем импортируйте их здесь."
+   },
+   "keyring_setup_no_keypair": {
+      "description": "Setup text if no keypair available",
+      "message": "Пара ключей нужна для шифрования и расшифровки сообщений, а также чтобы предложить вашим адресатам шифровать переписку."
+   },
+   "keyring_setup_no_keypair_heading": {
+      "description": "Setup heading if no keypair available",
+      "message": "В связке ключей пока нет парных ключей."
+   },
+   "keyserver_additionals_label": {
+      "description": "Label for configuration of additional key sources",
+      "message": "Дополнительно"
+   },
+   "keyserver_autocrypt_lookup": {
+      "description": "Enable Looking Up Keys Via Autocrypt",
+      "message": "Использовать ключи из заголовков Autocrypt входящих писем"
+   },
+   "keyserver_key_binding_header": {
+      "description": "Header for key binding feature",
+      "message": "Обнаружение ключей"
+   },
+   "keyserver_key_binding_label": {
+      "description": "Label for key binding feature",
+      "message": "Определение текущего ключа контактов и автоматический подбор ключа"
+   },
+   "keyserver_oks_lookup": {
+      "description": "Enable keys.openpgp.org Auto Lookup",
+      "message": "Автоматический поиск ключей на \u003C0>keys.openpgp.org\u003C/0>"
+   },
+   "keyserver_tofu_lookup": {
+      "description": "Enable Mailvelope Key Server Auto Lookup",
+      "message": "Использовать сервер ключей Mailvelope"
+   },
+   "keyserver_verifying_servers": {
+      "description": "Label for verifying key servers.",
+      "message": "Сервер ключей с проверкой по электронной почте"
+   },
+   "keyserver_wkd_lookup": {
+      "description": "Enable Web Key Directory Auto Lookup",
+      "message": "Запрашивать ключи у почтовых провайдеров получателей (Web Key Directory)"
+   },
+   "keyusers_add_btn": {
+      "description": "Add user button label",
+      "message": "Добавить новый"
+   },
+   "keyusers_add_btn_title": {
+      "description": "Add user button title",
+      "message": "Добавить новый ID пользователя"
+   },
+   "keyusers_keyserver": {
+      "description": "Label of key server column key users table",
+      "message": "Сервер ключей"
+   },
+   "keyusers_keyserver_not": {
+      "description": "User ID not synchronized with key server label text",
+      "message": "не синхронизировано"
+   },
+   "keyusers_keyserver_sync": {
+      "description": "User ID synchronized with key server label text",
+      "message": "синхронизировано"
+   },
+   "keyusers_keyserver_unverified": {
+      "description": "User ID key server not verified label text",
+      "message": "не подтверждено"
+   },
+   "keyusers_title": {
+      "description": "Title of the key users panel",
+      "message": "Пользовательские ID"
+   },
+   "learn_more_link": {
+      "description": "Text of a link to a learn-more resource",
+      "message": "Узнать больше"
+   },
+   "message_no_keys": {
+      "description": "Decrypt error message.",
+      "message": "Не найден закрытый ключ для этого сообщения. Требуется закрытый ключ с ID: $1"
+   },
+   "message_read_error": {
+      "description": "Message read error message: $1: error message.",
+      "message": "Ошибка расшифровки сообщения: $1"
+   },
+   "nameaddrinput_error_email_exists": {
+      "description": "Error message for email input field.",
+      "message": "Адрес уже используется"
+   },
+   "nameaddrinput_error_name_empty": {
+      "description": "Error message for name input field.",
+      "message": "Пожалуйста, укажите имя"
+   },
+   "notification_text_copy_to_clipboard": {
+      "description": "Copy to clipboard toast message.",
+      "message": "Текст скопирован в буфер."
+   },
+   "options_docu": {
+      "description": "Options navigation: Documentation.",
+      "message": "Документация"
+   },
+   "options_home": {
+      "description": "Options navigation: Home.",
+      "message": "Настройки"
+   },
+   "options_settings": {
+      "description": "Options header: Settings.",
+      "message": "Прочее"
+   },
+   "options_title": {
+      "description": "Title of options page.",
+      "message": "Настройки Mailvelope"
+   },
+   "paragraph_analyticsconsent_modal": {
+      "description": "p modal analytics consent",
+      "message": "Вы можете отказаться в любой момент, изменив настройки."
+   },
+   "preferred": {
+      "description": "Indicates if a keyring is preferred",
+      "message": "предпочитаемый"
+   },
+   "provider_gmail_auth": {
+      "description": "Authorizations",
+      "message": "Авторизации"
+   },
+   "provider_gmail_auth_cancel_btn": {
+      "description": "Cancel authorization button",
+      "message": "Отменить авторизацию"
+   },
+   "provider_gmail_auth_readonly": {
+      "description": "Readonly authorization",
+      "message": "чтение email"
+   },
+   "provider_gmail_auth_send": {
+      "description": "Send authorization",
+      "message": "отправка email"
+   },
+   "provider_gmail_auth_table_title": {
+      "description": "Title for authorization table.",
+      "message": "Авторизации Google API"
+   },
+   "provider_gmail_dialog_auth_google_signin": {
+      "description": "Text Google sign in button",
+      "message": "Вход с Google"
+   },
+   "provider_gmail_dialog_auth_intro": {
+      "description": "Intro text for GMAIL OAuth dialog.",
+      "message": "Чтобы использовать интеграцию с Gmail для \u003C0>\u003C/0>, Mailvelope нужны следующие разрешения:"
+   },
+   "provider_gmail_dialog_auth_outro": {
+      "description": "Outro text for GMAIL OAuth dialog.",
+      "message": "Если вы нажмете кнопку входа, откроется окно авторизации Google. Укажите свой аккаунт Gmail для адреса \u003C0>\u003C/0> и следуйте инструкциям."
+   },
+   "provider_gmail_dialog_description": {
+      "description": "Leading text for GMAIL API dialog.",
+      "message": "Использование Gmail API расширяет функционал Mailvelope в паре с Gmail. Отправлять и получать шифрованные письма и вложения станет проще."
+   },
+   "provider_gmail_dialog_gsuite_alert": {
+      "description": "Alert text for GSuite Users in GMAIL API dialog.",
+      "message": "This feature is free for Gmail accounts. If you are part of a Google Workspace (\u003C0>workspace.google.com\u003C/0>) organization, you will need to purchase a license from the \u003C1>Mailvelope website\u003C/1>."
+   },
+   "provider_gmail_dialog_privacy_policy": {
+      "description": "Privacy policy link.",
+      "message": "Наша политика приватности"
+   },
+   "provider_gmail_dialog_title": {
+      "description": "Title of GMAIL API dialog.",
+      "message": "Использование Gmail API"
+   },
+   "provider_gmail_integration": {
+      "description": "Label for Gmail integration option.",
+      "message": "Интеграция Gmail API"
+   },
+   "provider_gmail_integration_info": {
+      "description": "Info message for Gmail integration option",
+      "message": "Mailvelope требуются дополнительные разрешения для доступа к Gmail API. Как только вы решите воспользоваться шифрованием Mailvelope в Gmail, вам предложат авторизоваться. Понадобится войти в аккаунт Google."
+   },
+   "provider_gmail_integration_warning": {
+      "description": "Warning message, when Gmail is not authorized",
+      "message": "Gmail не авторизована для поискового шаблона \u003C0>\u003C/0>. Пожалуйста, проверьте настройки (\u003C1>\u003C/1>)."
+   },
+   "provider_gmail_licensing_dialog_business_btn_info": {
+      "description": "Info text on Business button ",
+      "message": "Безопасная связь с организациями по всему миру"
+   },
+   "provider_gmail_licensing_dialog_business_btn_price_info": {
+      "description": "Info text for price label of Business button",
+      "message": "пользователь / в месяц"
+   },
+   "provider_gmail_licensing_dialog_deactivate_btn": {
+      "description": "Gmail API deactivate button in licensing dialog",
+      "message": "Продолжить без Gmail API"
+   },
+   "provider_gmail_licensing_dialog_para_1": {
+      "description": "Text of Gmail API licensing dialog first paragraph.",
+      "message": "Use of the Gmail API within Google Workspace organizations is \u003C0>subject to a fee\u003C/0>."
+   },
+   "provider_gmail_licensing_dialog_para_2": {
+      "description": "Text of Gmail API licensing dialog second paragraph.",
+      "message": "Можно использовать Mailvelope с Gmail бесплатно, однако \u003C0>с API ваш рабочий процесс\u003C/0> (создание и чтение шифрованных сообщений и вложений) будет \u003C1>заметно быстрее и проще\u003C/1>."
+   },
+   "provider_gmail_licensing_dialog_para_3": {
+      "description": "Text of Gmail API licensing dialog third paragraph.",
+      "message": "Попробуйте Mailvelope Business с активированным Gmail API \u003C0>14 дней бесплатно\u003C/0>:"
+   },
+   "provider_gmail_licensing_dialog_test_btn": {
+      "description": "Gmail API test button in licensing dialog",
+      "message": "Попробуйте Gmail API бесплатно"
+   },
+   "provider_gmail_licensing_dialog_title": {
+      "description": "Title of GMAIL API licensing dialog.",
+      "message": "Нужна лицензия Mailvelope Business"
+   },
+   "provider_gmail_licensing_table_caption": {
+      "description": "Caption for G Suite licensing table.",
+      "message": "Licenses to use the Gmail API integration within Google Workspace (\u003C0>workspace.google.com\u003C/0>) can be purchased from the \u003C1>Mailvelope website\u003C/1>."
+   },
+   "provider_gmail_licensing_table_title": {
+      "description": "Title for G Suite licensing table.",
+      "message": "Лицензия Mailvelope"
+   },
+   "provider_gmail_secure_forward_btn": {
+      "description": "Secure forward button title/tooltip",
+      "message": "Безопасная пересылка"
+   },
+   "provider_gmail_secure_replyAll_btn": {
+      "description": "Secure reply all button title/tooltip",
+      "message": "Безопасный ответ всем"
+   },
+   "provider_gmail_secure_reply_btn": {
+      "description": "Secure reply button title/tooltip",
+      "message": "Безопасный ответ"
+   },
+   "pwd_dialog_cache_pwd": {
+      "description": "Checkbox label for remembering of the password.",
+      "message": "Временно запомнить пароль"
+   },
+   "pwd_dialog_cancel": {
+      "description": "User canceled key unlock dialog.",
+      "message": "Действие с ключом отменено."
+   },
+   "pwd_dialog_header": {
+      "description": "Header of the password dialog.",
+      "message": "Введите пароль ключа"
+   },
+   "pwd_dialog_pwd_please": {
+      "description": "Placeholder for password.",
+      "message": "Пожалуйста, введите пароль"
+   },
+   "pwd_dialog_reason_add_user": {
+      "description": "",
+      "message": "Для создания ID пользователя, пожалуйста, укажите пароль."
+   },
+   "pwd_dialog_reason_create_backup": {
+      "description": "",
+      "message": "Пожалуйста, введите свой пароль ключа, чтобы создать лист восстановления."
+   },
+   "pwd_dialog_reason_create_draft": {
+      "description": "",
+      "message": "Чтобы сохранить черновик, введите пароль ключа."
+   },
+   "pwd_dialog_reason_decrypt": {
+      "description": "",
+      "message": "Для расшифровки сообщения введите пароль ключа"
+   },
+   "pwd_dialog_reason_editor": {
+      "description": "",
+      "message": "Пожалуйста, введите пароль ключа для изменения настроек шифрованных коммуникаций."
+   },
+   "pwd_dialog_reason_revoke": {
+      "description": "",
+      "message": "Для отзыва этого ключа, пожалуйста, укажите пароль."
+   },
+   "pwd_dialog_reason_revoke_user": {
+      "description": "",
+      "message": "Для отзыва ID пользователя, пожалуйста, укажите пароль."
+   },
+   "pwd_dialog_reason_set_exdate": {
+      "description": "",
+      "message": "Для изменения срока действия ключа, пожалуйста, укажите пароль."
+   },
+   "pwd_dialog_reason_sign": {
+      "description": "",
+      "message": "Для подписи сообщения введите пароль ключа"
+   },
+   "pwd_dialog_title": {
+      "description": "Title of the password dialog.",
+      "message": "Ввод пароля | Mailvelope"
+   },
+   "pwd_dialog_userid": {
+      "description": "Label for user ID.",
+      "message": "ID польз.:"
+   },
+   "pwd_dialog_wrong_pwd": {
+      "description": "Password error message.",
+      "message": "Неверный пароль"
+   },
+   "recovery_sheet_backup_data": {
+      "description": "",
+      "message": "Резервная копия ваших данных"
+   },
+   "recovery_sheet_backup_local": {
+      "description": "",
+      "message": "Чтобы сохранять данные только на своем компьютере, используйте опцию в настройках шифрования вашей учетной записи  ($1)."
+   },
+   "recovery_sheet_backup_server": {
+      "description": "",
+      "message": "Резервная копия данных, необходимых для шифрованной связи (например, пароля ключа), будет храниться в зашифрованном виде на сервере ($1)  нашего партнера Mailvelope."
+   },
+   "recovery_sheet_be_aware": {
+      "description": "Label",
+      "message": "Обратите внимание"
+   },
+   "recovery_sheet_check_settings": {
+      "description": "",
+      "message": "пожалуйста, проверьте настройки своего аккаунта:"
+   },
+   "recovery_sheet_creation_date": {
+      "description": "Label for recovery sheet creation date",
+      "message": "Создан"
+   },
+   "recovery_sheet_data_lost": {
+      "description": "",
+      "message": "без резервной копии вы не сможете прочесть однажды зашифрованные сообщения, если потеряли пароль ключа, а также в случае проблем с устройством или расширением браузера!"
+   },
+   "recovery_sheet_encryption_note": {
+      "description": "Sub title",
+      "message": "Советы по шифрованию коммуникаций ($1)."
+   },
+   "recovery_sheet_enter_code": {
+      "description": "Label for navigation path",
+      "message": "Для установки на другом компьютере введите код восстановления в настройках:"
+   },
+   "recovery_sheet_explain_pgp": {
+      "description": "",
+      "message": "Связь с $1 зашифрована с использованием PGP. Вы можете отправлять шифрованные письма так, что лишь вы и адресаты сможете их прочесть."
+   },
+   "recovery_sheet_extension_problems": {
+      "description": "List item",
+      "message": "из-за проблем с расширением браузера,"
+   },
+   "recovery_sheet_forgot_password": {
+      "description": "List item",
+      "message": "потому что вы забыли пароль ключа,"
+   },
+   "recovery_sheet_further_info": {
+      "description": "",
+      "message": "Прочая информация и другие настройки доступны в вашей учетной записи $1"
+   },
+   "recovery_sheet_header": {
+      "description": "Title of recovery sheet.",
+      "message": "Важная информация!"
+   },
+   "recovery_sheet_in_general": {
+      "description": "Label",
+      "message": "Как правило, это важно"
+   },
+   "recovery_sheet_invite_contacts": {
+      "description": "",
+      "message": "В настройках шифрования вашей учетной записи $1 вы можете пригласить других адресатов использовать связь с шифрованием PGP. Если адресат уже получал приглашение и все прошло нормально, рядом с email вы увидите значок замочка."
+   },
+   "recovery_sheet_keep_safe": {
+      "description": "",
+      "message": "распечатайте и сохраните документ в надежном месте, чтобы никто не узнал код восстановления."
+   },
+   "recovery_sheet_key_server": {
+      "description": "",
+      "message": "Других пользователей $1, которые используют PGP-шифрование GMX, можно увидеть в главной папке вашей учетной записи $1. Если вам это не нужно, можете отключить соответствующую функцию в настройках вашей учетной записи $1."
+   },
+   "recovery_sheet_mobile_devices": {
+      "description": "",
+      "message": "На мобильных устройствах"
+   },
+   "recovery_sheet_not_working": {
+      "description": "Label for list",
+      "message": "Если шифрование сообщений больше не работает"
+   },
+   "recovery_sheet_other_computer": {
+      "description": "",
+      "message": "На другом компьютере"
+   },
+   "recovery_sheet_other_contacts": {
+      "description": "",
+      "message": "Зашифрованная переписка с другими адресатами"
+   },
+   "recovery_sheet_other_devices": {
+      "description": "Sub title",
+      "message": "Зашифрованная переписка на других устройствах"
+   },
+   "recovery_sheet_other_devices_setup": {
+      "description": "",
+      "message": "Настройка шифрованной переписки на других устройствах"
+   },
+   "recovery_sheet_other_problems": {
+      "description": "List item",
+      "message": "по другим причинам,"
+   },
+   "recovery_sheet_pgp_compat": {
+      "description": "",
+      "message": "Вы можете безопасно общаться с адресатами, которые также используют PGP-шифрование переписки."
+   },
+   "recovery_sheet_print_block": {
+      "description": "Sub title of recovery sheet.",
+      "message": "Пожалуйста, сохраните этот документ в надежном месте!"
+   },
+   "recovery_sheet_print_button": {
+      "description": "",
+      "message": "Печать"
+   },
+   "recovery_sheet_print_notice": {
+      "description": "Sub title of recovery sheet.",
+      "message": "Пожалуйста, распечатайте этот документ и сохраните его в надежном месте!"
+   },
+   "recovery_sheet_provider_communication": {
+      "description": "",
+      "message": "Шифрованная переписка"
+   },
+   "recovery_sheet_provider_inbox": {
+      "description": "",
+      "message": "Входящие"
+   },
+   "recovery_sheet_provider_security": {
+      "description": "",
+      "message": "Безопасность"
+   },
+   "recovery_sheet_provider_settings": {
+      "description": "",
+      "message": "Настройки"
+   },
+   "recovery_sheet_qr_code": {
+      "description": "",
+      "message": "Сканируйте QR-код с помощью своего мобильного устройства."
+   },
+   "recovery_sheet_recommendation": {
+      "description": "",
+      "message": "Рекомендация"
+   },
+   "recovery_sheet_recover_data": {
+      "description": "Sub title",
+      "message": "Восстановление данных"
+   },
+   "recovery_sheet_recovery_code": {
+      "description": "",
+      "message": "Код восстановления"
+   },
+   "recovery_sheet_subtitle_receipt": {
+      "description": "Sub title of recovery sheet.",
+      "message": "Лист восстановления для зашифрованной переписки"
+   },
+   "recovery_sheet_subtitle_recover": {
+      "description": "Sub title",
+      "message": "Восстановление зашифрованной переписки"
+   },
+   "recovery_sheet_trusted_contacts": {
+      "description": "",
+      "message": "Если речь о пользователях GMX, вы можете быть уверены в их аутентичности. Если это пользователь какого-нибудь иного почтового сервиса, никогда не помешает проверить его личность."
+   },
+   "recovery_sheet_unknown_third": {
+      "description": "",
+      "message": "устанавливайте шифрование переписки только на безопасных устройствах, которые не могут оказаться в руках посторонних."
+   },
+   "recovery_sheet_unlock_backup": {
+      "description": "",
+      "message": "Резервную копию ваших данных можно расшифровать только с помощью кода восстановления на этом листе восстановления."
+   },
+   "reload_tab": {
+      "description": "Info message.",
+      "message": "Пожалуйста, перезагрузите соответствующие страницы, чтобы изменения вступили в силу."
+   },
+   "restore_backup_dialog_button": {
+      "description": "",
+      "message": "Подтвердить"
+   },
+   "restore_backup_dialog_headline": {
+      "description": "",
+      "message": "Пожалуйста, введите ваш код восстановления:"
+   },
+   "restore_password_dialog_button": {
+      "description": "",
+      "message": "Показать"
+   },
+   "restore_password_dialog_headline": {
+      "description": "",
+      "message": "Пароль ключа:"
+   },
+   "security_background_color_text": {
+      "description": "Security background select color text",
+      "message": "2. Выберите цвет"
+   },
+   "security_background_icons_text": {
+      "description": "Security background select icon text",
+      "message": "1. Выберите изображение"
+   },
+   "security_background_text": {
+      "description": "Security background text",
+      "message": "Фон безопасности используется во время просмотра и редактирования зашифрованных писем. Для пущей безопасности можно персонализировать этот фон. Так вы будете уверены, что никто не подсунул вам фальшивый интерфейс Mailvelope и не получил доступ к вашим персональным данным."
+   },
+   "security_cache_header": {
+      "description": "Password cache header",
+      "message": "Запоминать пароли для сессии браузера"
+   },
+   "security_cache_help": {
+      "description": "Help text for cache time.",
+      "message": "Число от 1 до 999"
+   },
+   "security_cache_off": {
+      "description": "Don't store password.",
+      "message": "Нет"
+   },
+   "security_cache_on": {
+      "description": "Store password in memory for $1 minutes.",
+      "message": "Да, сохранять в памяти "
+   },
+   "security_cache_time": {
+      "description": "Store password in memory for $1 minutes.",
+      "message": "мин."
+   },
+   "security_display_decrypted": {
+      "description": "Label for display options",
+      "message": "Где показывать расшифрованные сообщения?"
+   },
+   "security_display_inline": {
+      "description": "Decrypted message display option",
+      "message": "На странице почтового сервиса"
+   },
+   "security_display_popup": {
+      "description": "Decrypted message display option",
+      "message": "В отдельном всплывающем окне Mailvelope"
+   },
+   "security_hide_armored_head": {
+      "description": "Hide header infos in armored messages",
+      "message": "Скрывать в сообщениях PGP версию Mailvelope и комментарий"
+   },
+   "security_log_action": {
+      "description": "Title of the action column of the security log table.",
+      "message": "Действие"
+   },
+   "security_log_add_attachment": {
+      "description": "A click on the attachment upload button as an event type",
+      "message": "Нажата кнопка добавления вложения"
+   },
+   "security_log_attachment_download": {
+      "description": "Attachment downloaded as an event source",
+      "message": "Вложение загружено"
+   },
+   "security_log_backup_create": {
+      "description": "",
+      "message": "Нажмите для создания резервной копии"
+   },
+   "security_log_backup_restore": {
+      "description": "",
+      "message": "Нажмите для восстановления из резервной копии"
+   },
+   "security_log_content_copy": {
+      "description": "",
+      "message": "Копирование в диалоге проверки"
+   },
+   "security_log_decrypt_ui": {
+      "description": "",
+      "message": "Расшифровать"
+   },
+   "security_log_decryption_operation": {
+      "description": "",
+      "message": "Сообщение расшифровано: $1"
+   },
+   "security_log_dialog_cancel": {
+      "description": "",
+      "message": "Нажатие для отмены в диалоге"
+   },
+   "security_log_dialog_encrypt": {
+      "description": "",
+      "message": "Нажатие кнопку шифрования"
+   },
+   "security_log_dialog_ok": {
+      "description": "",
+      "message": "Подтверждение"
+   },
+   "security_log_dialog_sign": {
+      "description": "",
+      "message": "Нажатие подписи в диалоге"
+   },
+   "security_log_editor": {
+      "description": "Message editor container as an event source",
+      "message": "Редактор Mailvelope"
+   },
+   "security_log_email_viewer": {
+      "description": "Email decryption container as an event source",
+      "message": "Расшифрованное PGP-сообщение"
+   },
+   "security_log_encrypt_dialog": {
+      "description": "Encrypt dialog as an event source",
+      "message": "Диалог шифрования"
+   },
+   "security_log_encrypt_form": {
+      "description": "Encrypt form as an event source",
+      "message": "Форма шифрования"
+   },
+   "security_log_encrypt_ui": {
+      "description": "",
+      "message": "Зашифровать"
+   },
+   "security_log_encryption_operation": {
+      "description": "",
+      "message": "Сообщение зашифровано для: $1"
+   },
+   "security_log_import_dialog": {
+      "description": "Key import dialog as an event source",
+      "message": "Диалог импорта"
+   },
+   "security_log_key_backup": {
+      "description": "Message keybackup container as an event source",
+      "message": "Резервная копия ключа"
+   },
+   "security_log_key_generator": {
+      "description": "Key generator container as an event source",
+      "message": "Создание ключей"
+   },
+   "security_log_password_click": {
+      "description": "",
+      "message": "Нажатие в парольном диалоге"
+   },
+   "security_log_password_dialog": {
+      "description": "Password dialog as an event source",
+      "message": "Запрос пароля"
+   },
+   "security_log_password_input": {
+      "description": "",
+      "message": "Ввод пароля"
+   },
+   "security_log_remove_attachment": {
+      "description": "A click on the attachment remove button as event type",
+      "message": "Вложение удалено"
+   },
+   "security_log_restore_backup_click": {
+      "description": "",
+      "message": "Нажмите для диалога восстановления из резервной копии"
+   },
+   "security_log_sign_operation": {
+      "description": "",
+      "message": "Сообщение подписано ключом $1"
+   },
+   "security_log_signature_modal_close": {
+      "description": "",
+      "message": "Нажмите для закрытия диалога подписи"
+   },
+   "security_log_signature_modal_open": {
+      "description": "",
+      "message": "Нажмите для открытия диалога подписи"
+   },
+   "security_log_source": {
+      "description": "Title of the source column of the security log table.",
+      "message": "Объект"
+   },
+   "security_log_text": {
+      "description": "Text explaining the purpose of the security log",
+      "message": "Журнал содержит информацию о действиях пользователя в Mailvelope."
+   },
+   "security_log_text_input": {
+      "description": "User clicked in text area",
+      "message": "Вставка в текстовое поле"
+   },
+   "security_log_textarea_click": {
+      "description": "User clicked in text area",
+      "message": "Нажатие в текстовом поле"
+   },
+   "security_log_textarea_input": {
+      "description": "User clicked in text area",
+      "message": "Ввод данных в текстовое поле"
+   },
+   "security_log_textarea_select": {
+      "description": "Selection of the text area as an event type",
+      "message": "Выделение данных в текстовом поле"
+   },
+   "security_log_timestamp": {
+      "description": "Title of the timestamp column of the security log table.",
+      "message": "Время"
+   },
+   "security_log_verify_dialog": {
+      "description": "Verify dialog as an event source",
+      "message": "Диалог проверки"
+   },
+   "security_log_viewer": {
+      "description": "Message viewer as an event source",
+      "message": "Просмотрщик Mailvelope"
+   },
+   "security_openpgp_header": {
+      "description": "OpenPGP settings header",
+      "message": "Настройки OpenPGP"
+   },
+   "settings_analytics": {
+      "description": "Tab for deciding whether or not to share analytics data.",
+      "message": "Аналитика"
+   },
+   "settings_backup": {
+      "description": "Tab allowing to backup and restore the settings.",
+      "message": "Резервная копия"
+   },
+   "settings_general": {
+      "description": "Tab of options to display general settings.",
+      "message": "Общие настройки"
+   },
+   "settings_keyserver": {
+      "description": "Tab of options to display key server settings.",
+      "message": "Каталоги ключей"
+   },
+   "settings_provider": {
+      "description": "Tab of options to display provider (Gmail) settings.",
+      "message": "Gmail API"
+   },
+   "settings_security": {
+      "description": "Tab of options to display security settings.",
+      "message": "Безопасность"
+   },
+   "settings_security_background": {
+      "description": "Security background header",
+      "message": "Фон безопасности"
+   },
+   "settings_security_log": {
+      "description": "Tab of options to display security log.",
+      "message": "Журнал"
+   },
+   "settings_watchlist": {
+      "description": "Tab of options to display list of authorized domains.",
+      "message": "Домены"
+   },
+   "sign_dialog_header": {
+      "description": "Header of sign dialog. Choose the person you want to sign the message with.",
+      "message": "Подписать сообщение как:"
+   },
+   "sign_error": {
+      "description": "Error during signing process.",
+      "message": "Ошибка подписи сообщения: $1"
+   },
+   "signer_unknown": {
+      "description": "Name of unknown signer.",
+      "message": "Неизвестно"
+   },
+   "text_decrypt_button": {
+      "description": "Button label for decrypting the message",
+      "message": "Расшифровать"
+   },
+   "text_decrypting": {
+      "description": "Navigation link to text decryption feature",
+      "message": "Расшифровка текста"
+   },
+   "text_encrypting": {
+      "description": "Navigation link to text encryption feature",
+      "message": "Шифрование текста"
+   },
+   "upload_aborting_warning": {
+      "description": "A warning for the aborting of the file upload.",
+      "message": "Закачка файла будет прервана."
+   },
+   "upload_attachment": {
+      "description": "Text in the upload attachment button of the message editor dialog",
+      "message": "Выбрать файл"
+   },
+   "upload_drop": {
+      "description": "Text in file drop overlay area",
+      "message": "Перетащите файл в эту область, чтобы прикрепить"
+   },
+   "upload_help": {
+      "description": "Text in file upload area. Sentence continues with: Upload File (Button).",
+      "message": "Перетащите файл в это окно или"
+   },
+   "upload_quota_exceeded_warning": {
+      "description": "A warning shown when the attachments upload quota is exceeded.",
+      "message": "Допустимый размер вложения:"
+   },
+   "upload_quota_warning_headline": {
+      "description": "",
+      "message": "Слишком большое вложение"
+   },
+   "user_create_btn": {
+      "description": "Create user button label",
+      "message": "Создать"
+   },
+   "user_create_title": {
+      "description": "Title of create user page",
+      "message": "Создать ID пользователя"
+   },
+   "user_keyserver_not": {
+      "description": "User ID is not synchronized with Mailvelope key server",
+      "message": "Пользовательский ID не синхронизирован с сервером ключей Mailvelope."
+   },
+   "user_keyserver_remove": {
+      "description": "A remove request has been sent to the Mailvelope key server",
+      "message": "Чтобы окончательно удалить сервер ключей Mailvelope, было выслано подтверждающее письмо ($1)."
+   },
+   "user_keyserver_remove_btn": {
+      "description": "Remove user ID button label text",
+      "message": "Удалить ID пользователя"
+   },
+   "user_keyserver_resend_confirmation_btn": {
+      "description": "Resend confirmation button label text",
+      "message": "Отправить подтверждение снова"
+   },
+   "user_keyserver_sync": {
+      "description": "User ID is synchronised with the Mailvelope key server",
+      "message": "Пользовательский ID синхронизирован с сервером ключей Mailvelope."
+   },
+   "user_keyserver_unverified": {
+      "description": "User ID Mailvelope key server not verified",
+      "message": "Пожалуйста, подтвердите намерение синхронизировать ID пользователя с сервером ключей Mailvelope."
+   },
+   "user_keyserver_upload": {
+      "description": "An upload request has been sent to the Mailvelope key server",
+      "message": "Для синхронизации с сервером ключей Mailvelope было отправлено письмо с подтверждением на адрес $1."
+   },
+   "user_remove_btn": {
+      "description": "Remove user button label",
+      "message": "Удалить"
+   },
+   "user_remove_btn_title": {
+      "description": "Remove user button title",
+      "message": "Удалить ID пользователя"
+   },
+   "user_remove_dialog_confirmation": {
+      "description": "Confirmation question in remove user dialog.",
+      "message": "Хотите удалить этот пользовательский ID из вашего ключа?"
+   },
+   "user_remove_dialog_keyserver_warning": {
+      "description": "Warning message, that key will be deleted from keyserver",
+      "message": "ID пользователя также удален с сервера ключей Mailvelope."
+   },
+   "user_remove_dialog_title": {
+      "description": "Title of remove user dialog.",
+      "message": "Удалить ID пользователя"
+   },
+   "user_revoke_btn": {
+      "description": "Revoke user button label",
+      "message": "Отозвать"
+   },
+   "user_revoke_btn_title": {
+      "description": "Revoke user button title",
+      "message": "Отозвать ID пользователя"
+   },
+   "user_revoke_dialog_confirmation": {
+      "description": "Confirmation question in revoke user dialog.",
+      "message": "По-прежнему хотите отозвать?"
+   },
+   "user_revoke_dialog_description": {
+      "description": "Description in revoke user dialog.",
+      "message": "После отзыва ID пользователя для этого ключа не будет работать."
+   },
+   "user_revoke_dialog_title": {
+      "description": "Title of revoke user dialog.",
+      "message": "Отозвать ID пользователя"
+   },
+   "user_title": {
+      "description": "Title of user page",
+      "message": "ID пользователя"
+   },
+   "usersignatures_title": {
+      "description": "Title of signatures panel in user.",
+      "message": "Подтверждения"
+   },
+   "verify_error": {
+      "description": "Error during verification process.",
+      "message": "Невозможно проверить это сообщение: $1"
+   },
+   "verify_frame_help_text": {
+      "description": "Help text on verify frame.",
+      "message": "Нажмите для проверки подписи"
+   },
+   "waiting_dialog_decryption_failed": {
+      "description": "Error message in the waiting dialog after failing to decrypt a message",
+      "message": "Ошибка расшифровки."
+   },
+   "watchlist_command_create": {
+      "description": "Create entry in watchlist.",
+      "message": "Добавить"
+   },
+   "watchlist_command_edit": {
+      "description": "Edit entry in watchlist.",
+      "message": "Ред."
+   },
+   "watchlist_delete_confirmation": {
+      "description": "Message in the watchlist delete confirmation dialog.",
+      "message": "Действительно удалить этот сайт из списка настроенных доменов?"
+   },
+   "watchlist_expose_api": {
+      "description": "Expose API to Webmailer.",
+      "message": "API"
+   },
+   "watchlist_record_title": {
+      "description": "Title of the watchlist editor dialog.",
+      "message": "Добавление домена"
+   },
+   "watchlist_remove_dialog_title": {
+      "description": "Title of delete watchlist dialog.",
+      "message": "Удаление домена"
+   },
+   "watchlist_title_active": {
+      "description": "Entry in watchlist is active.",
+      "message": "Включено"
+   },
+   "watchlist_title_frame": {
+      "description": "Web domain URL match pattern of site in watchlist.",
+      "message": "Домен"
+   },
+   "watchlist_title_https_only": {
+      "description": "Only allow URLs with HTTPS scheme in watchlist.",
+      "message": "Только HTTPS"
+   },
+   "watchlist_title_scan": {
+      "description": "Scan status of site in watchlist.",
+      "message": "Включено"
+   },
+   "watchlist_title_site": {
+      "description": "Site in watchlist.",
+      "message": "Сайт"
+   },
+   "word_or": {
+      "description": "Separate list of elements.",
+      "message": "или"
+   },
+   "wrong_restore_code": {
+      "description": "",
+      "message": "Неверный код восстановления"
+   }
+}

@@ -1,228 +1,262 @@
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import {
+  forceCenter,
+  forceCollide,
+  forceLink,
+  forceManyBody,
+  forceRadial,
+  forceSimulation
+} from "d3-force-3d";
+
+const ENTITY_TYPES = ["employee", "skill", "department", "interest", "topic"];
+const RELATIONSHIP_KINDS = ["has-skill", "in-department", "interested-in", "related-to"];
+const CURRENT_USER_KEY = "socialgraph.demoUserId";
+const PANEL_STATE_KEY = "socialgraph.collapsedPanels";
+const GRAPH_FILTER_KEY = "socialgraph.graphFilters";
+const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const savedGraphFilters = JSON.parse(localStorage.getItem(GRAPH_FILTER_KEY) || "{}");
+
+const TYPE_COLORS = {
+  employee: 0x106d80,
+  skill: 0x7d4cc2,
+  department: 0x16884f,
+  interest: 0xd97816,
+  topic: 0x3e5f9c
+};
+
+const VISUAL_ROLE_STYLES = {
+  core: { label: "Core hub", radius: 25, charge: -760, collide: 58, orbit: 155 },
+  connector: { label: "Connector", radius: 22, charge: -620, collide: 52, orbit: 205 },
+  participant: { label: "Participant", radius: 18, charge: -430, collide: 42, orbit: 260 },
+  peripheral: { label: "Peripheral", radius: 15, charge: -300, collide: 34, orbit: 320 },
+  external: { label: "External", radius: 17, charge: -340, collide: 38, orbit: 350 },
+  system: { label: "System", radius: 16, charge: -320, collide: 36, orbit: 380 }
+};
+
+function createAmbientMotionForce() {
+  let nodes = [];
+
+  function force(alpha) {
+    if (REDUCED_MOTION) {
+      return;
+    }
+
+    const time = performance.now() * 0.001;
+    for (const node of nodes) {
+      if ((node.index ?? 0) % 3 === 1) {
+        continue;
+      }
+
+      const phase = (node.index ?? 0) * 1.73;
+      const strength = 0.022 * Math.max(0.25, alpha);
+      node.vx += Math.sin(time * 0.7 + phase) * strength;
+      node.vy += Math.cos(time * 0.53 + phase) * strength;
+    }
+  }
+
+  force.initialize = initializedNodes => {
+    nodes = initializedNodes;
+  };
+
+  return force;
+}
+
+function applyIridescentFilm(material, baseColor, isMine) {
+  material.onBeforeCompile = shader => {
+    shader.uniforms.uIridescentBase = { value: baseColor.clone() };
+    shader.uniforms.uIridescentStrength = { value: isMine ? 0.72 : 0.58 };
+    shader.uniforms.uIridescentOffset = { value: isMine ? 1.4 : 0.35 };
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <common>",
+      `#include <common>
+      uniform vec3 uIridescentBase;
+      uniform float uIridescentStrength;
+      uniform float uIridescentOffset;`
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <opaque_fragment>",
+      `float filmAngle = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), 1.45);
+      vec3 filmColor = 0.5 + 0.5 * cos(6.28318 * (vec3(0.0, 0.33, 0.67) + filmAngle * 0.9 + uIridescentOffset));
+      filmColor = mix(uIridescentBase, filmColor, 0.82);
+      outgoingLight = mix(outgoingLight, outgoingLight + filmColor * (0.42 + filmAngle * 0.86), filmAngle * uIridescentStrength);
+      #include <opaque_fragment>`
+    );
+  };
+  material.needsUpdate = true;
+  return material;
+}
+
 const state = {
   entities: [],
   relationships: [],
   graph: { nodes: [], links: [] },
+  selectedEntityId: null,
+  selectedRelationshipId: null,
+  focusedEntityId: null,
   searchQuery: "",
   relationshipFilters: {
     text: "",
     kind: "",
     direction: "all"
   },
-  selectedEntityId: null,
-  selectedRelationshipId: null,
-  selectedRelationship: null,
-  focusedEntityId: null,
   pendingDelete: null,
-  undoAction: null,
-  undoTimerId: null,
-  activityMessage: "",
-  viewport: {
-    scale: 1,
-    minScale: 0.55,
-    maxScale: 2.4,
-    translateX: 0,
-    translateY: 0,
-    pointerId: null,
-    dragStartX: 0,
-    dragStartY: 0,
-    originX: 0,
-    originY: 0,
-    didPan: false,
-    graphSignature: "",
-    needsFit: true
-  },
+  currentUserId: localStorage.getItem(CURRENT_USER_KEY) || "Guido_Machmueller",
   loading: {
     entities: false,
     relationships: false,
     graph: false
   },
-  error: ""
+  collapsedPanels: JSON.parse(localStorage.getItem(PANEL_STATE_KEY) || "{}"),
+  graphFilters: {
+    visibleTypes: savedGraphFilters.visibleTypes ?? [...ENTITY_TYPES],
+    expandedNodeIds: new Set(savedGraphFilters.expandedNodeIds ?? [])
+  }
 };
 
-const urlState = {
-  hydrated: false,
-  suppressSync: false,
-  pendingNotice: ""
-};
+const dom = Object.fromEntries([
+  "leftPanel",
+  "rightPanel",
+  "toggleLeftPanel",
+  "toggleRightPanel",
+  "demoUser",
+  "profileForm",
+  "profileTitle",
+  "profileModeTag",
+  "profileName",
+  "profileNote",
+  "profileDepartment",
+  "profileSkills",
+  "profileTopics",
+  "profileSubmit",
+  "focusMine",
+  "departmentOptions",
+  "entityList",
+  "entitySummaryTitle",
+  "entitySummaryModeTag",
+  "entitySummaryText",
+  "entityMetricGrid",
+  "entityNeighborList",
+  "entityKindChips",
+  "relationshipList",
+  "statusSummary",
+  "selectionSummary",
+  "relationshipModeTag",
+  "relationshipResultsSummary",
+  "relationshipSearch",
+  "relationshipKindFilter",
+  "relationshipDirectionFilter",
+  "relationshipClearFilters",
+  "focusTag",
+  "spotlightTag",
+  "graphFilterSummary",
+  "graphTypeFilters",
+  "errorBanner",
+  "activityBanner",
+  "deleteConfirm",
+  "deleteConfirmTitle",
+  "deleteConfirmBody",
+  "deleteConfirmSubmit",
+  "deleteConfirmCancel",
+  "undoBanner",
+  "undoBannerTitle",
+  "undoBannerBody",
+  "undoBannerAction",
+  "undoBannerDismiss",
+  "graphFrame",
+  "graph",
+  "graphLabels",
+  "graphTooltip",
+  "graphZoomIn",
+  "graphZoomOut",
+  "graphResetView",
+  "graphFitView",
+  "entitySearch",
+  "entityForm",
+  "entityFormTitle",
+  "entityName",
+  "entityType",
+  "entityNote",
+  "entitySubmit",
+  "entityReset",
+  "entityDelete",
+  "relationshipForm",
+  "relationshipFormTitle",
+  "relationshipInspectorMeta",
+  "relationshipFocusNotice",
+  "relationshipSource",
+  "relationshipTarget",
+  "relationshipKind",
+  "relationshipNote",
+  "relationshipReset",
+  "relationshipDelete",
+  "relationshipSubmit",
+  "focusSelected",
+  "showFullGraph",
+  "reloadAll",
+  "entitiesLoading",
+  "relationshipsLoading",
+  "graphLoading"
+].map(id => [id, document.getElementById(id)]));
 
-const dom = {
-  entityList: document.getElementById("entityList"),
-  entitySummaryTitle: document.getElementById("entitySummaryTitle"),
-  entitySummaryModeTag: document.getElementById("entitySummaryModeTag"),
-  entitySummaryText: document.getElementById("entitySummaryText"),
-  entityMetricGrid: document.getElementById("entityMetricGrid"),
-  entityNeighborList: document.getElementById("entityNeighborList"),
-  entityKindChips: document.getElementById("entityKindChips"),
-  relationshipList: document.getElementById("relationshipList"),
-  statusSummary: document.getElementById("statusSummary"),
-  selectionSummary: document.getElementById("selectionSummary"),
-  relationshipModeTag: document.getElementById("relationshipModeTag"),
-  relationshipResultsSummary: document.getElementById("relationshipResultsSummary"),
-  relationshipSearch: document.getElementById("relationshipSearch"),
-  relationshipKindFilter: document.getElementById("relationshipKindFilter"),
-  relationshipDirectionFilter: document.getElementById("relationshipDirectionFilter"),
-  relationshipClearFilters: document.getElementById("relationshipClearFilters"),
-  focusTag: document.getElementById("focusTag"),
-  spotlightTag: document.getElementById("spotlightTag"),
-  errorBanner: document.getElementById("errorBanner"),
-  activityBanner: document.getElementById("activityBanner"),
-  deleteConfirm: document.getElementById("deleteConfirm"),
-  deleteConfirmTitle: document.getElementById("deleteConfirmTitle"),
-  deleteConfirmBody: document.getElementById("deleteConfirmBody"),
-  deleteConfirmSubmit: document.getElementById("deleteConfirmSubmit"),
-  deleteConfirmCancel: document.getElementById("deleteConfirmCancel"),
-  undoBanner: document.getElementById("undoBanner"),
-  undoBannerTitle: document.getElementById("undoBannerTitle"),
-  undoBannerBody: document.getElementById("undoBannerBody"),
-  undoBannerAction: document.getElementById("undoBannerAction"),
-  undoBannerDismiss: document.getElementById("undoBannerDismiss"),
-  graphFrame: document.getElementById("graphFrame"),
-  graph: document.getElementById("graph"),
-  graphZoomIn: document.getElementById("graphZoomIn"),
-  graphZoomOut: document.getElementById("graphZoomOut"),
-  graphResetView: document.getElementById("graphResetView"),
-  graphFitView: document.getElementById("graphFitView"),
-  entitySearch: document.getElementById("entitySearch"),
-  entityForm: document.getElementById("entityForm"),
-  entityFormTitle: document.getElementById("entityFormTitle"),
-  entityName: document.getElementById("entityName"),
-  entityNote: document.getElementById("entityNote"),
-  entitySubmit: document.getElementById("entitySubmit"),
-  entityReset: document.getElementById("entityReset"),
-  entityDelete: document.getElementById("entityDelete"),
-  relationshipForm: document.getElementById("relationshipForm"),
-  relationshipFormTitle: document.getElementById("relationshipFormTitle"),
-  relationshipInspectorMeta: document.getElementById("relationshipInspectorMeta"),
-  relationshipFocusNotice: document.getElementById("relationshipFocusNotice"),
-  relationshipSource: document.getElementById("relationshipSource"),
-  relationshipTarget: document.getElementById("relationshipTarget"),
-  relationshipKind: document.getElementById("relationshipKind"),
-  relationshipNote: document.getElementById("relationshipNote"),
-  relationshipReset: document.getElementById("relationshipReset"),
-  relationshipDelete: document.getElementById("relationshipDelete"),
-  relationshipSubmit: document.getElementById("relationshipSubmit"),
-  focusSelected: document.getElementById("focusSelected"),
-  showFullGraph: document.getElementById("showFullGraph"),
-  reloadAll: document.getElementById("reloadAll"),
-  entitiesLoading: document.getElementById("entitiesLoading"),
-  relationshipsLoading: document.getElementById("relationshipsLoading"),
-  graphLoading: document.getElementById("graphLoading")
-};
-
-const URL_STATE_KEYS = {
-  selectedEntityId: "entity",
-  selectedRelationshipId: "relationship",
-  focusedEntityId: "focus",
-  entitySearch: "q",
-  relationshipSearch: "relq",
-  relationshipKind: "relkind",
-  relationshipDirection: "reldir"
-};
-
-function selectedEntity() {
-  return state.entities.find(entity => entity.id === state.selectedEntityId) ?? null;
-}
-
-function selectedRelationship() {
-  if (state.selectedRelationship && state.selectedRelationship.id === state.selectedRelationshipId) {
-    return state.selectedRelationship;
+function setPanelCollapsed(side, collapsed) {
+  const isLeft = side === "left";
+  const panel = isLeft ? dom.leftPanel : dom.rightPanel;
+  const button = isLeft ? dom.toggleLeftPanel : dom.toggleRightPanel;
+  if (!panel || !button) {
+    return;
   }
 
-  return state.relationships.find(edge => edge.id === state.selectedRelationshipId) ?? null;
+  state.collapsedPanels[side] = collapsed;
+  localStorage.setItem(PANEL_STATE_KEY, JSON.stringify(state.collapsedPanels));
+  document.querySelector(".shell")?.classList.toggle(`${side}-collapsed`, collapsed);
+  panel.classList.toggle("collapsed", collapsed);
+  button.setAttribute("aria-expanded", String(!collapsed));
+  button.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${isLeft ? "employee" : "relationship"} panel`);
+  button.textContent = isLeft
+    ? collapsed ? ">" : "<"
+    : collapsed ? "<" : ">";
+  requestAnimationFrame(() => graphView?.resize?.(true));
 }
 
-function relationshipMode() {
-  return state.selectedEntityId ? "entity" : "global";
+function togglePanel(side) {
+  setPanelCollapsed(side, !state.collapsedPanels[side]);
 }
 
-function copyEntity(entity) {
-  return entity
-    ? { id: entity.id, name: entity.name, note: entity.note || "" }
-    : null;
-}
-
-function copyRelationship(edge) {
-  return edge
-    ? {
-      id: edge.id,
-      sourceEntityId: edge.sourceEntityId,
-      targetEntityId: edge.targetEntityId,
-      kind: edge.kind,
-      note: edge.note || ""
-    }
-    : null;
+if (![...dom.demoUser.options].some(option => option.value === state.currentUserId)) {
+  state.currentUserId = "Guido_Machmueller";
+  localStorage.setItem(CURRENT_USER_KEY, state.currentUserId);
 }
 
 function normalizeText(value) {
   return (value || "").trim().toLowerCase();
 }
 
-function pluralize(count, singular, plural = `${singular}s`) {
-  return `${count} ${count === 1 ? singular : plural}`;
+function currentEmployee() {
+  return state.entities.find(entity =>
+    entity.type === "employee" &&
+    (entity.ownerUserId || "").toLowerCase() === state.currentUserId.toLowerCase()) ?? null;
 }
 
-function relationshipMatchesText(edge, query) {
-  if (!query) {
-    return true;
-  }
-
-  return [
-    edge.id,
-    edge.sourceEntityId,
-    edge.targetEntityId,
-    edge.kind,
-    edge.note
-  ].some(value => normalizeText(value).includes(query));
+function currentEmployeeId() {
+  return currentEmployee()?.id ?? state.currentUserId;
 }
 
-function entityMatchesSearch(entity, query) {
-  if (!query) {
-    return true;
-  }
+function selectedEntity() {
+  return state.entities.find(entity => entity.id === state.selectedEntityId) ?? null;
+}
 
-  return [entity.id, entity.name, entity.note].some(value => normalizeText(value).includes(query));
+function selectedRelationship() {
+  return state.relationships.find(edge => edge.id === state.selectedRelationshipId) ?? null;
+}
+
+function entityLabel(id) {
+  return state.entities.find(entity => entity.id === id)?.name ?? id;
 }
 
 function getIncidentRelationships(entityId) {
-  if (!entityId) {
-    return [];
-  }
-
   return state.relationships.filter(edge =>
     edge.sourceEntityId === entityId || edge.targetEntityId === entityId);
-}
-
-function relationshipMatchesDirection(edge) {
-  if (!state.selectedEntityId || state.relationshipFilters.direction === "all") {
-    return true;
-  }
-
-  if (state.relationshipFilters.direction === "incoming") {
-    return edge.targetEntityId === state.selectedEntityId;
-  }
-
-  if (state.relationshipFilters.direction === "outgoing") {
-    return edge.sourceEntityId === state.selectedEntityId;
-  }
-
-  return true;
-}
-
-function getScopedRelationships() {
-  if (!state.selectedEntityId) {
-    return state.relationships;
-  }
-
-  return getIncidentRelationships(state.selectedEntityId);
-}
-
-function getFilteredRelationships() {
-  const query = normalizeText(state.relationshipFilters.text);
-
-  return getScopedRelationships().filter(edge =>
-    relationshipMatchesText(edge, query) &&
-    (!state.relationshipFilters.kind || edge.kind === state.relationshipFilters.kind) &&
-    relationshipMatchesDirection(edge));
 }
 
 function getEntityMetrics(entityId) {
@@ -231,225 +265,192 @@ function getEntityMetrics(entityId) {
   const outgoing = incident.filter(edge => edge.sourceEntityId === entityId);
   const neighborIds = [...new Set(incident.map(edge =>
     edge.sourceEntityId === entityId ? edge.targetEntityId : edge.sourceEntityId))];
-  const kinds = [...new Set(incident.map(edge => edge.kind).filter(Boolean))]
-    .sort((left, right) => left.localeCompare(right));
+  const kinds = [...new Set(incident.map(edge => edge.kind).filter(Boolean))].sort();
+  return { incident, incoming, outgoing, neighborIds, kinds };
+}
+
+function isSystemEntity(entity) {
+  const id = entity.id ?? "";
+  const name = entity.name ?? entity.label ?? "";
+  return id.includes("@") || name.includes("@") || id.toLowerCase().includes("no_reply");
+}
+
+function isExternalEntity(entity) {
+  return /\(ext\)/i.test(entity.name ?? entity.label ?? "");
+}
+
+function visualRoleForEntity(entity) {
+  if (isSystemEntity(entity)) {
+    return "system";
+  }
+  if (isExternalEntity(entity)) {
+    return "external";
+  }
+
+  const degree = getIncidentRelationships(entity.id).length;
+  if (degree >= 30) {
+    return "core";
+  }
+  if (degree >= 15) {
+    return "connector";
+  }
+  if (degree >= 5) {
+    return "participant";
+  }
+  return "peripheral";
+}
+
+function visualRoleStyle(entity) {
+  return VISUAL_ROLE_STYLES[visualRoleForEntity(entity)] ?? VISUAL_ROLE_STYLES.peripheral;
+}
+
+function relationshipWeight(edge) {
+  const note = edge.note ?? state.relationships.find(relationship => relationship.id === edge.id)?.note ?? "";
+  const match = /weight=(\d+)/i.exec(note);
+  return match ? Number(match[1]) : 1;
+}
+
+function linkEndpointId(endpoint) {
+  return typeof endpoint === "object" ? endpoint.id : endpoint;
+}
+
+function saveGraphFilters() {
+  localStorage.setItem(GRAPH_FILTER_KEY, JSON.stringify({
+    visibleTypes: state.graphFilters.visibleTypes,
+    expandedNodeIds: [...state.graphFilters.expandedNodeIds]
+  }));
+}
+
+function ensureInitialExpansion() {
+  if (state.graphFilters.expandedNodeIds.size || !currentEmployee()) {
+    return;
+  }
+  state.graphFilters.expandedNodeIds.add(currentEmployeeId());
+  saveGraphFilters();
+}
+
+function toggleGraphType(type, enabled) {
+  state.graphFilters.visibleTypes = enabled
+    ? [...new Set([...state.graphFilters.visibleTypes, type])]
+    : state.graphFilters.visibleTypes.filter(item => item !== type);
+  saveGraphFilters();
+  render();
+}
+
+function toggleExpandedNode(id) {
+  if (state.graphFilters.expandedNodeIds.has(id)) {
+    state.graphFilters.expandedNodeIds.delete(id);
+  } else {
+    state.graphFilters.expandedNodeIds.add(id);
+  }
+  saveGraphFilters();
+  state.selectedEntityId = id;
+  render();
+}
+
+function visibleGraph() {
+  const nodeById = new Map(state.graph.nodes.map(node => [node.id, node]));
+  const expandedIds = new Set(state.graphFilters.expandedNodeIds);
+  expandedIds.add(currentEmployeeId());
+
+  const candidateNodeIds = new Set([currentEmployeeId(), ...expandedIds]);
+  const candidateLinks = [];
+  for (const link of state.graph.links) {
+    const sourceId = linkEndpointId(link.source);
+    const targetId = linkEndpointId(link.target);
+    if (expandedIds.has(sourceId) || expandedIds.has(targetId)) {
+      candidateLinks.push(link);
+      candidateNodeIds.add(sourceId);
+      candidateNodeIds.add(targetId);
+    }
+  }
+
+  const visibleTypes = new Set(state.graphFilters.visibleTypes);
+  const candidates = [...candidateNodeIds]
+    .map(id => nodeById.get(id))
+    .filter(Boolean)
+    .filter(node => visibleTypes.has(node.type));
+
+  const topEmployeeIds = new Set([currentEmployeeId(), ...state.graphFilters.expandedNodeIds]);
+  for (const expandedId of expandedIds) {
+    const weightedNeighbors = [];
+    for (const link of candidateLinks) {
+      const sourceId = linkEndpointId(link.source);
+      const targetId = linkEndpointId(link.target);
+      if (sourceId !== expandedId && targetId !== expandedId) {
+        continue;
+      }
+      const neighborId = sourceId === expandedId ? targetId : sourceId;
+      const neighbor = nodeById.get(neighborId);
+      if (neighbor?.type === "employee") {
+        weightedNeighbors.push([neighborId, relationshipWeight(link)]);
+      }
+    }
+    weightedNeighbors
+      .sort((left, right) => right[1] - left[1] || entityLabel(left[0]).localeCompare(entityLabel(right[0])))
+      .slice(0, 10)
+      .forEach(([id]) => topEmployeeIds.add(id));
+  }
+
+  const visibleNodeIds = new Set(candidates
+    .filter(node => node.type !== "employee" || topEmployeeIds.has(node.id))
+    .map(node => node.id));
+
+  const links = candidateLinks.filter(link =>
+    visibleNodeIds.has(linkEndpointId(link.source)) &&
+    visibleNodeIds.has(linkEndpointId(link.target)));
 
   return {
-    incidentCount: incident.length,
-    incomingCount: incoming.length,
-    outgoingCount: outgoing.length,
-    neighborCount: neighborIds.length,
-    neighborIds,
-    kinds
+    nodes: [...visibleNodeIds].map(id => nodeById.get(id)).filter(Boolean),
+    links
   };
 }
 
-function getNeighborSummaries(entityId) {
-  return getEntityMetrics(entityId).neighborIds
-    .map(neighborId => {
-      const entity = state.entities.find(item => item.id === neighborId);
-      return entity
-        ? { ...entity, incidentCount: getIncidentRelationships(neighborId).length }
-        : null;
-    })
-    .filter(Boolean)
+function getSelectableEmployees() {
+  return state.entities
+    .filter(entity => entity.type === "employee" && !isSystemEntity(entity))
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
-function getGraphSpotlight() {
-  const nodeQuery = normalizeText(state.searchQuery);
-  const filteredEdges = getFilteredRelationships();
-  const isEntitySearchActive = Boolean(nodeQuery);
-  const areRelationshipFiltersActive =
-    Boolean(normalizeText(state.relationshipFilters.text)) ||
-    Boolean(state.relationshipFilters.kind) ||
-    (state.selectedEntityId && state.relationshipFilters.direction !== "all");
-
-  const matchingNodeIds = new Set(
-    state.entities
-      .filter(entity => entityMatchesSearch(entity, nodeQuery))
-      .map(entity => entity.id));
-  const matchingEdgeIds = new Set(filteredEdges.map(edge => edge.id));
-  const connectedNodeIds = new Set();
-
-  for (const edge of filteredEdges) {
-    connectedNodeIds.add(edge.sourceEntityId);
-    connectedNodeIds.add(edge.targetEntityId);
+function reconcileCurrentUser() {
+  if (currentEmployee()) {
+    return;
   }
 
-  return {
-    isEntitySearchActive,
-    areRelationshipFiltersActive,
-    matchingNodeIds,
-    matchingEdgeIds,
-    connectedNodeIds,
-    hasSpotlight: isEntitySearchActive || areRelationshipFiltersActive
-  };
+  const fallback = state.entities.find(entity => entity.id === "Guido_Machmueller")
+    ?? getSelectableEmployees()[0];
+  if (!fallback) {
+    return;
+  }
+
+  state.currentUserId = fallback.ownerUserId || fallback.id;
+  localStorage.setItem(CURRENT_USER_KEY, state.currentUserId);
 }
 
-function describeRelationship(edge) {
-  return `${edge.sourceEntityId} -> ${edge.targetEntityId} (${edge.kind || "relationship"})`;
-}
+function renderDemoUsers() {
+  const employees = getSelectableEmployees();
+  if (!employees.length) {
+    return;
+  }
 
-function findRelationshipByIdentity(sourceEntityId, targetEntityId, kind) {
-  return state.relationships.find(edge =>
-    edge.sourceEntityId === sourceEntityId &&
-    edge.targetEntityId === targetEntityId &&
-    edge.kind === kind) ?? null;
+  dom.demoUser.innerHTML = "";
+  for (const employee of employees) {
+    const option = document.createElement("option");
+    option.value = employee.ownerUserId || employee.id;
+    option.textContent = employee.name;
+    dom.demoUser.appendChild(option);
+  }
+  dom.demoUser.value = state.currentUserId;
 }
 
 function setError(message) {
-  state.error = message || "";
-  dom.errorBanner.hidden = !state.error;
-  dom.errorBanner.textContent = state.error;
+  dom.errorBanner.hidden = !message;
+  dom.errorBanner.textContent = message || "";
 }
 
-function setActivityMessage(message) {
-  state.activityMessage = message || "";
-  dom.activityBanner.hidden = !state.activityMessage;
-  dom.activityBanner.textContent = state.activityMessage;
-}
-
-function clearUndoTimer() {
-  if (state.undoTimerId) {
-    window.clearTimeout(state.undoTimerId);
-    state.undoTimerId = null;
-  }
-}
-
-function setUndoAction(action) {
-  clearUndoTimer();
-  state.undoAction = action;
-  if (!action) {
-    return;
-  }
-
-  state.undoTimerId = window.setTimeout(() => {
-    state.undoAction = null;
-    state.undoTimerId = null;
-    render();
-  }, 12000);
-}
-
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function roundViewportValue(value) {
-  return Math.round(value * 1000) / 1000;
-}
-
-function getGraphSignature(graph) {
-  return JSON.stringify({
-    nodes: graph.nodes.map(node => node.id),
-    links: graph.links.map(link => link.id)
-  });
-}
-
-function getViewportScale() {
-  return clamp(state.viewport.scale, state.viewport.minScale, state.viewport.maxScale);
-}
-
-function setViewportScale(nextScale, anchorX, anchorY) {
-  const viewport = state.viewport;
-  const currentScale = getViewportScale();
-  const targetScale = clamp(nextScale, viewport.minScale, viewport.maxScale);
-  if (Math.abs(targetScale - currentScale) < 0.001) {
-    return false;
-  }
-
-  const frame = dom.graphFrame.getBoundingClientRect();
-  const focusX = anchorX ?? frame.width / 2;
-  const focusY = anchorY ?? frame.height / 2;
-
-  viewport.translateX = focusX - ((focusX - viewport.translateX) * (targetScale / currentScale));
-  viewport.translateY = focusY - ((focusY - viewport.translateY) * (targetScale / currentScale));
-  viewport.scale = roundViewportValue(targetScale);
-  return true;
-}
-
-function getGraphBounds(nodes) {
-  if (!nodes.length) {
-    return { minX: 0, minY: 0, maxX: 0, maxY: 0, width: 0, height: 0 };
-  }
-
-  const paddingX = 104;
-  const paddingTop = 98;
-  const paddingBottom = 76;
-  const xs = [];
-  const ys = [];
-
-  for (const node of nodes) {
-    xs.push(node.x - paddingX, node.x + paddingX);
-    ys.push(node.y - paddingTop, node.y + paddingBottom);
-  }
-
-  const minX = Math.min(...xs);
-  const maxX = Math.max(...xs);
-  const minY = Math.min(...ys);
-  const maxY = Math.max(...ys);
-
-  return {
-    minX,
-    minY,
-    maxX,
-    maxY,
-    width: maxX - minX,
-    height: maxY - minY
-  };
-}
-
-function fitViewportToGraph(bounds, width, height) {
-  const viewport = state.viewport;
-  if (!bounds.width || !bounds.height) {
-    viewport.scale = 1;
-    viewport.translateX = 0;
-    viewport.translateY = 0;
-    viewport.needsFit = false;
-    return;
-  }
-
-  const padding = 32;
-  const availableWidth = Math.max(120, width - padding * 2);
-  const availableHeight = Math.max(120, height - padding * 2);
-  const scale = clamp(
-    Math.min(availableWidth / bounds.width, availableHeight / bounds.height),
-    viewport.minScale,
-    viewport.maxScale
-  );
-
-  const centerX = bounds.minX + bounds.width / 2;
-  const centerY = bounds.minY + bounds.height / 2;
-
-  viewport.scale = roundViewportValue(scale);
-  viewport.translateX = roundViewportValue(width / 2 - centerX * viewport.scale);
-  viewport.translateY = roundViewportValue(height / 2 - centerY * viewport.scale);
-  viewport.needsFit = false;
-}
-
-function resetViewport(width, height, bounds) {
-  const viewport = state.viewport;
-  viewport.scale = 1;
-  if (bounds?.width && bounds?.height) {
-    const centerX = bounds.minX + bounds.width / 2;
-    const centerY = bounds.minY + bounds.height / 2;
-    viewport.translateX = roundViewportValue(width / 2 - centerX);
-    viewport.translateY = roundViewportValue(height / 2 - centerY);
-  } else {
-    viewport.translateX = 0;
-    viewport.translateY = 0;
-  }
-  viewport.needsFit = false;
-}
-
-function cancelPan() {
-  const viewport = state.viewport;
-  if (viewport.pointerId !== null && dom.graph.hasPointerCapture?.(viewport.pointerId)) {
-    dom.graph.releasePointerCapture(viewport.pointerId);
-  }
-  viewport.pointerId = null;
-  viewport.didPan = false;
-  dom.graphFrame.classList.remove("is-panning");
+function setActivity(message) {
+  dom.activityBanner.hidden = !message;
+  dom.activityBanner.textContent = message || "";
 }
 
 function setLoading(key, value) {
@@ -461,11 +462,14 @@ function setLoading(key, value) {
   }
 }
 
-async function requestJson(url, options) {
-  const response = await fetch(url, {
-    headers: { "Content-Type": "application/json" },
-    ...options
-  });
+async function requestJson(url, options = {}) {
+  const method = (options.method || "GET").toUpperCase();
+  const headers = {
+    "Content-Type": "application/json",
+    ...(method === "GET" ? {} : { "X-SocialGraph-UserId": state.currentUserId }),
+    ...options.headers
+  };
+  const response = await fetch(url, { ...options, headers });
 
   if (!response.ok) {
     let message = "Request failed";
@@ -475,678 +479,63 @@ async function requestJson(url, options) {
     } catch {
       message = await response.text() || message;
     }
-
     throw new Error(`${response.status} ${message}`.trim());
   }
 
-  if (response.status === 204) {
-    return null;
-  }
-
-  return response.json();
+  return response.status === 204 ? null : response.json();
 }
 
-function readWorkbenchStateFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  return {
-    selectedEntityId: params.get(URL_STATE_KEYS.selectedEntityId),
-    selectedRelationshipId: params.get(URL_STATE_KEYS.selectedRelationshipId),
-    focusedEntityId: params.get(URL_STATE_KEYS.focusedEntityId),
-    searchQuery: params.get(URL_STATE_KEYS.entitySearch) ?? "",
-    relationshipText: params.get(URL_STATE_KEYS.relationshipSearch) ?? "",
-    relationshipKind: params.get(URL_STATE_KEYS.relationshipKind) ?? "",
-    relationshipDirection: params.get(URL_STATE_KEYS.relationshipDirection) ?? "all"
-  };
+function appendEmpty(container, text) {
+  const empty = document.createElement("div");
+  empty.className = "empty";
+  empty.textContent = text;
+  container.appendChild(empty);
 }
 
-function writeWorkbenchStateToUrl() {
-  if (urlState.suppressSync) {
-    return;
-  }
-
-  const params = new URLSearchParams();
-  if (state.selectedEntityId) {
-    params.set(URL_STATE_KEYS.selectedEntityId, state.selectedEntityId);
-  }
-  if (state.selectedRelationshipId) {
-    params.set(URL_STATE_KEYS.selectedRelationshipId, state.selectedRelationshipId);
-  }
-  if (state.focusedEntityId) {
-    params.set(URL_STATE_KEYS.focusedEntityId, state.focusedEntityId);
-  }
-  if (state.searchQuery.trim()) {
-    params.set(URL_STATE_KEYS.entitySearch, state.searchQuery.trim());
-  }
-  if (state.relationshipFilters.text.trim()) {
-    params.set(URL_STATE_KEYS.relationshipSearch, state.relationshipFilters.text.trim());
-  }
-  if (state.relationshipFilters.kind) {
-    params.set(URL_STATE_KEYS.relationshipKind, state.relationshipFilters.kind);
-  }
-  if (state.selectedEntityId && state.relationshipFilters.direction !== "all") {
-    params.set(URL_STATE_KEYS.relationshipDirection, state.relationshipFilters.direction);
-  }
-
-  const nextQuery = params.toString();
-  const nextUrl = nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname;
-  const currentUrl = `${window.location.pathname}${window.location.search}`;
-  if (nextUrl !== currentUrl) {
-    window.history.replaceState(null, "", nextUrl);
-  }
+function splitValues(value) {
+  return [...new Set(value
+    .split(",")
+    .map(item => item.trim())
+    .filter(Boolean))];
 }
 
-function applyUrlStateToInputs() {
-  dom.entitySearch.value = state.searchQuery;
-  dom.relationshipSearch.value = state.relationshipFilters.text;
-  dom.relationshipDirectionFilter.value = state.relationshipFilters.direction;
+function findEntityByNameAndType(name, type) {
+  const normalized = normalizeText(name);
+  return state.entities.find(entity =>
+    entity.type === type && normalizeText(entity.name) === normalized) ?? null;
 }
 
-function queueUrlStateNotice(message) {
-  if (!message) {
-    return;
+async function ensureEntity(name, type) {
+  const existing = findEntityByNameAndType(name, type);
+  if (existing) {
+    return existing;
   }
 
-  urlState.pendingNotice = urlState.pendingNotice
-    ? `${urlState.pendingNotice} ${message}`
-    : message;
-}
-
-function hydrateWorkbenchStateFromUrl() {
-  if (urlState.hydrated) {
-    return;
-  }
-
-  const snapshot = readWorkbenchStateFromUrl();
-  state.selectedEntityId = snapshot.selectedEntityId || null;
-  state.selectedRelationshipId = snapshot.selectedRelationshipId || null;
-  state.focusedEntityId = snapshot.focusedEntityId || null;
-  state.searchQuery = snapshot.searchQuery;
-  state.relationshipFilters.text = snapshot.relationshipText;
-  state.relationshipFilters.kind = snapshot.relationshipKind;
-  state.relationshipFilters.direction =
-    ["all", "incoming", "outgoing"].includes(snapshot.relationshipDirection)
-      ? snapshot.relationshipDirection
-      : "all";
-  applyUrlStateToInputs();
-  urlState.hydrated = true;
-}
-
-function reconcileWorkbenchStateAfterLoad() {
-  const entityIds = new Set(state.entities.map(entity => entity.id));
-  const relationshipIds = new Set(state.relationships.map(edge => edge.id));
-
-  if (state.selectedEntityId && !entityIds.has(state.selectedEntityId)) {
-    state.selectedEntityId = null;
-    queueUrlStateNotice("Saved entity selection was cleared because it no longer exists.");
-  }
-
-  if (state.focusedEntityId && !entityIds.has(state.focusedEntityId)) {
-    state.focusedEntityId = null;
-    queueUrlStateNotice("Saved graph focus was cleared because that entity is no longer available.");
-  }
-
-  if (!state.selectedEntityId) {
-    state.relationshipFilters.direction = "all";
-  }
-
-  const availableKinds = new Set(getScopedRelationships().map(edge => edge.kind).filter(Boolean));
-  if (state.relationshipFilters.kind && !availableKinds.has(state.relationshipFilters.kind)) {
-    state.relationshipFilters.kind = "";
-    queueUrlStateNotice("Saved relationship kind filter was cleared because it no longer matches the active result set.");
-  }
-
-  if (state.selectedRelationshipId && !relationshipIds.has(state.selectedRelationshipId)) {
-    state.selectedRelationshipId = null;
-    state.selectedRelationship = null;
-    queueUrlStateNotice("Saved relationship selection was cleared because it no longer exists.");
-  } else if (state.selectedRelationshipId) {
-    const restoredRelationship = state.relationships.find(edge => edge.id === state.selectedRelationshipId) ?? null;
-    state.selectedRelationship = restoredRelationship;
-    const visibleRelationshipIds = new Set(getFilteredRelationships().map(edge => edge.id));
-    if (!visibleRelationshipIds.has(state.selectedRelationshipId)) {
-      state.selectedRelationshipId = null;
-      state.selectedRelationship = null;
-      queueUrlStateNotice("Saved relationship selection was cleared because it is outside the restored filters.");
-    }
-  } else {
-    state.selectedRelationship = null;
-  }
-
-  applyUrlStateToInputs();
-}
-
-function flushUrlStateNotice() {
-  if (!urlState.pendingNotice) {
-    return;
-  }
-
-  setActivityMessage(urlState.pendingNotice);
-  urlState.pendingNotice = "";
-}
-
-function render() {
-  renderDeleteConfirm();
-  renderUndoBanner();
-  renderEntitySummary();
-  renderEntityList();
-  renderEntityForm();
-  renderRelationshipControls();
-  renderRelationshipList();
-  renderGraphMeta();
-  renderGraph(state.graph);
-  writeWorkbenchStateToUrl();
-}
-
-function renderDeleteConfirm() {
-  const pendingDelete = state.pendingDelete;
-  dom.deleteConfirm.hidden = !pendingDelete;
-  if (!pendingDelete) {
-    return;
-  }
-
-  dom.deleteConfirmTitle.textContent = pendingDelete.title;
-  dom.deleteConfirmBody.textContent = pendingDelete.body;
-  dom.deleteConfirmSubmit.textContent = pendingDelete.confirmLabel;
-}
-
-function renderUndoBanner() {
-  const undoAction = state.undoAction;
-  dom.undoBanner.hidden = !undoAction;
-  if (!undoAction) {
-    return;
-  }
-
-  dom.undoBannerTitle.textContent = undoAction.title;
-  dom.undoBannerBody.textContent = undoAction.body;
-  dom.undoBannerAction.textContent = undoAction.actionLabel;
-}
-
-function renderEntitySummary() {
-  const entity = selectedEntity();
-  const spotlight = getGraphSpotlight();
-
-  dom.entityMetricGrid.innerHTML = "";
-  dom.entityNeighborList.innerHTML = "";
-  dom.entityKindChips.innerHTML = "";
-
-  if (!entity) {
-    dom.entitySummaryTitle.textContent = "No entity selected";
-    dom.entitySummaryModeTag.textContent = state.focusedEntityId ? "Focused graph context" : "Full graph context";
-    dom.entitySummaryText.textContent =
-      "Select an entity to inspect incident counts, neighboring entities, and quick relationship filters.";
-    appendEmpty(dom.entityMetricGrid, "Entity metrics appear here after you select an entity.");
-    appendEmpty(dom.entityNeighborList, "Neighbor drilldown becomes available once an entity is selected.");
-    appendEmpty(dom.entityKindChips, "Quick kind chips appear after an entity is selected.");
-    return;
-  }
-
-  const metrics = getEntityMetrics(entity.id);
-  const modeParts = [];
-  modeParts.push(state.focusedEntityId ? "Focused graph" : "Full graph");
-  modeParts.push(spotlight.hasSpotlight ? "Spotlight active" : "No spotlight");
-
-  dom.entitySummaryTitle.textContent = `${entity.name} neighborhood`;
-  dom.entitySummaryModeTag.textContent = modeParts.join(" + ");
-  dom.entitySummaryText.textContent = state.focusedEntityId === entity.id
-    ? `${entity.name} is currently driving the one-hop graph focus. Spotlighting can still mute or emphasize nodes and edges without changing the fetched graph.`
-    : `${entity.name} is selected for local context. Use Focus selected to refetch the one-hop graph, or stay in the full graph and use spotlighting only.`;
-
-  const metricsToRender = [
-    { label: "Incident", value: metrics.incidentCount },
-    { label: "Incoming", value: metrics.incomingCount },
-    { label: "Outgoing", value: metrics.outgoingCount },
-    { label: "Neighbors", value: metrics.neighborCount }
-  ];
-
-  for (const metric of metricsToRender) {
-    const card = document.createElement("article");
-    card.className = "metric-card";
-
-    const value = document.createElement("strong");
-    value.className = "metric-value";
-    value.textContent = String(metric.value);
-
-    const label = document.createElement("span");
-    label.className = "muted";
-    label.textContent = metric.label;
-
-    card.append(value, label);
-    dom.entityMetricGrid.appendChild(card);
-  }
-
-  const neighbors = getNeighborSummaries(entity.id);
-  if (!neighbors.length) {
-    appendEmpty(dom.entityNeighborList, "No neighbors connected to the selected entity yet.");
-  } else {
-    for (const neighbor of neighbors) {
-      const chip = document.createElement("div");
-      chip.className = "chip-card";
-
-      const label = document.createElement("strong");
-      label.textContent = neighbor.name;
-
-      const meta = document.createElement("span");
-      meta.className = "muted";
-      meta.textContent = `${neighbor.id} · ${pluralize(neighbor.incidentCount, "incident")}`;
-
-      const actions = document.createElement("div");
-      actions.className = "actions";
-
-      const selectButton = document.createElement("button");
-      selectButton.className = "ghost";
-      selectButton.type = "button";
-      selectButton.textContent = "Select";
-      selectButton.addEventListener("click", () => selectEntity(neighbor.id));
-
-      const focusButton = document.createElement("button");
-      focusButton.className = "ghost";
-      focusButton.type = "button";
-      focusButton.textContent = "Focus";
-      focusButton.addEventListener("click", async () => {
-        await selectEntity(neighbor.id);
-        await focusGraph(neighbor.id);
-      });
-
-      actions.append(selectButton, focusButton);
-      chip.append(label, meta, actions);
-      dom.entityNeighborList.appendChild(chip);
-    }
-  }
-
-  if (!metrics.kinds.length) {
-    appendEmpty(dom.entityKindChips, "No incident relationship kinds available for the selected entity.");
-    return;
-  }
-
-  for (const kind of metrics.kinds) {
-    const button = document.createElement("button");
-    button.className = state.relationshipFilters.kind === kind ? "chip-button active" : "chip-button";
-    button.type = "button";
-    button.textContent = kind;
-    button.addEventListener("click", () => {
-      state.relationshipFilters.kind = state.relationshipFilters.kind === kind ? "" : kind;
-      dom.relationshipKindFilter.value = state.relationshipFilters.kind;
-      render();
-    });
-    dom.entityKindChips.appendChild(button);
-  }
-}
-
-function renderEntityList() {
-  dom.entityList.innerHTML = "";
-
-  const query = normalizeText(state.searchQuery);
-  const entities = state.entities.filter(entity => entityMatchesSearch(entity, query));
-
-  if (!entities.length) {
-    appendEmpty(
-      dom.entityList,
-      query ? "No entities match the current filter." : "No entities yet. Create the first one below.");
-    return;
-  }
-
-  for (const entity of entities) {
-    const metrics = getEntityMetrics(entity.id);
-    const card = document.createElement("article");
-    card.className = "entity-card explorer-card";
-    card.setAttribute("role", "button");
-    card.setAttribute("tabindex", "0");
-    card.setAttribute("aria-describedby", "entityExplorerHint");
-    card.setAttribute("aria-label", `${entity.name}. Press Enter or Space to select. Press F to focus the graph.`);
-    card.setAttribute("aria-pressed", String(entity.id === state.selectedEntityId));
-    card.dataset.explorerCard = "entity";
-    card.dataset.entityId = entity.id;
-    if (entity.id === state.selectedEntityId) {
-      card.classList.add("active");
-    }
-    card.addEventListener("click", event => {
-      if (shouldIgnoreExplorerCardActivation(event)) {
-        return;
-      }
-
-      selectEntity(entity.id);
-    });
-    card.addEventListener("keydown", event => handleExplorerCardKeydown(event, {
-      listType: "entity",
-      itemId: entity.id,
-      activate: () => selectEntity(entity.id),
-      alternateActivate: () => focusGraph(entity.id)
-    }));
-
-    const headingRow = document.createElement("div");
-    headingRow.className = "entity-row";
-
-    const heading = document.createElement("strong");
-    heading.textContent = entity.name;
-
-    const count = document.createElement("span");
-    count.className = "tag";
-    count.textContent = pluralize(metrics.incidentCount, "incident");
-
-    headingRow.append(heading, count);
-
-    const note = document.createElement("p");
-    note.className = "muted";
-    note.textContent = entity.note || "No note";
-
-    const meta = document.createElement("div");
-    meta.className = "entity-meta";
-
-    const idTag = document.createElement("span");
-    idTag.className = "tag";
-    idTag.textContent = entity.id;
-
-    const neighborTag = document.createElement("span");
-    neighborTag.className = "tag";
-    neighborTag.textContent = pluralize(metrics.neighborCount, "neighbor");
-
-    meta.append(idTag, neighborTag);
-
-    const buttonRow = document.createElement("div");
-    buttonRow.className = "actions";
-
-    const selectButton = document.createElement("button");
-    selectButton.className = "ghost";
-    selectButton.type = "button";
-    selectButton.textContent = entity.id === state.selectedEntityId ? "Selected" : "Select entity";
-    selectButton.addEventListener("click", () => selectEntity(entity.id));
-
-    const focusButton = document.createElement("button");
-    focusButton.className = "ghost";
-    focusButton.type = "button";
-    focusButton.textContent = state.focusedEntityId === entity.id ? "Focused" : "Focus";
-    focusButton.addEventListener("click", () => focusGraph(entity.id));
-
-    buttonRow.append(selectButton, focusButton);
-    card.append(headingRow, note, meta, buttonRow);
-    dom.entityList.appendChild(card);
-  }
-}
-
-function renderEntityForm() {
-  const entity = selectedEntity();
-  dom.entityFormTitle.textContent = entity ? `Edit entity: ${entity.name}` : "Create entity";
-  dom.entitySubmit.textContent = entity ? "Save changes" : "Create entity";
-  dom.entityDelete.hidden = !entity;
-
-  if (!document.activeElement || !dom.entityForm.contains(document.activeElement)) {
-    dom.entityName.value = entity?.name || "";
-    dom.entityNote.value = entity?.note || "";
-  }
-}
-
-function syncEntityOptions(select, preferredId) {
-  const currentValue = select.value;
-  select.innerHTML = "";
-
-  for (const entity of state.entities) {
-    const option = document.createElement("option");
-    option.value = entity.id;
-    option.textContent = `${entity.name} (${entity.id})`;
-    select.appendChild(option);
-  }
-
-  if (!state.entities.length) {
-    const option = document.createElement("option");
-    option.value = "";
-    option.textContent = "No entities available";
-    select.appendChild(option);
-    return;
-  }
-
-  const nextValue = preferredId && state.entities.some(entity => entity.id === preferredId)
-    ? preferredId
-    : state.entities.some(entity => entity.id === currentValue)
-      ? currentValue
-      : state.entities[0].id;
-
-  select.value = nextValue;
-}
-
-function syncRelationshipKindOptions() {
-  const currentValue = dom.relationshipKindFilter.value;
-  const kinds = [...new Set(getScopedRelationships().map(edge => edge.kind).filter(Boolean))]
-    .sort((left, right) => left.localeCompare(right));
-
-  dom.relationshipKindFilter.innerHTML = "";
-
-  const allOption = document.createElement("option");
-  allOption.value = "";
-  allOption.textContent = "All kinds";
-  dom.relationshipKindFilter.appendChild(allOption);
-
-  for (const kind of kinds) {
-    const option = document.createElement("option");
-    option.value = kind;
-    option.textContent = kind;
-    dom.relationshipKindFilter.appendChild(option);
-  }
-
-  if (currentValue && kinds.includes(currentValue)) {
-    dom.relationshipKindFilter.value = currentValue;
-  } else if (state.relationshipFilters.kind && kinds.includes(state.relationshipFilters.kind)) {
-    dom.relationshipKindFilter.value = state.relationshipFilters.kind;
-  } else {
-    dom.relationshipKindFilter.value = "";
-    if (state.relationshipFilters.kind && !kinds.length) {
-      state.relationshipFilters.kind = "";
-    }
-  }
-}
-
-function inferRelationshipTarget(selectedId) {
-  const otherEntity = state.entities.find(entity => entity.id !== selectedId);
-  return otherEntity?.id || selectedId;
-}
-
-function renderRelationshipControls() {
-  const hasEntities = state.entities.length > 0;
-  const entity = selectedEntity();
-  const relationship = selectedRelationship();
-  const scopedRelationships = getScopedRelationships();
-  const filteredRelationships = getFilteredRelationships();
-  const selectedRelationshipVisibleInGraph = relationship
-    ? state.graph.links.some(link => link.id === relationship.id)
-    : true;
-  const spotlight = getGraphSpotlight();
-
-  syncEntityOptions(dom.relationshipSource, relationship?.sourceEntityId || entity?.id || null);
-  syncEntityOptions(
-    dom.relationshipTarget,
-    relationship?.targetEntityId || (entity ? inferRelationshipTarget(entity.id) : null));
-  syncRelationshipKindOptions();
-
-  dom.relationshipDirectionFilter.disabled = !entity;
-  if (!entity) {
-    dom.relationshipDirectionFilter.value = "all";
-    state.relationshipFilters.direction = "all";
-  }
-
-  dom.relationshipForm.querySelectorAll("input, textarea, select, button").forEach(control => {
-    control.disabled = !hasEntities;
+  return requestJson("/api/entities", {
+    method: "POST",
+    body: JSON.stringify({ name, note: "", type })
   });
-
-  dom.relationshipFormTitle.textContent = relationship ? "Edit relationship" : "Create relationship";
-  dom.relationshipSubmit.textContent = relationship ? "Save relationship" : "Create relationship";
-  dom.relationshipDelete.hidden = !relationship;
-  dom.relationshipReset.textContent = relationship ? "Clear selection" : "Reset form";
-
-  if (!document.activeElement || !dom.relationshipForm.contains(document.activeElement)) {
-    dom.relationshipKind.value = relationship?.kind || "";
-    dom.relationshipNote.value = relationship?.note || "";
-  }
-
-  dom.focusSelected.disabled = !entity;
-  dom.showFullGraph.disabled = !state.focusedEntityId;
-
-  dom.relationshipModeTag.textContent = entity ? `Entity context: ${entity.name}` : "Global browse";
-  dom.relationshipResultsSummary.textContent = entity
-    ? `${pluralize(filteredRelationships.length, "relationship")} shown of ${pluralize(scopedRelationships.length, "incident relationship")}`
-    : `${pluralize(filteredRelationships.length, "relationship")} shown of ${pluralize(state.relationships.length, "relationship")}`;
-
-  if (relationship) {
-    dom.relationshipInspectorMeta.textContent =
-      `Relationship ${relationship.id}: ${relationship.sourceEntityId} → ${relationship.targetEntityId}`;
-  } else {
-    dom.relationshipInspectorMeta.textContent =
-      "Select a relationship from the filtered list or graph to edit it. Clear the selection to create a new one.";
-  }
-
-  dom.relationshipFocusNotice.hidden = !relationship || selectedRelationshipVisibleInGraph;
-  dom.relationshipFocusNotice.textContent =
-    relationship && !selectedRelationshipVisibleInGraph
-      ? "The selected relationship is outside the currently focused one-hop graph. Show the full graph or refocus to see it highlighted."
-      : "";
-
-  if (relationship && entity) {
-    dom.selectionSummary.textContent =
-      `${entity.name} is selected. Filtering ${pluralize(scopedRelationships.length, "incident relationship")} and editing ${relationship.id}.`;
-  } else if (relationship) {
-    dom.selectionSummary.textContent =
-      `Global relationship browsing is active. Inspecting ${relationship.id} directly from the graph or filtered list.`;
-  } else if (entity) {
-    dom.selectionSummary.textContent =
-      `${entity.name} is selected. Use quick kind chips or explorer filters to narrow the visible incident relationships.`;
-  } else {
-    dom.selectionSummary.textContent =
-      "Global relationship browsing is active. Filter all relationships, then inspect one without selecting an entity first.";
-  }
-
-  if (spotlight.areRelationshipFiltersActive) {
-    dom.selectionSummary.textContent += " Relationship spotlighting is active on the graph.";
-  }
 }
 
-function renderRelationshipList() {
-  dom.relationshipList.innerHTML = "";
-
-  const edges = getFilteredRelationships();
-
-  if (!state.relationships.length) {
-    appendEmpty(
-      dom.relationshipList,
-      relationshipMode() === "entity"
-        ? "No relationships for the selected entity yet."
-        : "No relationships yet. Create the first relationship in the inspector below.");
-    return;
+async function ensureRelationship(sourceEntityId, targetEntityId, kind, note = "") {
+  const existing = state.relationships.find(edge =>
+    edge.sourceEntityId === sourceEntityId &&
+    edge.targetEntityId === targetEntityId &&
+    edge.kind === kind);
+  if (existing) {
+    return existing;
   }
 
-  if (!edges.length) {
-    appendEmpty(dom.relationshipList, "No relationships match the current filters.");
-    return;
-  }
-
-  for (const edge of edges) {
-    const card = document.createElement("article");
-    card.className = "relationship-card explorer-card";
-    card.setAttribute("role", "button");
-    card.setAttribute("tabindex", "0");
-    card.setAttribute("aria-describedby", "relationshipExplorerHint");
-    card.setAttribute(
-      "aria-label",
-      `${edge.sourceEntityId} to ${edge.targetEntityId} (${edge.kind}). Press Enter or Space to inspect.`
-    );
-    card.setAttribute("aria-pressed", String(edge.id === state.selectedRelationshipId));
-    card.dataset.explorerCard = "relationship";
-    card.dataset.relationshipId = edge.id;
-    if (edge.id === state.selectedRelationshipId) {
-      card.classList.add("active");
+  try {
+    return await requestJson("/api/relationship-edges", {
+      method: "POST",
+      body: JSON.stringify({ sourceEntityId, targetEntityId, kind, note })
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("conflict:relationship already exists")) {
+      return null;
     }
-    card.addEventListener("click", event => {
-      if (shouldIgnoreExplorerCardActivation(event)) {
-        return;
-      }
-
-      selectRelationship(edge.id);
-    });
-    card.addEventListener("keydown", event => handleExplorerCardKeydown(event, {
-      listType: "relationship",
-      itemId: edge.id,
-      activate: () => selectRelationship(edge.id)
-    }));
-
-    const row = document.createElement("div");
-    row.className = "relationship-row";
-
-    const title = document.createElement("div");
-    title.innerHTML = `<strong>${edge.sourceEntityId}</strong> <span class="muted">→</span> <strong>${edge.targetEntityId}</strong>`;
-
-    const kind = document.createElement("span");
-    kind.className = "tag";
-    kind.textContent = edge.kind;
-
-    row.append(title, kind);
-
-    const note = document.createElement("p");
-    note.className = "muted";
-    note.textContent = edge.note || "No note";
-
-    const meta = document.createElement("p");
-    meta.className = "muted";
-    meta.textContent = `ID: ${edge.id}`;
-
-    const actions = document.createElement("div");
-    actions.className = "actions";
-
-    const selectButton = document.createElement("button");
-    selectButton.className = "ghost";
-    selectButton.type = "button";
-    selectButton.textContent = edge.id === state.selectedRelationshipId ? "Selected" : "Inspect";
-    selectButton.addEventListener("click", event => {
-      event.stopPropagation();
-      selectRelationship(edge.id);
-    });
-
-    const focusButton = document.createElement("button");
-    focusButton.className = "ghost";
-    focusButton.type = "button";
-    focusButton.textContent = "Focus source";
-    focusButton.addEventListener("click", event => {
-      event.stopPropagation();
-      focusGraph(edge.sourceEntityId);
-    });
-
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "danger";
-    deleteButton.type = "button";
-    deleteButton.textContent = "Delete";
-    deleteButton.addEventListener("click", event => {
-      event.stopPropagation();
-      queueRelationshipDelete(edge.id);
-    });
-
-    actions.append(selectButton, focusButton, deleteButton);
-    card.append(row, note, meta, actions);
-    dom.relationshipList.appendChild(card);
-  }
-}
-
-function renderGraphMeta() {
-  const counts = `${state.graph.nodes.length} nodes, ${state.graph.links.length} relationships`;
-  const spotlight = getGraphSpotlight();
-
-  dom.statusSummary.textContent = state.focusedEntityId
-    ? `Focused graph loaded: ${counts}`
-    : `Full graph loaded: ${counts}`;
-
-  if (state.focusedEntityId) {
-    const entity = state.entities.find(item => item.id === state.focusedEntityId);
-    dom.focusTag.hidden = false;
-    dom.focusTag.textContent = `Focused on ${entity?.name || state.focusedEntityId}`;
-  } else {
-    dom.focusTag.hidden = true;
-  }
-
-  dom.spotlightTag.hidden = !spotlight.hasSpotlight;
-  if (spotlight.hasSpotlight) {
-    const parts = [];
-    if (spotlight.isEntitySearchActive) {
-      parts.push("Node spotlight");
-    }
-    if (spotlight.areRelationshipFiltersActive) {
-      parts.push("Edge spotlight");
-    }
-    dom.spotlightTag.textContent = parts.join(" + ");
+    throw error;
   }
 }
 
@@ -1154,12 +543,6 @@ async function loadEntities() {
   setLoading("entities", true);
   try {
     state.entities = await requestJson("/api/entities");
-    if (state.selectedEntityId && !state.entities.some(entity => entity.id === state.selectedEntityId)) {
-      state.selectedEntityId = null;
-    }
-    if (state.focusedEntityId && !state.entities.some(entity => entity.id === state.focusedEntityId)) {
-      state.focusedEntityId = null;
-    }
   } finally {
     setLoading("entities", false);
   }
@@ -1174,34 +557,10 @@ async function loadRelationships() {
   }
 }
 
-async function loadSelectedRelationship() {
-  if (!state.selectedRelationshipId) {
-    state.selectedRelationship = null;
-    return;
-  }
-
-  try {
-    state.selectedRelationship = await requestJson(
-      `/api/relationship-edges/${encodeURIComponent(state.selectedRelationshipId)}`);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "";
-    if (message.startsWith("404")) {
-      state.selectedRelationshipId = null;
-      state.selectedRelationship = null;
-      return;
-    }
-
-    throw error;
-  }
-}
-
 async function loadGraph() {
   setLoading("graph", true);
   try {
-    const suffix = state.focusedEntityId
-      ? `?entityId=${encodeURIComponent(state.focusedEntityId)}`
-      : "";
-    state.graph = await requestJson(`/api/graph${suffix}`);
+    state.graph = await requestJson("/api/graph");
   } finally {
     setLoading("graph", false);
   }
@@ -1209,899 +568,984 @@ async function loadGraph() {
 
 async function refreshAll() {
   setError("");
-  try {
-    urlState.suppressSync = true;
-    hydrateWorkbenchStateFromUrl();
-    await loadEntities();
-    await loadRelationships();
-    reconcileWorkbenchStateAfterLoad();
-    await loadGraph();
-    await loadSelectedRelationship();
-    flushUrlStateNotice();
-    render();
-  } catch (error) {
-    setError(error instanceof Error ? error.message : "Unable to refresh the workbench");
-    render();
-  } finally {
-    urlState.suppressSync = false;
-    writeWorkbenchStateToUrl();
-  }
-}
-
-function renderSelection() {
-  setError("");
+  await Promise.all([loadEntities(), loadRelationships()]);
+  reconcileCurrentUser();
+  renderDemoUsers();
+  ensureInitialExpansion();
+  await loadGraph();
   render();
 }
 
-async function selectEntity(entityId) {
-  state.pendingDelete = null;
-  state.selectedEntityId = entityId;
-  state.selectedRelationshipId = null;
-  state.selectedRelationship = null;
-  const entity = selectedEntity();
-  if (entity) {
-    dom.entityName.value = entity.name;
-    dom.entityNote.value = entity.note;
+function render() {
+  renderProfile();
+  renderEntityExplorer();
+  renderEntitySummary();
+  renderRelationshipControls();
+  renderRelationshipExplorer();
+  renderSelectionForms();
+  renderGraphFilters();
+  renderStatus();
+  graphView.setGraph(visibleGraph());
+}
+
+function renderProfile() {
+  const employee = currentEmployee();
+  dom.demoUser.value = state.currentUserId;
+  dom.profileTitle.textContent = employee ? employee.name : "New employee profile";
+  dom.profileModeTag.textContent = "Editable";
+  dom.profileName.value = employee?.name ?? "";
+  dom.profileNote.value = employee?.note ?? "";
+
+  const profileEdges = employee ? getIncidentRelationships(employee.id).filter(edge => edge.sourceEntityId === employee.id) : [];
+  const department = profileEdges
+    .map(edge => edge.kind === "in-department" ? state.entities.find(entity => entity.id === edge.targetEntityId) : null)
+    .find(Boolean);
+  const skills = profileEdges
+    .filter(edge => edge.kind === "has-skill")
+    .map(edge => entityLabel(edge.targetEntityId));
+  const topics = profileEdges
+    .filter(edge => edge.kind === "interested-in" || edge.kind === "related-to")
+    .map(edge => entityLabel(edge.targetEntityId));
+
+  dom.profileDepartment.value = department?.name ?? "";
+  dom.profileSkills.value = skills.join(", ");
+  dom.profileTopics.value = topics.join(", ");
+
+  dom.departmentOptions.innerHTML = "";
+  for (const departmentEntity of state.entities.filter(entity => entity.type === "department")) {
+    const option = document.createElement("option");
+    option.value = departmentEntity.name;
+    dom.departmentOptions.appendChild(option);
   }
-  renderSelection();
 }
 
-async function selectRelationship(relationshipId) {
-  state.pendingDelete = null;
-  state.selectedRelationshipId = relationshipId;
-  state.selectedRelationship = state.relationships.find(edge => edge.id === relationshipId) ?? null;
-  renderSelection();
+function entityMatches(entity) {
+  const query = normalizeText(state.searchQuery);
+  if (!query) {
+    return true;
+  }
+
+  return [entity.name, entity.note, entity.type, entity.ownerUserId]
+    .some(value => normalizeText(value).includes(query));
 }
 
-async function focusGraph(entityId) {
-  state.pendingDelete = null;
-  const previousFocusedEntityId = state.focusedEntityId;
-  state.focusedEntityId = entityId;
-  renderSelection();
+function renderEntityExplorer() {
+  dom.entityList.innerHTML = "";
+  const entities = state.entities.filter(entityMatches);
+  if (!entities.length) {
+    appendEmpty(dom.entityList, "No matching entities.");
+    return;
+  }
+
+  for (const entity of entities) {
+    const card = document.createElement("article");
+    card.className = `entity-card explorer-card type-${entity.type}`;
+    card.tabIndex = 0;
+    card.dataset.explorerCard = "entity";
+    card.dataset.entityId = entity.id;
+    const roleStyle = visualRoleStyle(entity);
+    if (entity.id === state.selectedEntityId) {
+      card.classList.add("active");
+    }
+    card.innerHTML = `
+      <div class="entity-row">
+        <strong>${escapeHtml(entity.name)}</strong>
+        <span class="tag">${escapeHtml(roleStyle.label)}</span>
+      </div>
+      <p class="muted">${escapeHtml(entity.note || "No note yet")}</p>
+      <span class="muted">${getIncidentRelationships(entity.id).length} connections</span>
+    `;
+    card.addEventListener("click", () => selectEntity(entity.id));
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        selectEntity(entity.id);
+      }
+      if (event.key.toLowerCase() === "f") {
+        event.preventDefault();
+        focusGraph(entity.id);
+      }
+    });
+    dom.entityList.appendChild(card);
+  }
+}
+
+function renderEntitySummary() {
+  const entity = selectedEntity();
+  if (!entity) {
+    dom.entitySummaryTitle.textContent = "No entity selected";
+    dom.entitySummaryModeTag.textContent = "Full graph context";
+    dom.entitySummaryText.textContent = "Select an entity to inspect incident counts, neighboring entities, and quick relationship filters.";
+    dom.entityMetricGrid.innerHTML = "";
+    dom.entityNeighborList.innerHTML = "";
+    dom.entityKindChips.innerHTML = "";
+    return;
+  }
+
+  const metrics = getEntityMetrics(entity.id);
+  dom.entitySummaryTitle.textContent = entity.name;
+  dom.entitySummaryModeTag.textContent = entity.type;
+  dom.entitySummaryText.textContent = entity.note || "No note yet.";
+  dom.entityMetricGrid.innerHTML = [
+    ["Incident", metrics.incident.length],
+    ["Incoming", metrics.incoming.length],
+    ["Outgoing", metrics.outgoing.length],
+    ["Neighbors", metrics.neighborIds.length]
+  ].map(([label, value]) => `<div class="metric-card"><strong class="metric-value">${value}</strong><span>${label}</span></div>`).join("");
+
+  dom.entityNeighborList.innerHTML = "";
+  for (const neighborId of metrics.neighborIds) {
+    const neighbor = state.entities.find(item => item.id === neighborId);
+    if (!neighbor) {
+      continue;
+    }
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "chip-button";
+    button.textContent = neighbor.name;
+    button.addEventListener("click", () => selectEntity(neighbor.id));
+    dom.entityNeighborList.appendChild(button);
+  }
+  if (!metrics.neighborIds.length) {
+    appendEmpty(dom.entityNeighborList, "No neighbors yet.");
+  }
+
+  dom.entityKindChips.innerHTML = "";
+  for (const kind of metrics.kinds) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "chip-button";
+    button.textContent = kind;
+    button.addEventListener("click", () => {
+      state.relationshipFilters.kind = kind;
+      dom.relationshipKindFilter.value = kind;
+      render();
+    });
+    dom.entityKindChips.appendChild(button);
+  }
+  if (!metrics.kinds.length) {
+    appendEmpty(dom.entityKindChips, "No relationship kinds yet.");
+  }
+}
+
+function getScopedRelationships() {
+  const scoped = state.selectedEntityId
+    ? getIncidentRelationships(state.selectedEntityId)
+    : state.relationships;
+  const query = normalizeText(state.relationshipFilters.text);
+  return scoped.filter(edge => {
+    const matchesText = !query || [
+      edge.kind,
+      edge.note,
+      entityLabel(edge.sourceEntityId),
+      entityLabel(edge.targetEntityId)
+    ].some(value => normalizeText(value).includes(query));
+    const matchesKind = !state.relationshipFilters.kind || edge.kind === state.relationshipFilters.kind;
+    const matchesDirection =
+      !state.selectedEntityId ||
+      state.relationshipFilters.direction === "all" ||
+      (state.relationshipFilters.direction === "incoming" && edge.targetEntityId === state.selectedEntityId) ||
+      (state.relationshipFilters.direction === "outgoing" && edge.sourceEntityId === state.selectedEntityId);
+    return matchesText && matchesKind && matchesDirection;
+  });
+}
+
+function renderRelationshipControls() {
+  const kinds = [...new Set(state.relationships.map(edge => edge.kind).filter(Boolean))].sort();
+  dom.relationshipKindFilter.innerHTML = `<option value="">All kinds</option>${kinds.map(kind =>
+    `<option value="${escapeHtml(kind)}">${escapeHtml(kind)}</option>`).join("")}`;
+  dom.relationshipKindFilter.value = state.relationshipFilters.kind;
+  dom.relationshipDirectionFilter.value = state.relationshipFilters.direction;
+}
+
+function renderRelationshipExplorer() {
+  const relationships = getScopedRelationships();
+  dom.relationshipList.innerHTML = "";
+  dom.relationshipModeTag.textContent = state.selectedEntityId ? "Selected entity" : "Global browse";
+  dom.relationshipResultsSummary.textContent = `${relationships.length} relationship${relationships.length === 1 ? "" : "s"}`;
+  dom.selectionSummary.textContent = state.selectedEntityId
+    ? `Browsing relationships around ${entityLabel(state.selectedEntityId)}.`
+    : "Browse all relationships or narrow the list around a selected entity.";
+
+  if (!relationships.length) {
+    appendEmpty(dom.relationshipList, "No matching relationships.");
+    return;
+  }
+
+  for (const edge of relationships) {
+    const card = document.createElement("article");
+    card.className = "relationship-card explorer-card";
+    card.tabIndex = 0;
+    card.dataset.explorerCard = "relationship";
+    card.dataset.relationshipId = edge.id;
+    if (edge.id === state.selectedRelationshipId) {
+      card.classList.add("active");
+    }
+    card.innerHTML = `
+      <div class="relationship-row">
+        <strong>${escapeHtml(edge.kind)}</strong>
+        <span class="tag">${escapeHtml(edge.id)}</span>
+      </div>
+      <p>${escapeHtml(entityLabel(edge.sourceEntityId))} -> ${escapeHtml(entityLabel(edge.targetEntityId))}</p>
+      <p class="muted">${escapeHtml(edge.note || "No note yet")}</p>
+    `;
+    card.addEventListener("click", () => selectRelationship(edge.id));
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        selectRelationship(edge.id);
+      }
+    });
+    dom.relationshipList.appendChild(card);
+  }
+}
+
+function renderGraphFilters() {
+  dom.graphTypeFilters.innerHTML = "";
+  const visibleTypes = new Set(state.graphFilters.visibleTypes);
+  for (const type of ENTITY_TYPES) {
+    const label = document.createElement("label");
+    label.className = "type-toggle";
+    label.innerHTML = `
+      <input type="checkbox" value="${escapeHtml(type)}" ${visibleTypes.has(type) ? "checked" : ""}>
+      <span>${escapeHtml(type)}</span>
+    `;
+    label.querySelector("input").addEventListener("change", event => {
+      toggleGraphType(type, event.target.checked);
+    });
+    dom.graphTypeFilters.appendChild(label);
+  }
+
+  const expandedCount = state.graphFilters.expandedNodeIds.size;
+  dom.graphFilterSummary.textContent = `${expandedCount} expanded, top 10 weighted employees`;
+}
+
+function renderSelectionForms() {
+  const entity = selectedEntity();
+  dom.entityFormTitle.textContent = entity ? "Entity inspector" : "Create topic node";
+  dom.entityName.value = entity?.name ?? "";
+  dom.entityType.value = entity?.type ?? "topic";
+  dom.entityNote.value = entity?.note ?? "";
+  dom.entitySubmit.textContent = entity ? "Save node" : "Create node";
+  dom.entityDelete.hidden = !entity;
+
+  const employee = currentEmployee();
+  dom.relationshipSource.innerHTML = state.entities
+    .filter(item => item.type === "employee")
+    .map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`)
+    .join("");
+  dom.relationshipTarget.innerHTML = state.entities
+    .map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)} (${escapeHtml(item.type)})</option>`)
+    .join("");
+
+  const edge = selectedRelationship();
+  dom.relationshipFormTitle.textContent = edge ? "Relationship inspector" : "Create relationship";
+  dom.relationshipSubmit.textContent = edge ? "Save relationship" : "Create relationship";
+  dom.relationshipDelete.hidden = !edge;
+  dom.relationshipSource.value = edge?.sourceEntityId ?? employee?.id ?? "";
+  dom.relationshipTarget.value = edge?.targetEntityId ?? state.selectedEntityId ?? "";
+  dom.relationshipKind.value = edge?.kind ?? "related-to";
+  dom.relationshipNote.value = edge?.note ?? "";
+  dom.relationshipFocusNotice.hidden = true;
+}
+
+function renderStatus() {
+  const graph = visibleGraph();
+  const nodeCount = graph.nodes.length;
+  const linkCount = graph.links.length;
+  dom.statusSummary.textContent = `${nodeCount} shown of ${state.graph.nodes.length} nodes, ${linkCount} links`;
+  dom.focusTag.hidden = !state.graphFilters.expandedNodeIds.size;
+  dom.focusTag.textContent = state.graphFilters.expandedNodeIds.size
+    ? `Expanded: ${state.graphFilters.expandedNodeIds.size}`
+    : "";
+  dom.spotlightTag.hidden = !state.searchQuery && !state.relationshipFilters.kind && !state.relationshipFilters.text;
+  dom.spotlightTag.textContent = "Spotlight active";
+  dom.focusSelected.disabled = !state.selectedEntityId;
+  dom.showFullGraph.disabled = state.graphFilters.expandedNodeIds.size <= 1 &&
+    state.graphFilters.expandedNodeIds.has(currentEmployeeId());
+}
+
+async function selectEntity(id) {
+  state.selectedEntityId = id;
+  state.selectedRelationshipId = null;
+  render();
+}
+
+function selectRelationship(id) {
+  const edge = state.relationships.find(item => item.id === id);
+  if (!edge) {
+    return;
+  }
+  state.selectedRelationshipId = id;
+  state.selectedEntityId = edge.sourceEntityId;
+  render();
+}
+
+async function focusGraph(id) {
+  state.graphFilters.expandedNodeIds.add(id);
+  saveGraphFilters();
+  render();
+}
+
+async function showFullGraph() {
+  state.graphFilters.expandedNodeIds = new Set([currentEmployeeId()]);
+  saveGraphFilters();
+  render();
+}
+
+async function submitProfile(event) {
+  event.preventDefault();
+  setError("");
+  const employee = currentEmployee();
+  const payload = {
+    name: dom.profileName.value.trim(),
+    note: dom.profileNote.value.trim(),
+    type: "employee"
+  };
 
   try {
-    await loadGraph();
-    render();
+    let saved = employee;
+    if (employee) {
+      saved = await requestJson(`/api/entities/${encodeURIComponent(employee.id)}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+      });
+    } else {
+      saved = await requestJson("/api/entities", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    }
+
+    await loadEntities();
+    state.selectedEntityId = saved.id;
+
+    const departmentName = dom.profileDepartment.value.trim();
+    if (departmentName) {
+      const department = await ensureEntity(departmentName, "department");
+      await ensureRelationship(saved.id, department.id, "in-department", "Profile department");
+    }
+
+    for (const skillName of splitValues(dom.profileSkills.value)) {
+      const skill = await ensureEntity(skillName, "skill");
+      await ensureRelationship(saved.id, skill.id, "has-skill", "Profile skill");
+    }
+
+    for (const topicName of splitValues(dom.profileTopics.value)) {
+      const type = findEntityByNameAndType(topicName, "interest") ? "interest" : "topic";
+      const topic = await ensureEntity(topicName, type);
+      await ensureRelationship(saved.id, topic.id, type === "interest" ? "interested-in" : "related-to", "Profile topic");
+    }
+
+    await refreshAll();
+    setActivity("Profile saved and graph updated.");
   } catch (error) {
-    state.focusedEntityId = previousFocusedEntityId;
-    setError(error instanceof Error ? error.message : "Unable to focus graph");
-    render();
+    setError(error instanceof Error ? error.message : "Unable to save profile");
   }
 }
 
 async function submitEntity(event) {
   event.preventDefault();
-  state.pendingDelete = null;
   setError("");
-  setActivityMessage("");
-
   const payload = {
     name: dom.entityName.value.trim(),
-    note: dom.entityNote.value.trim()
+    note: dom.entityNote.value.trim(),
+    type: dom.entityType.value
   };
 
   try {
-    if (state.selectedEntityId) {
-      await requestJson(`/api/entities/${encodeURIComponent(state.selectedEntityId)}`, {
+    const entity = selectedEntity();
+    const saved = entity
+      ? await requestJson(`/api/entities/${encodeURIComponent(entity.id)}`, {
         method: "PUT",
         body: JSON.stringify(payload)
-      });
-    } else {
-      const created = await requestJson("/api/entities", {
+      })
+      : await requestJson("/api/entities", {
         method: "POST",
         body: JSON.stringify(payload)
       });
-      state.selectedEntityId = created.id;
-    }
-
+    state.selectedEntityId = saved.id;
     await refreshAll();
+    setActivity(entity ? "Node saved." : "Node created.");
   } catch (error) {
     setError(error instanceof Error ? error.message : "Unable to save entity");
   }
 }
 
-function clearEntitySelection() {
-  state.pendingDelete = null;
-  state.selectedEntityId = null;
-  state.selectedRelationshipId = null;
-  state.selectedRelationship = null;
-  dom.entityForm.reset();
-  render();
+async function submitRelationship(event) {
+  event.preventDefault();
+  setError("");
+  const payload = {
+    sourceEntityId: dom.relationshipSource.value,
+    targetEntityId: dom.relationshipTarget.value,
+    kind: dom.relationshipKind.value,
+    note: dom.relationshipNote.value.trim()
+  };
+
+  try {
+    const edge = selectedRelationship();
+    const saved = edge
+      ? await requestJson(`/api/relationship-edges/${encodeURIComponent(edge.id)}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+      })
+      : await requestJson("/api/relationship-edges", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    state.selectedRelationshipId = saved.id;
+    await refreshAll();
+    setActivity(edge ? "Relationship saved." : "Relationship created.");
+  } catch (error) {
+    setError(error instanceof Error ? error.message : "Unable to save relationship");
+  }
 }
 
 function queueEntityDelete() {
-  if (!state.selectedEntityId) {
-    return;
-  }
-
   const entity = selectedEntity();
   if (!entity) {
     return;
   }
-
-  const incidentRelationships = getIncidentRelationships(entity.id).map(copyRelationship);
-  state.pendingDelete = {
-    type: "entity",
-    title: `Delete entity ${entity.name}?`,
-    body:
-      `${entity.name} will be removed together with ${pluralize(incidentRelationships.length, "incident relationship")}. ` +
-      "Undo remains available for a short recovery window.",
-    confirmLabel: "Delete entity",
-    snapshot: {
-      entity: copyEntity(entity),
-      incidentRelationships,
-      wasFocused: state.focusedEntityId === entity.id
-    }
-  };
-  render();
+  const incidentCount = getIncidentRelationships(entity.id).length;
+  state.pendingDelete = { type: "entity", id: entity.id };
+  dom.deleteConfirmTitle.textContent = `Delete ${entity.name}?`;
+  dom.deleteConfirmBody.textContent = `This also removes ${incidentCount} incident relationship${incidentCount === 1 ? "" : "s"}.`;
+  dom.deleteConfirm.hidden = false;
 }
 
-function queueRelationshipDelete(id) {
-  const relationship = state.relationships.find(item => item.id === id);
-  if (!relationship) {
+function queueRelationshipDelete() {
+  const edge = selectedRelationship();
+  if (!edge) {
     return;
   }
-
-  state.pendingDelete = {
-    type: "relationship",
-    title: "Delete relationship?",
-    body:
-      `${describeRelationship(relationship)} will be removed from the explorer and graph. ` +
-      "Undo remains available for a short recovery window.",
-    confirmLabel: "Delete relationship",
-    snapshot: {
-      relationship: copyRelationship(relationship)
-    }
-  };
-  render();
+  state.pendingDelete = { type: "relationship", id: edge.id };
+  dom.deleteConfirmTitle.textContent = `Delete ${edge.kind}?`;
+  dom.deleteConfirmBody.textContent = `${entityLabel(edge.sourceEntityId)} -> ${entityLabel(edge.targetEntityId)}`;
+  dom.deleteConfirm.hidden = false;
 }
 
 async function confirmPendingDelete() {
   if (!state.pendingDelete) {
     return;
   }
-
   setError("");
-  setActivityMessage("");
-
   try {
     if (state.pendingDelete.type === "entity") {
-      await confirmEntityDelete(state.pendingDelete.snapshot);
+      await requestJson(`/api/entities/${encodeURIComponent(state.pendingDelete.id)}`, { method: "DELETE" });
+      state.selectedEntityId = null;
     } else {
-      await confirmRelationshipDelete(state.pendingDelete.snapshot);
+      await requestJson(`/api/relationship-edges/${encodeURIComponent(state.pendingDelete.id)}`, { method: "DELETE" });
+      state.selectedRelationshipId = null;
     }
+    state.pendingDelete = null;
+    dom.deleteConfirm.hidden = true;
+    await refreshAll();
+    setActivity("Delete completed.");
   } catch (error) {
     setError(error instanceof Error ? error.message : "Unable to delete selection");
-  } finally {
-    state.pendingDelete = null;
-    render();
   }
-}
-
-async function confirmEntityDelete(snapshot) {
-  await requestJson(`/api/entities/${encodeURIComponent(snapshot.entity.id)}`, { method: "DELETE" });
-  if (state.focusedEntityId === snapshot.entity.id) {
-    state.focusedEntityId = null;
-  }
-
-  const relationship = selectedRelationship();
-  if (relationship &&
-    (relationship.sourceEntityId === snapshot.entity.id ||
-      relationship.targetEntityId === snapshot.entity.id)) {
-    state.selectedRelationshipId = null;
-    state.selectedRelationship = null;
-  }
-
-  state.selectedEntityId = null;
-  dom.entityForm.reset();
-  setActivityMessage(
-    `Deleted ${snapshot.entity.name} and ${pluralize(snapshot.incidentRelationships.length, "incident relationship")}.`);
-  setUndoAction({
-    type: "entity",
-    title: `Deleted entity ${snapshot.entity.name}`,
-    body: `${pluralize(snapshot.incidentRelationships.length, "incident relationship")} can be restored briefly.`,
-    actionLabel: "Undo entity delete",
-    snapshot
-  });
-  await refreshAll();
-}
-
-async function confirmRelationshipDelete(snapshot) {
-  await requestJson(`/api/relationship-edges/${encodeURIComponent(snapshot.relationship.id)}`, { method: "DELETE" });
-  if (state.selectedRelationshipId === snapshot.relationship.id) {
-    state.selectedRelationshipId = null;
-    state.selectedRelationship = null;
-  }
-
-  setActivityMessage(`Deleted relationship ${describeRelationship(snapshot.relationship)}.`);
-  setUndoAction({
-    type: "relationship",
-    title: "Deleted relationship",
-    body: `${describeRelationship(snapshot.relationship)} can be restored briefly.`,
-    actionLabel: "Undo relationship delete",
-    snapshot
-  });
-  await refreshAll();
-}
-
-function wasConflict(error) {
-  return error instanceof Error && error.message.startsWith("409 ");
-}
-
-async function restoreDeletedItem() {
-  if (!state.undoAction) {
-    return;
-  }
-
-  setError("");
-  setActivityMessage("");
-
-  try {
-    if (state.undoAction.type === "relationship") {
-      await restoreRelationship(state.undoAction.snapshot);
-    } else {
-      await restoreEntity(state.undoAction.snapshot);
-    }
-
-    clearUndoTimer();
-    state.undoAction = null;
-    await refreshAll();
-  } catch (error) {
-    setError(error instanceof Error ? error.message : "Unable to restore deleted item");
-    render();
-  }
-}
-
-async function restoreRelationship(snapshot) {
-  const existing = findRelationshipByIdentity(
-    snapshot.relationship.sourceEntityId,
-    snapshot.relationship.targetEntityId,
-    snapshot.relationship.kind);
-
-  if (existing) {
-    state.selectedEntityId = existing.sourceEntityId;
-    state.selectedRelationshipId = existing.id;
-    state.selectedRelationship = existing;
-    setActivityMessage(`Relationship ${describeRelationship(existing)} was already present.`);
-    return;
-  }
-
-  let restored;
-  try {
-    restored = await requestJson("/api/relationship-edges", {
-      method: "POST",
-      body: JSON.stringify({
-        sourceEntityId: snapshot.relationship.sourceEntityId,
-        targetEntityId: snapshot.relationship.targetEntityId,
-        kind: snapshot.relationship.kind,
-        note: snapshot.relationship.note
-      })
-    });
-  } catch (error) {
-    if (!wasConflict(error)) {
-      throw error;
-    }
-
-    restored = {
-      id: snapshot.relationship.id,
-      sourceEntityId: snapshot.relationship.sourceEntityId,
-      targetEntityId: snapshot.relationship.targetEntityId,
-      kind: snapshot.relationship.kind,
-      note: snapshot.relationship.note
-    };
-  }
-
-  state.selectedEntityId = restored.sourceEntityId;
-  state.selectedRelationshipId = restored.id;
-  state.selectedRelationship = restored;
-  setActivityMessage(`Restored relationship ${describeRelationship(restored)}.`);
-}
-
-async function restoreEntity(snapshot) {
-  let restoredEntity = state.entities.find(entity => entity.id === snapshot.entity.id) ?? null;
-
-  if (!restoredEntity) {
-    restoredEntity = await requestJson("/api/entities", {
-      method: "POST",
-      body: JSON.stringify({
-        name: snapshot.entity.name,
-        note: snapshot.entity.note
-      })
-    });
-  }
-
-  let restoredCount = 0;
-  let alreadyPresentCount = 0;
-
-  for (const edge of snapshot.incidentRelationships) {
-    const sourceEntityId = edge.sourceEntityId === snapshot.entity.id ? restoredEntity.id : edge.sourceEntityId;
-    const targetEntityId = edge.targetEntityId === snapshot.entity.id ? restoredEntity.id : edge.targetEntityId;
-
-    const existingRelationship = findRelationshipByIdentity(sourceEntityId, targetEntityId, edge.kind);
-    if (existingRelationship) {
-      alreadyPresentCount += 1;
-      continue;
-    }
-
-    try {
-      await requestJson("/api/relationship-edges", {
-        method: "POST",
-        body: JSON.stringify({
-          sourceEntityId,
-          targetEntityId,
-          kind: edge.kind,
-          note: edge.note
-        })
-      });
-      restoredCount += 1;
-    } catch (error) {
-      if (!wasConflict(error)) {
-        throw error;
-      }
-
-      alreadyPresentCount += 1;
-    }
-  }
-
-  state.selectedEntityId = restoredEntity.id;
-  state.selectedRelationshipId = null;
-  state.selectedRelationship = null;
-  if (snapshot.wasFocused) {
-    state.focusedEntityId = restoredEntity.id;
-  }
-
-  let message = `Restored entity ${restoredEntity.name}`;
-  if (restoredEntity.id !== snapshot.entity.id) {
-    message += ` as ${restoredEntity.id}`;
-  }
-  message += ` with ${restoredCount} recreated relationship`;
-  if (restoredCount !== 1) {
-    message += "s";
-  }
-  if (alreadyPresentCount) {
-    message += ` and ${alreadyPresentCount} already present`;
-  }
-  message += ".";
-  setActivityMessage(message);
 }
 
 function cancelPendingDelete() {
   state.pendingDelete = null;
-  render();
+  dom.deleteConfirm.hidden = true;
 }
 
-async function deleteSelectedEntity() {
-  queueEntityDelete();
-}
-
-async function deleteRelationship(id) {
-  queueRelationshipDelete(id);
-}
-
-function dismissUndoBanner() {
-  clearUndoTimer();
-  state.undoAction = null;
-  render();
-}
-
-async function submitRelationship(event) {
-  event.preventDefault();
-  state.pendingDelete = null;
-  setError("");
-  setActivityMessage("");
-
-  const payload = {
-    sourceEntityId: dom.relationshipSource.value,
-    targetEntityId: dom.relationshipTarget.value,
-    kind: dom.relationshipKind.value.trim(),
-    note: dom.relationshipNote.value.trim()
-  };
-
-  try {
-    let relationship;
-    if (state.selectedRelationshipId) {
-      relationship = await requestJson(`/api/relationship-edges/${encodeURIComponent(state.selectedRelationshipId)}`, {
-        method: "PUT",
-        body: JSON.stringify(payload)
-      });
-    } else {
-      relationship = await requestJson("/api/relationship-edges", {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-    }
-
-    state.selectedRelationshipId = relationship.id;
-    state.selectedRelationship = relationship;
-    state.selectedEntityId = payload.sourceEntityId;
-    await refreshAll();
-  } catch (error) {
-    setError(error instanceof Error ? error.message : "Unable to save relationship");
-  }
-}
-
-async function clearRelationshipSelection() {
-  state.pendingDelete = null;
+function clearEntitySelection() {
+  state.selectedEntityId = null;
   state.selectedRelationshipId = null;
-  state.selectedRelationship = null;
-  dom.relationshipKind.value = "";
-  dom.relationshipNote.value = "";
-  renderSelection();
+  render();
+}
+
+function clearRelationshipSelection() {
+  state.selectedRelationshipId = null;
+  render();
 }
 
 function clearRelationshipFilters() {
-  state.pendingDelete = null;
-  state.relationshipFilters.text = "";
-  state.relationshipFilters.kind = "";
-  state.relationshipFilters.direction = "all";
+  state.relationshipFilters = { text: "", kind: "", direction: "all" };
   dom.relationshipSearch.value = "";
-  dom.relationshipKindFilter.value = "";
-  dom.relationshipDirectionFilter.value = "all";
   render();
 }
 
-function appendEmpty(container, text) {
-  const empty = document.createElement("div");
-  empty.className = "empty";
-  empty.textContent = text;
-  container.appendChild(empty);
+function escapeHtml(value) {
+  const div = document.createElement("div");
+  div.textContent = value ?? "";
+  return div.innerHTML;
 }
 
-function shouldIgnoreExplorerCardActivation(event) {
-  return event.target instanceof HTMLElement && Boolean(event.target.closest("button"));
-}
+class ThreeGraphView {
+  constructor() {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0xf7fbfd);
+    this.camera = new THREE.OrthographicCamera(-480, 480, 320, -320, -1200, 1200);
+    this.camera.position.set(0, 0, 800);
+    this.renderer = new THREE.WebGLRenderer({ canvas: dom.graph, antialias: true, alpha: false });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.08;
+    this.controls = new OrbitControls(this.camera, dom.graph);
+    this.controls.enableDamping = true;
+    this.controls.dampingFactor = 0.08;
+    this.controls.enableRotate = false;
+    this.controls.screenSpacePanning = true;
+    this.controls.minZoom = 0.35;
+    this.controls.maxZoom = 3.2;
+    this.raycaster = new THREE.Raycaster();
+    this.pointer = new THREE.Vector2();
+    this.nodeMeshes = new Map();
+    this.linkLines = new Map();
+    this.clock = new THREE.Clock();
+    this.simulation = null;
+    this.graph = { nodes: [], links: [] };
+    this.draggedNode = null;
+    this.hoveredNodeId = null;
+    this.clickTimer = null;
+    this.width = 0;
+    this.height = 0;
+    this.pixelRatio = 0;
 
-function getExplorerCards(listType) {
-  const selector = listType === "entity"
-    ? "[data-explorer-card=\"entity\"]"
-    : "[data-explorer-card=\"relationship\"]";
-  const container = listType === "entity" ? dom.entityList : dom.relationshipList;
-  return Array.from(container.querySelectorAll(selector));
-}
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xb8d6e4, 1.18));
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.36));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
+    keyLight.position.set(220, 340, 500);
+    this.scene.add(keyLight);
+    const rimLight = new THREE.DirectionalLight(0x8deaff, 1.45);
+    rimLight.position.set(-360, -220, 420);
+    this.scene.add(rimLight);
+    const pearlLight = new THREE.PointLight(0xffd6f7, 1.65, 1100);
+    pearlLight.position.set(180, -280, 360);
+    this.scene.add(pearlLight);
 
-function moveExplorerFocus(listType, itemId, direction) {
-  const cards = getExplorerCards(listType);
-  if (!cards.length) {
-    return;
+    dom.graph.addEventListener("click", event => this.handleClick(event));
+    dom.graph.addEventListener("dblclick", event => this.pick(event, true));
+    dom.graph.addEventListener("pointerdown", event => this.startDrag(event));
+    dom.graph.addEventListener("pointermove", event => this.handlePointerMove(event));
+    dom.graph.addEventListener("pointerleave", () => this.clearTooltip());
+    dom.graph.addEventListener("pointerup", () => this.endDrag());
+    dom.graph.addEventListener("pointercancel", () => this.endDrag());
+    this.resizeObserver = new ResizeObserver(() => this.resize(true));
+    this.resizeObserver.observe(dom.graphFrame);
+    window.addEventListener("resize", () => this.resize(true));
+
+    this.resize(true);
+    this.animate();
   }
 
-  const currentIndex = cards.findIndex(card =>
-    listType === "entity"
-      ? card.dataset.entityId === itemId
-      : card.dataset.relationshipId === itemId);
-  if (currentIndex < 0) {
-    return;
-  }
-
-  const targetIndex = clamp(currentIndex + direction, 0, cards.length - 1);
-  if (targetIndex !== currentIndex) {
-    cards[targetIndex].focus();
-  }
-}
-
-function focusExplorerBoundary(listType, itemId, boundary) {
-  const cards = getExplorerCards(listType);
-  if (!cards.length) {
-    return;
-  }
-
-  const targetCard = boundary === "start" ? cards[0] : cards[cards.length - 1];
-  const targetId = listType === "entity" ? targetCard.dataset.entityId : targetCard.dataset.relationshipId;
-  if (targetId !== itemId) {
-    targetCard.focus();
-  }
-}
-
-function handleExplorerCardKeydown(event, options) {
-  if (event.target !== event.currentTarget) {
-    return;
-  }
-
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    options.activate();
-    return;
-  }
-
-  if (options.listType === "entity" && event.key.toLowerCase() === "f") {
-    event.preventDefault();
-    options.alternateActivate?.();
-    return;
-  }
-
-  if (event.key === "ArrowDown" || event.key === "ArrowRight") {
-    event.preventDefault();
-    moveExplorerFocus(options.listType, options.itemId, 1);
-    return;
-  }
-
-  if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
-    event.preventDefault();
-    moveExplorerFocus(options.listType, options.itemId, -1);
-    return;
-  }
-
-  if (event.key === "Home") {
-    event.preventDefault();
-    focusExplorerBoundary(options.listType, options.itemId, "start");
-    return;
-  }
-
-  if (event.key === "End") {
-    event.preventDefault();
-    focusExplorerBoundary(options.listType, options.itemId, "end");
-  }
-}
-
-function zoomGraph(delta) {
-  if (setViewportScale(getViewportScale() + delta)) {
-    renderGraph(state.graph);
-  }
-}
-
-function fitGraphViewport() {
-  const width = dom.graph.clientWidth || 960;
-  const height = dom.graph.clientHeight || 640;
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const radialExtent = Math.max(120, (Math.min(width, height) - 220) / 2);
-  const radius = Math.max(110, radialExtent);
-  const nodes = state.graph.nodes.map((node, index) => {
-    const angle = state.graph.nodes.length === 1
-      ? 0
-      : (Math.PI * 2 * index) / state.graph.nodes.length - Math.PI / 2;
-
-    return {
-      ...node,
-      x: state.graph.nodes.length === 1 ? centerX : centerX + Math.cos(angle) * radius,
-      y: state.graph.nodes.length === 1 ? centerY : centerY + Math.sin(angle) * radius
+  setGraph(graph) {
+    const radius = Math.max(190, Math.min(420, graph.nodes.length * 16));
+    this.graph = {
+      nodes: graph.nodes.map((node, index) => {
+        const angle = graph.nodes.length <= 1 ? 0 : (Math.PI * 2 * index) / graph.nodes.length;
+        return {
+          ...node,
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius,
+          z: 0
+        };
+      }),
+      links: graph.links.map(link => ({ ...link }))
     };
-  });
-
-  fitViewportToGraph(getGraphBounds(nodes), width, height);
-  renderGraph(state.graph);
-}
-
-function resetGraphViewport() {
-  const width = dom.graph.clientWidth || 960;
-  const height = dom.graph.clientHeight || 640;
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const radialExtent = Math.max(120, (Math.min(width, height) - 220) / 2);
-  const radius = Math.max(110, radialExtent);
-  const nodes = state.graph.nodes.map((node, index) => {
-    const angle = state.graph.nodes.length === 1
-      ? 0
-      : (Math.PI * 2 * index) / state.graph.nodes.length - Math.PI / 2;
-
-    return {
-      ...node,
-      x: state.graph.nodes.length === 1 ? centerX : centerX + Math.cos(angle) * radius,
-      y: state.graph.nodes.length === 1 ? centerY : centerY + Math.sin(angle) * radius
-    };
-  });
-
-  resetViewport(width, height, getGraphBounds(nodes));
-  renderGraph(state.graph);
-}
-
-function beginGraphPan(event) {
-  if (
-    event.button !== 0 ||
-    !(event.target instanceof SVGElement) ||
-    !event.target.classList.contains("graph-surface")
-  ) {
-    return;
+    this.rebuild();
   }
 
-  const viewport = state.viewport;
-  viewport.pointerId = event.pointerId;
-  viewport.dragStartX = event.clientX;
-  viewport.dragStartY = event.clientY;
-  viewport.originX = viewport.translateX;
-  viewport.originY = viewport.translateY;
-  viewport.didPan = false;
-  dom.graph.setPointerCapture?.(event.pointerId);
-  dom.graphFrame.classList.add("is-panning");
-}
+  rebuild() {
+    for (const mesh of this.nodeMeshes.values()) {
+      this.scene.remove(mesh);
+    }
+    for (const line of this.linkLines.values()) {
+      this.scene.remove(line);
+    }
+    this.nodeMeshes.clear();
+    this.linkLines.clear();
+    dom.graphLabels.innerHTML = "";
+    this.clearTooltip();
 
-function updateGraphPan(event) {
-  const viewport = state.viewport;
-  if (viewport.pointerId !== event.pointerId) {
-    return;
+    for (const node of this.graph.nodes) {
+      const style = visualRoleStyle(node);
+      const geometry = this.createNodeGeometry(style.radius, visualRoleForEntity(node));
+      const material = this.createNodeMaterial(node, style);
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.renderOrder = 10;
+      mesh.userData = { type: "node", id: node.id };
+      this.nodeMeshes.set(node.id, mesh);
+      this.scene.add(mesh);
+    }
+
+    for (const link of this.graph.links) {
+      const material = new THREE.LineBasicMaterial({
+        color: link.id === state.selectedRelationshipId ? 0xd06d1a : 0x2f5362,
+        transparent: true,
+        opacity: link.id === state.selectedRelationshipId ? 0.95 : 0.5,
+        blending: THREE.NormalBlending
+      });
+      const geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+      const line = new THREE.Line(geometry, material);
+      line.renderOrder = 0;
+      line.userData = { type: "link", id: link.id };
+      this.linkLines.set(link.id, line);
+      this.scene.add(line);
+    }
+
+    const linkForce = forceLink(this.graph.links)
+      .id(node => node.id)
+      .distance(link => Math.max(66, 190 - relationshipWeight(link) * 13))
+      .strength(link => 0.18 + relationshipWeight(link) * 0.05);
+
+    this.simulation?.stop();
+    this.simulation = forceSimulation(this.graph.nodes, 2)
+      .force("link", linkForce)
+      .force("charge", forceManyBody().strength(node => visualRoleStyle(node).charge))
+      .force("center", forceCenter(0, 0))
+      .force("collide", forceCollide(node => visualRoleStyle(node).collide))
+      .force("radial", forceRadial(node => visualRoleStyle(node).orbit, 0, 0).strength(0.025))
+      .force("ambientMotion", createAmbientMotionForce())
+      .alpha(0.95)
+      .alphaMin(REDUCED_MOTION ? 0.001 : 0.018)
+      .alphaTarget(REDUCED_MOTION ? 0 : 0.032)
+      .alphaDecay(REDUCED_MOTION ? 0.08 : 0.018)
+      .velocityDecay(0.32);
   }
 
-  const deltaX = event.clientX - viewport.dragStartX;
-  const deltaY = event.clientY - viewport.dragStartY;
-  viewport.didPan = viewport.didPan || Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3;
-  viewport.translateX = roundViewportValue(viewport.originX + deltaX);
-  viewport.translateY = roundViewportValue(viewport.originY + deltaY);
-  renderGraph(state.graph);
-}
-
-function endGraphPan(event) {
-  if (state.viewport.pointerId !== event.pointerId) {
-    return;
+  createNodeMaterial(node, style) {
+    const isMine = node.ownerUserId === state.currentUserId;
+    const color = new THREE.Color(TYPE_COLORS[node.type] ?? TYPE_COLORS.topic);
+    const emissive = color.clone().lerp(new THREE.Color(0xeffcff), isMine ? 0.52 : 0.24);
+    const material = new THREE.MeshPhysicalMaterial({
+      color,
+      roughness: 0.11,
+      metalness: 0.02,
+      clearcoat: 1,
+      clearcoatRoughness: 0.08,
+      reflectivity: 0.92,
+      iridescence: isMine ? 1 : 0.92,
+      iridescenceIOR: isMine ? 2.45 : 2.18,
+      iridescenceThicknessRange: isMine ? [180, 1200] : [160, 980],
+      transmission: 0,
+      thickness: 1.35,
+      transparent: false,
+      opacity: 1,
+      depthWrite: true,
+      emissive,
+      emissiveIntensity: isMine ? 0.44 : 0.16,
+      sheen: 0.55,
+      sheenRoughness: 0.28,
+      sheenColor: new THREE.Color(0xcffaff)
+    });
+    return applyIridescentFilm(material, color, isMine);
   }
 
-  cancelPan();
-  renderGraph(state.graph);
-}
+  createNodeGeometry(radius, role) {
+    const segments = role === "core" ? 48 : 40;
+    return new THREE.SphereGeometry(radius, segments, Math.round(segments * 0.6));
+  }
 
-function makeInteractiveShell(element, label, activate) {
-  element.setAttribute("role", "button");
-  element.setAttribute("tabindex", "0");
-  element.setAttribute("aria-label", label);
-  element.addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === " ") {
+  resize(force = false) {
+    const width = Math.max(320, Math.round(dom.graphFrame.clientWidth));
+    const height = Math.max(320, Math.round(dom.graphFrame.clientHeight));
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    if (!force && width === this.width && height === this.height && pixelRatio === this.pixelRatio) {
+      return;
+    }
+
+    this.width = width;
+    this.height = height;
+    this.pixelRatio = pixelRatio;
+    this.renderer.setPixelRatio(pixelRatio);
+    this.camera.left = -width / 2;
+    this.camera.right = width / 2;
+    this.camera.top = height / 2;
+    this.camera.bottom = -height / 2;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height, false);
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
+    this.resize();
+    if (this.simulation && !REDUCED_MOTION && !this.draggedNode) {
+      this.simulation.alphaTarget(0.032).restart();
+    }
+    this.controls.update();
+    this.updateObjects();
+    this.renderer.render(this.scene, this.camera);
+    this.renderLabels();
+  }
+
+  updateObjects() {
+    const elapsed = this.clock.getElapsedTime();
+    const nodeById = new Map(this.graph.nodes.map(node => [node.id, node]));
+    for (const node of this.graph.nodes) {
+      const mesh = this.nodeMeshes.get(node.id);
+      if (!mesh) {
+        continue;
+      }
+      const depthDrift = REDUCED_MOTION ? 0 : Math.sin(elapsed * 0.85 + (node.index ?? 0) * 0.37) * 10;
+      mesh.position.set(node.x || 0, node.y || 0, depthDrift);
+      if (!REDUCED_MOTION) {
+        mesh.rotation.x += 0.0024;
+        mesh.rotation.y += 0.0048;
+      }
+      const active = node.id === state.selectedEntityId || state.graphFilters.expandedNodeIds.has(node.id);
+      const pulse = REDUCED_MOTION ? 1 : 1 + Math.sin(elapsed * 1.6 + (node.index ?? 0) * 0.53) * 0.025;
+      mesh.scale.setScalar((active ? 1.22 : 1) * pulse);
+    }
+
+    for (const link of this.graph.links) {
+      const source = typeof link.source === "object" ? link.source : nodeById.get(link.source);
+      const target = typeof link.target === "object" ? link.target : nodeById.get(link.target);
+      const line = this.linkLines.get(link.id);
+      if (!source || !target || !line) {
+        continue;
+      }
+      const positions = line.geometry.attributes.position;
+      const sourceMesh = this.nodeMeshes.get(source.id);
+      const targetMesh = this.nodeMeshes.get(target.id);
+      positions.setXYZ(0, source.x || 0, source.y || 0, sourceMesh?.position.z ?? 0);
+      positions.setXYZ(1, target.x || 0, target.y || 0, targetMesh?.position.z ?? 0);
+      positions.needsUpdate = true;
+      const weight = relationshipWeight(link);
+      line.material.opacity = link.id === state.selectedRelationshipId
+        ? 0.95
+        : this.relationshipIsSpotlighted(link) ? Math.min(0.72, 0.22 + weight * 0.048) : 0.12;
+      line.material.color.setHex(this.relationshipIsSpotlighted(link) ? 0x2f6f80 : 0x345261);
+    }
+  }
+
+  relationshipIsSpotlighted(link) {
+    if (!state.relationshipFilters.kind && !state.relationshipFilters.text) {
+      return true;
+    }
+    return getScopedRelationships().some(edge => edge.id === link.id);
+  }
+
+  renderLabels() {
+    dom.graphLabels.innerHTML = "";
+    const rect = dom.graphFrame.getBoundingClientRect();
+    for (const node of this.graph.nodes) {
+      const shouldShow =
+        node.id === state.selectedEntityId ||
+        node.id === state.focusedEntityId ||
+        node.ownerUserId === state.currentUserId ||
+        (state.searchQuery && entityMatches(node));
+      if (!shouldShow) {
+        continue;
+      }
+
+      const mesh = this.nodeMeshes.get(node.id);
+      if (!mesh) {
+        continue;
+      }
+      const projected = mesh.position.clone().project(this.camera);
+      const x = (projected.x * 0.5 + 0.5) * rect.width;
+      const y = (-projected.y * 0.5 + 0.5) * rect.height;
+      const label = document.createElement("span");
+      label.className = `graph-label type-${node.type}`;
+      label.style.transform = `translate(${x}px, ${y}px)`;
+      label.textContent = node.label;
+      dom.graphLabels.appendChild(label);
+    }
+  }
+
+  pick(event, isDoubleClick) {
+    const hit = this.getIntersectedNode(event);
+    if (!hit) {
+      return;
+    }
+    const id = hit.object.userData.id;
+    if (isDoubleClick) {
+      if (this.clickTimer) {
+        clearTimeout(this.clickTimer);
+        this.clickTimer = null;
+      }
       event.preventDefault();
-      activate();
-    }
-  });
-}
-
-function renderGraph(graph) {
-  const svg = dom.graph;
-  const width = svg.clientWidth || 960;
-  const height = svg.clientHeight || 640;
-  const spotlight = getGraphSpotlight();
-  const graphSignature = getGraphSignature(graph);
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svg.dataset.scale = String(getViewportScale());
-  svg.innerHTML = "";
-
-  if (!graph.nodes.length) {
-    dom.graphFrame.classList.remove("pannable", "is-panning");
-    state.viewport.graphSignature = graphSignature;
-    state.viewport.needsFit = true;
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", width / 2);
-    text.setAttribute("y", height / 2);
-    text.setAttribute("text-anchor", "middle");
-    text.setAttribute("fill", "#5b6b78");
-    text.setAttribute("font-size", "18");
-    text.textContent = "No nodes to display";
-    svg.appendChild(text);
-    return;
-  }
-
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const radialExtent = Math.max(120, (Math.min(width, height) - 220) / 2);
-  const radius = Math.max(110, radialExtent);
-  const nodes = graph.nodes.map((node, index) => {
-    const angle = graph.nodes.length === 1
-      ? 0
-      : (Math.PI * 2 * index) / graph.nodes.length - Math.PI / 2;
-
-    return {
-      ...node,
-      x: graph.nodes.length === 1 ? centerX : centerX + Math.cos(angle) * radius,
-      y: graph.nodes.length === 1 ? centerY : centerY + Math.sin(angle) * radius
-    };
-  });
-  const bounds = getGraphBounds(nodes);
-  const viewportChanged = state.viewport.graphSignature !== graphSignature;
-  if (viewportChanged) {
-    state.viewport.graphSignature = graphSignature;
-    state.viewport.needsFit = true;
-  }
-  if (state.viewport.needsFit) {
-    fitViewportToGraph(bounds, width, height);
-  }
-
-  dom.graphFrame.classList.add("pannable");
-  dom.graphFrame.classList.toggle("is-panning", state.viewport.pointerId !== null);
-
-  const surface = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  surface.setAttribute("class", "graph-surface");
-  surface.setAttribute("x", "0");
-  surface.setAttribute("y", "0");
-  surface.setAttribute("width", String(width));
-  surface.setAttribute("height", String(height));
-  surface.setAttribute("aria-hidden", "true");
-  svg.appendChild(surface);
-
-  const viewportGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  viewportGroup.setAttribute(
-    "transform",
-    `translate(${state.viewport.translateX} ${state.viewport.translateY}) scale(${getViewportScale()})`
-  );
-  svg.appendChild(viewportGroup);
-
-  const nodeById = new Map(nodes.map(node => [node.id, node]));
-
-  for (const link of graph.links) {
-    const source = nodeById.get(link.source);
-    const target = nodeById.get(link.target);
-    if (!source || !target) {
-      continue;
-    }
-
-    appendLink(viewportGroup, source, target, link, spotlight);
-  }
-
-  for (const node of nodes) {
-    appendNode(viewportGroup, node, spotlight);
-  }
-}
-
-function appendLink(svg, source, target, link, spotlight) {
-  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  group.setAttribute("class", "link-shell");
-  const edgeLabel = link.label || "relationship";
-  const scale = getViewportScale();
-  makeInteractiveShell(
-    group,
-    `${edgeLabel} from ${source.label} to ${target.label}. Press Enter to inspect relationship.`,
-    () => selectRelationship(link.id));
-  if (link.id === state.selectedRelationshipId) {
-    group.classList.add("active");
-  }
-  if (spotlight.areRelationshipFiltersActive) {
-    if (spotlight.matchingEdgeIds.has(link.id)) {
-      group.classList.add("spotlight");
+      toggleExpandedNode(id);
     } else {
-      group.classList.add("muted");
+      selectEntity(id);
     }
   }
-  group.addEventListener("click", event => {
-    event.stopPropagation();
-    selectRelationship(link.id);
-  });
 
-  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-  line.setAttribute("class", "link");
-  line.setAttribute("x1", source.x);
-  line.setAttribute("y1", source.y);
-  line.setAttribute("x2", target.x);
-  line.setAttribute("y2", target.y);
-  line.setAttribute("vector-effect", "non-scaling-stroke");
+  handleClick(event) {
+    if (event.detail > 1) {
+      return;
+    }
+    const hit = this.getIntersectedNode(event);
+    if (!hit) {
+      return;
+    }
+    const id = hit.object.userData.id;
+    if (this.clickTimer) {
+      clearTimeout(this.clickTimer);
+    }
+    this.clickTimer = window.setTimeout(() => {
+      this.clickTimer = null;
+      selectEntity(id);
+    }, 220);
+  }
 
-  const hitbox = document.createElementNS("http://www.w3.org/2000/svg", "line");
-  hitbox.setAttribute("class", "link-hitbox");
-  hitbox.setAttribute("x1", source.x);
-  hitbox.setAttribute("y1", source.y);
-  hitbox.setAttribute("x2", target.x);
-  hitbox.setAttribute("y2", target.y);
+  startDrag(event) {
+    const hit = this.getIntersectedNode(event);
+    if (!hit) {
+      return;
+    }
+    this.draggedNode = this.graph.nodes.find(node => node.id === hit.object.userData.id) ?? null;
+    if (this.draggedNode) {
+      this.controls.enabled = false;
+      this.draggedNode.fx = this.draggedNode.x;
+      this.draggedNode.fy = this.draggedNode.y;
+      this.draggedNode.fz = this.draggedNode.z;
+    }
+  }
 
-  const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  text.setAttribute("class", "link-label");
-  text.setAttribute("x", (source.x + target.x) / 2);
-  text.setAttribute("y", (source.y + target.y) / 2 - 10);
-  text.setAttribute("font-size", String(roundViewportValue(12 / scale)));
-  text.setAttribute("stroke-width", String(roundViewportValue(5 / scale)));
-  text.textContent = edgeLabel;
+  drag(event) {
+    if (!this.draggedNode) {
+      return;
+    }
+    const scale = 1 / this.camera.zoom;
+    this.draggedNode.fx += event.movementX * scale;
+    this.draggedNode.fy -= event.movementY * scale;
+    this.simulation?.alpha(0.25).restart();
+  }
 
-  group.append(line, hitbox, text);
-  svg.appendChild(group);
+  handlePointerMove(event) {
+    if (this.draggedNode) {
+      this.drag(event);
+      return;
+    }
+
+    this.updateTooltip(event);
+  }
+
+  updateTooltip(event) {
+    const hit = this.getIntersectedNode(event);
+    if (!hit) {
+      this.clearTooltip();
+      return;
+    }
+
+    const nodeId = hit.object.userData.id;
+    const node = state.entities.find(entity => entity.id === nodeId);
+    if (!node) {
+      this.clearTooltip();
+      return;
+    }
+
+    this.hoveredNodeId = nodeId;
+    const frameRect = dom.graphFrame.getBoundingClientRect();
+    const x = Math.min(frameRect.width - 250, Math.max(0, event.clientX - frameRect.left));
+    const y = Math.min(frameRect.height - 110, Math.max(0, event.clientY - frameRect.top));
+    const connectionCount = getIncidentRelationships(node.id).length;
+    const ownerLine = node.ownerUserId ? `<span>Owner: ${escapeHtml(node.ownerUserId)}</span>` : "";
+    const roleStyle = visualRoleStyle(node);
+
+    dom.graphTooltip.innerHTML = `
+      <strong>${escapeHtml(node.name)}</strong>
+      <span>${escapeHtml(roleStyle.label)} vertex - ${escapeHtml(node.type)}</span>
+      <span>ID: ${escapeHtml(node.id)}</span>
+      <span>${connectionCount} connection${connectionCount === 1 ? "" : "s"}</span>
+      ${ownerLine}
+    `;
+    dom.graphTooltip.style.transform = `translate(${x}px, ${y}px)`;
+    dom.graphTooltip.hidden = false;
+    dom.graph.style.cursor = "pointer";
+  }
+
+  clearTooltip() {
+    this.hoveredNodeId = null;
+    dom.graphTooltip.hidden = true;
+    dom.graphTooltip.textContent = "";
+    dom.graph.style.cursor = "";
+  }
+
+  endDrag() {
+    if (this.draggedNode) {
+      this.draggedNode = null;
+      this.controls.enabled = true;
+    }
+  }
+
+  getIntersectedNode(event) {
+    const rect = dom.graph.getBoundingClientRect();
+    this.pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.pointer.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
+    this.raycaster.setFromCamera(this.pointer, this.camera);
+    return this.raycaster.intersectObjects([...this.nodeMeshes.values()], false)[0] ?? null;
+  }
+
+  zoom(delta) {
+    const factor = delta < 0 ? 1.18 : 1 / 1.18;
+    this.camera.zoom = Math.max(this.controls.minZoom, Math.min(this.controls.maxZoom, this.camera.zoom * factor));
+    this.camera.updateProjectionMatrix();
+  }
+
+  reset() {
+    this.camera.position.set(0, 0, 800);
+    this.camera.zoom = 1;
+    this.controls.target.set(0, 0, 0);
+    this.camera.updateProjectionMatrix();
+    this.controls.update();
+  }
+
+  fit() {
+    this.reset();
+  }
 }
 
-function appendNode(svg, node, spotlight) {
-  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  group.setAttribute("class", "node-shell");
-  const scale = getViewportScale();
-  makeInteractiveShell(
-    group,
-    `${node.label}. Press Enter to select. Press F to focus graph on this node.`,
-    () => selectEntity(node.id));
-  group.addEventListener("keydown", event => {
-    if (event.key.toLowerCase() === "f") {
-      event.preventDefault();
-      focusGraph(node.id);
-    }
-  });
-  if (node.id === state.selectedEntityId || node.id === state.focusedEntityId) {
-    group.classList.add("active");
+const graphView = new ThreeGraphView();
+
+setPanelCollapsed("left", Boolean(state.collapsedPanels.left));
+setPanelCollapsed("right", Boolean(state.collapsedPanels.right));
+
+dom.toggleLeftPanel.addEventListener("click", () => togglePanel("left"));
+dom.toggleRightPanel.addEventListener("click", () => togglePanel("right"));
+dom.demoUser.addEventListener("change", async event => {
+  state.currentUserId = event.target.value;
+  localStorage.setItem(CURRENT_USER_KEY, state.currentUserId);
+  state.selectedEntityId = null;
+  state.selectedRelationshipId = null;
+  await refreshAll();
+});
+dom.profileForm.addEventListener("submit", submitProfile);
+dom.focusMine.addEventListener("click", () => {
+  const employee = currentEmployee();
+  if (employee) {
+    focusGraph(employee.id);
   }
-  if (spotlight.isEntitySearchActive) {
-    if (spotlight.matchingNodeIds.has(node.id)) {
-      group.classList.add("spotlight");
-    } else {
-      group.classList.add("muted");
-    }
-  } else if (spotlight.areRelationshipFiltersActive) {
-    if (spotlight.connectedNodeIds.has(node.id)) {
-      group.classList.add("spotlight");
-    } else {
-      group.classList.add("muted");
-    }
-  }
-  group.addEventListener("click", () => selectEntity(node.id));
-  group.addEventListener("dblclick", () => focusGraph(node.id));
-
-  const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-  circle.setAttribute("class", "node-circle");
-  circle.setAttribute("cx", node.x);
-  circle.setAttribute("cy", node.y);
-  circle.setAttribute("r", 58);
-  circle.setAttribute("vector-effect", "non-scaling-stroke");
-
-  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  label.setAttribute("class", "node-label");
-  label.setAttribute("x", node.x);
-  label.setAttribute("y", node.y + 4);
-  label.setAttribute("font-size", String(roundViewportValue(15 / scale)));
-  label.textContent = node.label;
-
-  group.append(circle, label);
-
-  if (node.note) {
-    const note = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    note.setAttribute("class", "node-note");
-    note.setAttribute("x", node.x);
-    note.setAttribute("y", node.y + 24);
-    note.setAttribute("font-size", String(roundViewportValue(12 / scale)));
-    note.textContent = node.note;
-    group.appendChild(note);
-  }
-
-  svg.appendChild(group);
-}
-
+});
 dom.entitySearch.addEventListener("input", event => {
   state.searchQuery = event.target.value;
   render();
 });
-
 dom.relationshipSearch.addEventListener("input", event => {
   state.relationshipFilters.text = event.target.value;
   render();
 });
-
 dom.relationshipKindFilter.addEventListener("change", event => {
   state.relationshipFilters.kind = event.target.value;
   render();
 });
-
 dom.relationshipDirectionFilter.addEventListener("change", event => {
   state.relationshipFilters.direction = event.target.value;
   render();
 });
-
 dom.relationshipClearFilters.addEventListener("click", clearRelationshipFilters);
 dom.entityForm.addEventListener("submit", submitEntity);
 dom.entityReset.addEventListener("click", clearEntitySelection);
-dom.entityDelete.addEventListener("click", deleteSelectedEntity);
+dom.entityDelete.addEventListener("click", queueEntityDelete);
 dom.relationshipForm.addEventListener("submit", submitRelationship);
 dom.relationshipReset.addEventListener("click", clearRelationshipSelection);
+dom.relationshipDelete.addEventListener("click", queueRelationshipDelete);
 dom.deleteConfirmSubmit.addEventListener("click", confirmPendingDelete);
 dom.deleteConfirmCancel.addEventListener("click", cancelPendingDelete);
-dom.undoBannerAction.addEventListener("click", restoreDeletedItem);
-dom.undoBannerDismiss.addEventListener("click", dismissUndoBanner);
-dom.graphZoomIn.addEventListener("click", () => zoomGraph(0.18));
-dom.graphZoomOut.addEventListener("click", () => zoomGraph(-0.18));
-dom.graphResetView.addEventListener("click", resetGraphViewport);
-dom.graphFitView.addEventListener("click", fitGraphViewport);
-dom.graph.addEventListener("pointerdown", beginGraphPan);
-dom.graph.addEventListener("pointermove", updateGraphPan);
-dom.graph.addEventListener("pointerup", endGraphPan);
-dom.graph.addEventListener("pointercancel", endGraphPan);
-dom.relationshipDelete.addEventListener("click", async () => {
-  if (state.selectedRelationshipId) {
-    await deleteRelationship(state.selectedRelationshipId);
-  }
-});
-dom.focusSelected.addEventListener("click", () => focusGraph(state.selectedEntityId));
-dom.showFullGraph.addEventListener("click", async () => {
-  state.pendingDelete = null;
-  const previousFocusedEntityId = state.focusedEntityId;
-  state.focusedEntityId = null;
-  renderSelection();
-
-  try {
-    await loadGraph();
-    render();
-  } catch (error) {
-    state.focusedEntityId = previousFocusedEntityId;
-    setError(error instanceof Error ? error.message : "Unable to load full graph");
-    render();
-  }
-});
+dom.undoBannerAction.addEventListener("click", () => {});
+dom.undoBannerDismiss.addEventListener("click", () => { dom.undoBanner.hidden = true; });
+dom.graphZoomIn.addEventListener("click", () => graphView.zoom(-120));
+dom.graphZoomOut.addEventListener("click", () => graphView.zoom(120));
+dom.graphResetView.addEventListener("click", () => graphView.reset());
+dom.graphFitView.addEventListener("click", () => graphView.fit());
+dom.focusSelected.addEventListener("click", () => state.selectedEntityId && focusGraph(state.selectedEntityId));
+dom.showFullGraph.addEventListener("click", showFullGraph);
 dom.reloadAll.addEventListener("click", refreshAll);
-window.addEventListener("resize", () => {
-  state.viewport.needsFit = true;
-  renderGraph(state.graph);
-});
 
-refreshAll();
+refreshAll().catch(error => setError(error instanceof Error ? error.message : "Unable to load SocialGraph"));

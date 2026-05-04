@@ -1,11 +1,22 @@
-Die Starteinstellungen von .\src\SocialGraph.Api\Properties\launchSettings.json werden verwendet…
+warn: Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware[16]
+      The WebRootPath was not found: I:\VS-Projekte\SocialGraph\wwwroot. Static files may be unavailable.
 info: Microsoft.Hosting.Lifetime[14]
-      Now listening on: https://localhost:61803
-info: Microsoft.Hosting.Lifetime[14]
-      Now listening on: http://localhost:61804
+      Now listening on: http://127.0.0.1:5299
 info: Microsoft.Hosting.Lifetime[0]
       Application started. Press Ctrl+C to shut down.
 info: Microsoft.Hosting.Lifetime[0]
-      Hosting environment: Development
+      Hosting environment: Production
 info: Microsoft.Hosting.Lifetime[0]
-      Content root path: \\wsl.localhost\Ubuntu\home\machm00g\docker\paperclip\projects\SocialGraph\src\SocialGraph.Api
+      Content root path: I:\VS-Projekte\SocialGraph
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/1.1 GET http://127.0.0.1:5299/api/entities - - -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'HTTP: GET /api/entities'
+info: Microsoft.AspNetCore.Http.Result.OkObjectResult[1]
+      Setting HTTP status code 200.
+info: Microsoft.AspNetCore.Http.Result.OkObjectResult[3]
+      Writing value of type 'EntityDto[]' as Json.
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'HTTP: GET /api/entities'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 GET http://127.0.0.1:5299/api/entities - 200 - application/json;+charset=utf-8 108.7724ms

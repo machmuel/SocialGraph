@@ -1,0 +1,5 @@
+[mcp_servers.guido]
+url = "https://mcp-guido.stephan-derkowski.de/"
+
+[mcp_servers.localhost]
+url = "http://localhost:5000/"

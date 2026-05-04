@@ -60,7 +60,7 @@ public sealed class GraphService(
     }
 
     private static GraphNodeDto ToNodeDto(EntityRecord entity) =>
-        new(entity.Id, entity.Name, entity.Note);
+        new(entity.Id, entity.Name, entity.Note, entity.Type, entity.OwnerUserId, entity.CreatedByUserId);
 
     private static GraphLinkDto ToLinkDto(RelationshipEdgeRecord edge) =>
         new(edge.Id, edge.SourceEntityId, edge.TargetEntityId, edge.Kind, edge.Kind, edge.Note);

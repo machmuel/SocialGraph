@@ -1,0 +1,2358 @@
+{
+   "action_menu_activate_current_tab": {
+      "description": "Activate on current tab shortcut in the action menu",
+      "message": "הרשה תחום זה"
+   },
+   "action_menu_all_options": {
+      "description": "All options link in the action menu",
+      "message": "כל האפשרויות"
+   },
+   "action_menu_configure_mailvelope": {
+      "description": "Configure Mailvelope label in the action menu",
+      "message": "\u003C0>תצר את Mailvelope\u003C/0> כדי להתחיל!"
+   },
+   "action_menu_dashboard_description": {
+      "description": "Dashboard description in the action menu",
+      "message": "הצג את כל אפשרויות התצורה."
+   },
+   "action_menu_dashboard_label": {
+      "description": "Dashboard label in the action menu",
+      "message": "לוח מחוונים"
+   },
+   "action_menu_file_encryption_description": {
+      "description": "File encryption description in the action menu",
+      "message": "הצפן קובץ אחד או קבצים רבים."
+   },
+   "action_menu_file_encryption_label": {
+      "description": "File encryption label in the action menu",
+      "message": "הצפנת קבצים"
+   },
+   "action_menu_help": {
+      "description": "Online help shortcut.",
+      "message": "עזרה"
+   },
+   "action_menu_keyring_description": {
+      "description": "Keyring description in the action menu",
+      "message": "נהל מפתחות ציבוריים ופרטיים."
+   },
+   "action_menu_keyring_label": {
+      "description": "Keyring label in the action menu",
+      "message": "מחזיק מפתחות"
+   },
+   "action_menu_primary_menu_aria_label": {
+      "description": "Accessibility, aria label of the primary menu",
+      "message": "התפריט העיקרי של Mailvelope"
+   },
+   "action_menu_reload_extension_scripts": {
+      "description": "Reload extension scripts shortcut in the action menu",
+      "message": "טען מחדש את Mailvelope"
+   },
+   "action_menu_review_security_logs_description": {
+      "description": "Review security logs description in the action menu",
+      "message": "סקור פעולות משתמש שקשורות לאבטחה."
+   },
+   "action_menu_review_security_logs_label": {
+      "description": "Review security logs label in the action menu",
+      "message": "יומן אבטחה"
+   },
+   "action_menu_setup_menu_aria_label": {
+      "description": "Accessibility, aria label of the setup menu",
+      "message": "תפריט תצורת Mailvelope"
+   },
+   "action_menu_setup_start_label": {
+      "description": "Start button label",
+      "message": "בוא נתחיל!"
+   },
+   "alert_header_error": {
+      "description": "Alert header of category error.",
+      "message": "שגיאה!"
+   },
+   "alert_header_important": {
+      "description": "Alert header of category important.",
+      "message": "חשוב!"
+   },
+   "alert_header_notice": {
+      "description": "Alert header of category notice.",
+      "message": "אנא שים לב:"
+   },
+   "alert_header_success": {
+      "description": "Alert header of category success.",
+      "message": "הצלחה!"
+   },
+   "alert_header_warning": {
+      "description": "Alert header of category warning.",
+      "message": "אזהרה!"
+   },
+   "alert_invalid_domainmatchpattern_warning": {
+      "description": "Alert header of category warning.",
+      "message": "דפוס התאמת תחומים הוא [*.]host.name.tld[:port]"
+   },
+   "alert_no_domainmatchpattern_warning": {
+      "description": "Alert header of category warning.",
+      "message": "לפחות דפוס התאמת תחומים אחד נחוץ."
+   },
+   "analytics_consent_description": {
+      "description": "Consent to share analytics information with mailvelope",
+      "message": "שתף מידע אנליטיקה צבור ועלום שם עם Mailvelope"
+   },
+   "analytics_consent_disabled_tooltip": {
+      "description": "Explanation for why user cannot opt in to analytics",
+      "message": "You can only opt-in to analytics upon installation and only if randomly selected."
+   },
+   "analytics_consent_interstitial_Btn_Learn_More": {
+      "description": "Btn FAQ",
+      "message": "למד עוד"
+   },
+   "analytics_consent_interstitial_Faq": {
+      "description": "FAQ",
+      "message": "Read more about Mailvelope metrics in our FAQ."
+   },
+   "analytics_consent_interstitial_We_Collect_Minimal_Data": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "Mailvelope counts the steps that get you closer to using it with your email service. It does not record every move you make."
+   },
+   "analytics_consent_interstitial_We_Collect_Minimal_Data_Title": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "We Collect Minimal Data"
+   },
+   "analytics_consent_interstitial_We_Respect_your_Choice": {
+      "description": "We Respect your Choice",
+      "message": "If you choose not to contribute, nothing is recorded. If you choose to contribute, you can change your mind at any time by opting out in settings."
+   },
+   "analytics_consent_interstitial_We_Respect_your_Choice_Title": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "We Respect your Choice"
+   },
+   "analytics_consent_interstitial_Your_Privacy_is_Preserved_Pt1": {
+      "description": "We Respect your Choice",
+      "message": "Mailvelope uses"
+   },
+   "analytics_consent_interstitial_Your_Privacy_is_Preserved_Pt2": {
+      "description": "We Respect your Choice",
+      "message": "which securely stores data without connecting it to identifiable information. Further, your IP address is not recorded or processed."
+   },
+   "analytics_consent_interstitial_Your_Privacy_is_Preserved_Title": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "Your Privacy is Preserved"
+   },
+   "analytics_consent_interstitial_learn_more": {
+      "description": "Label for expandable section",
+      "message": "Learn how metrics are safe"
+   },
+   "analytics_consent_interstitial_learn_more_explanation": {
+      "description": "Expandable section explaining how analytics protect privacy",
+      "message": "If you opt-in, analytics data will be aggregated and minimized using Clean Insights which stores this data without connection to identifying characteristics. We respect your choice and don't report anything if you chose not to contribute."
+   },
+   "analytics_consent_interstitial_message": {
+      "description": "Request for consent from selected users.",
+      "message": "Mailvelope is asking 1% of new users to contribute to anonymous metrics. If you say yes, Mailvelope will register successful steps in your onboarding journey. Will you contribute?"
+   },
+   "analytics_interstitial_header": {
+      "description": "Header of analytics consent dialog.",
+      "message": "Help us improve?"
+   },
+   "auth_domain_api_label": {
+      "description": "Label for API allowed info",
+      "message": "התר API"
+   },
+   "auth_domain_description": {
+      "description": "Description in authorize domain dialog",
+      "message": "האם תרצה להתיר את השימוש של Mailvelope עבור התחום $1?"
+   },
+   "auth_domain_headline": {
+      "description": "Headline of authorize domain dialog.",
+      "message": "הרשה תחום"
+   },
+   "button_analyticsconsent_modal": {
+      "description": "button modal analytics consent",
+      "message": "המשך"
+   },
+   "change_link": {
+      "description": "Navigation link to change this setting.",
+      "message": "שנה"
+   },
+   "cleartext_read_error": {
+      "description": "Cleartext message read error message: $1: error message.",
+      "message": "לא היה ניתן לקרא הודעה זו של טקסט ברור: $1"
+   },
+   "dashboard_link_encrypt_decrypt_files": {
+      "description": "Dashboard encrypt decrypt files link",
+      "message": "הצפנה"
+   },
+   "dashboard_link_manage_domains": {
+      "description": "Dashboard manage domains link",
+      "message": "תחומים מורשים"
+   },
+   "dashboard_link_manage_keys": {
+      "description": "Dashboard manage keys link",
+      "message": "נהל מפתחות"
+   },
+   "dashboard_link_view_security_log": {
+      "description": "Dashboard view security logs link",
+      "message": "יומני אבטחה"
+   },
+   "decrypt_att_frame_help_text": {
+      "description": "Help text on decrypt frame with encrypted attachments or clipped armored message.",
+      "message": "לחץ כאן כדי לראות את ההודעה"
+   },
+   "decrypt_attachment_label": {
+      "description": "Label for attachments in decrypted message",
+      "message": "צרופות"
+   },
+   "decrypt_cleartext_warning": {
+      "description": "Warning when cleartext is shown in decrypt component",
+      "message": "הטקסט להלן לא הוצפן."
+   },
+   "decrypt_decrypted_files_label": {
+      "description": "Decrypted files label on decrypt success page.",
+      "message": "קבצים מפוענחים"
+   },
+   "decrypt_digital_signature": {
+      "description": "Caption digital signature",
+      "message": "חָתוּם דיגיטלית"
+   },
+   "decrypt_digital_signature_failure": {
+      "description": "Caption digital signature",
+      "message": "חתימה בלתי תקפה"
+   },
+   "decrypt_digital_signature_inconsistent": {
+      "description": "Warning message if digital signature is inconsistent",
+      "message": "Inconsistent signatures: message and file not signed with same key"
+   },
+   "decrypt_digital_signature_missing": {
+      "description": "Digital signature is missing",
+      "message": "Signature missing"
+   },
+   "decrypt_digital_signature_null": {
+      "description": "Caption digital signature",
+      "message": "חתימה בלתי ידועה"
+   },
+   "decrypt_digital_signature_null_info": {
+      "description": "Digital signature unknown info message",
+      "message": "מפתח עם זהות $1 לא נמצא."
+   },
+   "decrypt_digital_signature_null_info_short": {
+      "description": "Digital signature unknown short info message",
+      "message": "מפתח לא נמצא."
+   },
+   "decrypt_digital_signature_sender_mismatch": {
+      "description": "Alert label in the case of sender email address mismatch",
+      "message": "Sender address mismatch"
+   },
+   "decrypt_digital_signature_sender_mismatch_tooltip": {
+      "description": "Tooltip for alert label in the case of sender email address mismatch",
+      "message": "This message contains a digital signature, but a mismatch was detected. The message was sent from an email address that doesn't match the signer's public key."
+   },
+   "decrypt_digital_signature_uncertain_sender": {
+      "description": "Digital signature link to more information in the case of uncertain sender identity",
+      "message": "Uncertain sender identity"
+   },
+   "decrypt_file_error_header": {
+      "description": "Header of file decryption error on decrypt result page.",
+      "message": "הצפנה של הקובץ $1 בלתי אפשרית."
+   },
+   "decrypt_frame_help_text": {
+      "description": "Help text on decrypt frame.",
+      "message": "לחץ כדי לפענח"
+   },
+   "decrypt_header": {
+      "description": "Header of file/text decrypt page.",
+      "message": "פענח נתונים"
+   },
+   "decrypt_header_success": {
+      "description": "Header of file/text decrypt result page.",
+      "message": "פענוח מוצלח"
+   },
+   "decrypt_home": {
+      "description": "File/text decrypting navigation: Home.",
+      "message": "פענח"
+   },
+   "decrypt_open_viewer_btn_title": {
+      "description": "Title of open message viewer icon button.",
+      "message": "פתח במציג Mailvelope"
+   },
+   "decrypt_show_message_btn": {
+      "description": "Show messsage button label in decrypt message.",
+      "message": "הראה הודעה"
+   },
+   "decrypt_signer_label": {
+      "description": "Label for signature line in decrypted message",
+      "message": "שולח"
+   },
+   "decrypt_text_area_label": {
+      "description": "Label of textarea to paste armored block in on decrypt page.",
+      "message": "טקסט לפענח"
+   },
+   "decrypt_text_decryption_btn": {
+      "description": "Text decryption button label on decrypt page.",
+      "message": "האם אתה גם רוצה לפענח טקסט?"
+   },
+   "decrypt_text_error_header": {
+      "description": "Header of text decryption error on decrypt result page.",
+      "message": "פענוח של הטקסט אינה אפשרית."
+   },
+   "dialog_cancel_btn": {
+      "description": "Dialog cancel button label",
+      "message": "בטל"
+   },
+   "dialog_no_btn": {
+      "description": "Dialog no button label",
+      "message": "לא"
+   },
+   "dialog_no_button": {
+      "description": "Dialog button no",
+      "message": "דלג"
+   },
+   "dialog_popup_close": {
+      "description": "Close decrypt popup.",
+      "message": "סגור"
+   },
+   "dialog_save_btn": {
+      "description": "Dialog save button label",
+      "message": "שמור"
+   },
+   "dialog_yes_btn": {
+      "description": "Dialog yes button label",
+      "message": "כן"
+   },
+   "dialog_yes_button": {
+      "description": "Dialog button yes",
+      "message": "כן"
+   },
+   "editor_blur_warn": {
+      "description": "Warning for lost focus.",
+      "message": "אזהרה: עורך הטקסט איבד מיקוד."
+   },
+   "editor_encrypt_button": {
+      "description": "Encrypt button.",
+      "message": "הצפן"
+   },
+   "editor_error_header": {
+      "description": "",
+      "message": "שגיאה"
+   },
+   "editor_extra_key_checkbox": {
+      "description": "Extra key checkbox label.",
+      "message": "הוסף מפתח אקסטרה"
+   },
+   "editor_extra_key_help": {
+      "description": "Extra key help text.",
+      "message": "דוא״ל יוצפן עם המפתח הנוסף הזה"
+   },
+   "editor_header": {
+      "description": "Header of editor popup.",
+      "message": "חבר דוא״ל מאובטח"
+   },
+   "editor_key_auto_sign": {
+      "description": "Label for default private key option.",
+      "message": "האם תרצה להחתים את כל הדוא״לים שלך?"
+   },
+   "editor_key_auto_sign_link": {
+      "description": "Test for auto sign link.",
+      "message": "שנה הגדרות כאן"
+   },
+   "editor_key_has_extra_msg": {
+      "description": "Label for info message invalid recipients but extra key.",
+      "message": "דוא״ל יוצפן עם המפתח החליפי שהוכנס למטה."
+   },
+   "editor_key_no_sign_option": {
+      "description": "Label for not sign option in sign key select.",
+      "message": "לא חתום"
+   },
+   "editor_key_not_found": {
+      "description": "Warning for when a recipient key was not found.",
+      "message": "מפתח לא נמצא!"
+   },
+   "editor_key_not_found_msg": {
+      "description": "Warning for when a recipient key was not found.",
+      "message": "כל הנמענים צריכים מפתח PGP כדי להצפין. עם זאת, אתה עדיין יכול להחתים את ההודעה."
+   },
+   "editor_label_attachments": {
+      "description": "Label for attachments select/drop area.",
+      "message": "צרופות"
+   },
+   "editor_label_copy_recipient": {
+      "description": "Label for copy recipient text input.",
+      "message": "עותק"
+   },
+   "editor_label_message": {
+      "description": "Label for message textarea.",
+      "message": "הודעה"
+   },
+   "editor_label_recipient": {
+      "description": "Label for recipient input.",
+      "message": "נמען"
+   },
+   "editor_label_subject": {
+      "description": "Label for subject text input.",
+      "message": "נושא"
+   },
+   "editor_link_file_encryption": {
+      "description": "Navigation link to file encryption",
+      "message": "הצפן קבצים"
+   },
+   "editor_no_default_key_caption_long": {
+      "description": "",
+      "message": "הדוא״ל אינו יכול להיחתם דיגיטלית מאחר שמפתח ברירת המחדל חסר"
+   },
+   "editor_no_default_key_caption_short": {
+      "description": "",
+      "message": "הדוא״ל אינו יכול להיחתם דיגיטלית"
+   },
+   "editor_remove_upload": {
+      "description": "Remove uploaded attachment",
+      "message": "הסר"
+   },
+   "editor_sign_button": {
+      "description": "Sign button.",
+      "message": "חתום בלבד"
+   },
+   "editor_sign_caption_long": {
+      "description": "",
+      "message": "כאשר הדוא״ל יישלח, הוא גם ייחתם דיגיטלית"
+   },
+   "editor_sign_caption_short": {
+      "description": "",
+      "message": "הדוא״ל ייחתם דיגיטלית"
+   },
+   "editor_transfer": {
+      "description": "Transfer button of editor popup.",
+      "message": "העבר"
+   },
+   "encrypt_change_signer_dialog_signer_label": {
+      "description": "Label for signer select of change signer dialog.",
+      "message": "בחר חתימה"
+   },
+   "encrypt_change_signer_dialog_title": {
+      "description": "Titel of change signer dialog.",
+      "message": "שנה חתימה"
+   },
+   "encrypt_dialog_no_recipient": {
+      "description": "Error message if no recipient selected.",
+      "message": "אנא הוסף נמען."
+   },
+   "encrypt_download_all_button": {
+      "description": "Button to download all files",
+      "message": "הורד הכל"
+   },
+   "encrypt_encrypted_files_label": {
+      "description": "Encrypted files label on encrypt success page.",
+      "message": "קבצים מוצפנים"
+   },
+   "encrypt_encrypted_for_label": {
+      "description": "Encrypted for label on encrypt success page.",
+      "message": "הוצפן עבור"
+   },
+   "encrypt_error": {
+      "description": "Error during encryption process.",
+      "message": "לא היה ניתן להצפין הודעה זו: $1"
+   },
+   "encrypt_file_error_header": {
+      "description": "Header of file decryption error on decrypt result page.",
+      "message": "הצפנת הקובץ $1 בלתי אפשרית."
+   },
+   "encrypt_frame_btn_label": {
+      "description": "Text on expanded editor button of editable email area",
+      "message": "כתוב דוא״ל מאובטח"
+   },
+   "encrypt_header": {
+      "description": "Header of file/text encrypt page.",
+      "message": "הצפן נתונים"
+   },
+   "encrypt_header_success": {
+      "description": "Header of file/text encrypt result page.",
+      "message": "הצפנה מוצלחת"
+   },
+   "encrypt_home": {
+      "description": "File/text encrypting navigation: Home.",
+      "message": "הצפן"
+   },
+   "encrypt_no_signer_info": {
+      "description": "No signer info text on encrypt page.",
+      "message": "נתונים מוצפנים אינם חתומים"
+   },
+   "encrypt_remove_signer_btn": {
+      "description": "Remove signer button label on encrypt page.",
+      "message": "הסר חתימה"
+   },
+   "encrypt_signed_as_label": {
+      "description": "Signed as label on encrypt success page.",
+      "message": "נחתם ע״י"
+   },
+   "encrypt_signer_info": {
+      "description": "Signer info text on encrypt page.",
+      "message": "נתונים מוצפנים נחתמים עם המפתח שלך ($1)"
+   },
+   "encrypt_text_encryption_btn": {
+      "description": "Text encryption button label on encrypt page.",
+      "message": "האם אתה רוצה גם להצפין טקסט?"
+   },
+   "encrypt_text_error_header": {
+      "description": "Header of text decryption error on decrypt result page.",
+      "message": "הצפנת הטקסט בלתי אפשרית."
+   },
+   "encrypt_upload_file_warning_too_big": {
+      "description": ".",
+      "message": "אחד מהקבצים גדול מדי."
+   },
+   "ext_description": {
+      "description": "Description of the extension.",
+      "message": "Protect your email conversations and attachments on Gmail, Nextcloud, Outlook & more with PGP and end-to-end encryption."
+   },
+   "ext_name": {
+      "description": "Name of the extension.",
+      "message": "Mailvelope - Secure your email with PGP"
+   },
+   "feature_banner_new_security_background_btn": {
+      "description": "Button text of feature banner for new security background.",
+      "message": "התאם אישית עכשיו"
+   },
+   "feature_banner_new_security_background_text": {
+      "description": "Text of feature banner for new security background.",
+      "message": "עשה את Mailvelope אפילו יותר מאובטח ע״י התאמה אישית של רקע האבטחה שלך."
+   },
+   "file_invalid_signed": {
+      "description": "Text of signer field of file element.",
+      "message": "החתימה בלתי תקפה"
+   },
+   "file_not_signed": {
+      "description": "Text of signer field of file element.",
+      "message": "קובץ לא חתום"
+   },
+   "file_read_error": {
+      "description": "",
+      "message": "לא היה ניתן לפענח קובץ זה: $1"
+   },
+   "file_signed": {
+      "description": "Text of signer field of file element.",
+      "message": "הקובץ חתום ע״י $1"
+   },
+   "form_back": {
+      "description": "Back form button.",
+      "message": "הקודם"
+   },
+   "form_busy": {
+      "description": "Form in busy state.",
+      "message": "מעבד"
+   },
+   "form_cancel": {
+      "description": "Cancel form button.",
+      "message": "בטל"
+   },
+   "form_clear": {
+      "description": "Clear form button.",
+      "message": "נקה"
+   },
+   "form_close": {
+      "description": "Close form button.",
+      "message": "סגור"
+   },
+   "form_confirm": {
+      "description": "Confirm form button.",
+      "message": "אשר"
+   },
+   "form_continue": {
+      "description": "Continue form button.",
+      "message": "המשך"
+   },
+   "form_definition_error_no_recipient_key": {
+      "description": "Error message when recipient key is not in keyring",
+      "message": "אין מפתח הצפנה תקף עבור כתובת הנמען."
+   },
+   "form_definition_error_signature_invalid": {
+      "description": "Error message when the form signature is not valid",
+      "message": "חתימת הטופס אינה תקפה."
+   },
+   "form_destination": {
+      "description": "URL the form data will be sent to",
+      "message": "יעד"
+   },
+   "form_destination_default": {
+      "description": "Behavior when no action is specified in form",
+      "message": "הנתונים המוצפנים יוחזרו אל הדף."
+   },
+   "form_forward": {
+      "description": "Forward form button.",
+      "message": "העבר הלאה"
+   },
+   "form_import": {
+      "description": "Import form button.",
+      "message": "ייבא"
+   },
+   "form_loading": {
+      "description": "Waiting modal when form is loading.",
+      "message": "טוען מן"
+   },
+   "form_next": {
+      "description": "Next form button.",
+      "message": "הבא"
+   },
+   "form_no": {
+      "description": "No form button.",
+      "message": "לא"
+   },
+   "form_ok": {
+      "description": "Ok form button.",
+      "message": "אשר"
+   },
+   "form_recipient": {
+      "description": "The email for which the form will be encrypted for",
+      "message": "נמען"
+   },
+   "form_save": {
+      "description": "Save form button.",
+      "message": "שמור"
+   },
+   "form_sign_error_no_default_key": {
+      "description": "Error message when trying to sign and no primary key is found",
+      "message": "אין מפתח פרטי זמין במחזיק המפתחות כדי לחתום על תוכן הטופס. אנא ייבא או צור אחד."
+   },
+   "form_submit": {
+      "description": "Submit form button.",
+      "message": "שליחה"
+   },
+   "form_undo": {
+      "description": "Undo form button.",
+      "message": "בטל עשייה"
+   },
+   "form_yes": {
+      "description": "Yes form button.",
+      "message": "כן"
+   },
+   "general_default_key_always": {
+      "description": "Label for default private key option.",
+      "message": "הוסף תמיד את מפתח ברירת המחדל שלי אל רשימת הנמענים (זה יתיר לך לפענח דוא״לים נשלחים)."
+   },
+   "general_default_key_auto_sign": {
+      "description": "Label for default private key option.",
+      "message": "החתם את כל ההודעות היוצאות."
+   },
+   "general_gnupg_check_availability": {
+      "description": "Button label to check availability of GnuPG",
+      "message": "התר לנו לבדוק זמינות"
+   },
+   "general_gnupg_installed_question": {
+      "description": "Status message with available user options",
+      "message": "Do you have GnuPG installed? If not \u003C0>Download here\u003C/0>. To check availability again \u003C1>Restart Mailvelope\u003C/1>. If you are sure it is installed, please follow \u003C2>this wiki\u003C/2> to make sure it has been set up properly."
+   },
+   "general_gnupg_not_available": {
+      "description": "Indicator if GnuPG is not available",
+      "message": "GnuPG אינו זמין"
+   },
+   "general_gnupg_prefer": {
+      "description": "Question if user prefers to use GnuPG",
+      "message": "האם אתה מעדיף להשתמש ב־GnuPG?"
+   },
+   "general_openpgp_current": {
+      "description": "Label for current OpenPGP backend. Sentence continues with either 'OpenPGP.js' or 'GnuPG",
+      "message": "אתה משתמש כרגע ב"
+   },
+   "general_openpgp_prefer": {
+      "description": "Label for OpenPGP backend selection.",
+      "message": "איזה קצה אחורי של הצפנה אתה מעדיף?"
+   },
+   "general_openpgp_preferences": {
+      "description": "Headline for OpenPGP settings.",
+      "message": "העדפות OpenPGP"
+   },
+   "general_prefer_gnupg_note": {
+      "description": "Help text for GnuPG as the preferred OpenPGP backend option.",
+      "message": "הערה: מפתחות ציבוריים מסתנכרנים בין מחזיקי מפתחות זמינים. על סמך זמינות של מפתחות פרטיים, Mailvelope יכול לדרוס את ההגדרה המתועדפת של סיפריית הצפנה."
+   },
+   "gmail_integration_auth_error_download": {
+      "description": "Error message for components requiring authorization of GMAIL integration",
+      "message": "Mailvelope אינו מורשה להוריד צרופות. אתה צריך להעניק אל Mailvelope גישה אל API של Gmail כדי להשתמש בתפקודיות זו."
+   },
+   "gmail_integration_auth_error_send": {
+      "description": "Error message for components requiring authorization of GMAIL integration",
+      "message": "Mailvelope אינו מורשה לשלוח דוא״לים. אתה צריך להעניק אל Mailvelope גישה אל API של Gmail כדי להשתמש בתפקודיות זו."
+   },
+   "gmail_integration_quoted_mail_header_forward": {
+      "description": "Header for forwarded mail",
+      "message": "---------- הודעה מועברת הלאה ---------\nמאת: $1\nתאריך: $2\nנושא: $3\nאל: $4"
+   },
+   "gmail_integration_quoted_mail_header_reply": {
+      "description": "Header for quoted reply mail",
+      "message": "במועד $1, $2 כתב:"
+   },
+   "gmail_integration_sent_success": {
+      "description": "Email sent success notification",
+      "message": "הדוא״ל נשלח בהצלחה."
+   },
+   "gnupg_connection": {
+      "description": "Header that shows that GnuPG is available on the system.",
+      "message": "חיבור GnuPG"
+   },
+   "gnupg_error_unusable_pub_key": {
+      "description": "",
+      "message": "אנא בדוק אם המפתחות הציבוריים הבאים זמינים במחזיק מפתחות GnuPG שלך ואם הם תקפים: $1"
+   },
+   "header_analyticsconsent_modal": {
+      "description": "h2 modal analytics consent",
+      "message": "Thank you for helping!"
+   },
+   "import_frame_help_text": {
+      "description": "Help text on import frame.",
+      "message": "לחץ כדי לייבא מפתח"
+   },
+   "install_landing_page_hint": {
+      "description": "Install landing page getting started hint",
+      "message": "לחץ כאן כדי לפתוח את ההרחבה."
+   },
+   "key_default_active_btn_title": {
+      "description": "Title for active default key button",
+      "message": "המפתח נקבע כמפתח ברירת מחדל"
+   },
+   "key_default_disabled_btn_title": {
+      "description": "Title for disabled (invalid) default key button",
+      "message": "המפתח אינו תקף עבור פעולות של הצפנה והחתמה"
+   },
+   "key_default_inactive_btn_title": {
+      "description": "Title for inactive default key button",
+      "message": "קבע מפתח כמפתח ברירת מחדל"
+   },
+   "key_export_btn": {
+      "description": "Export key button label",
+      "message": "ייצא"
+   },
+   "key_export_btn_title": {
+      "description": "Title for export key button",
+      "message": "ייצא קובץ"
+   },
+   "key_export_create_file": {
+      "description": "Download file button.",
+      "message": "שמור"
+   },
+   "key_export_dialog_copy_to_clipboard": {
+      "description": "Copy to clipboard button label.",
+      "message": "העתק ללוח גזירה"
+   },
+   "key_export_dialog_question": {
+      "description": "Question in export private key dialog.",
+      "message": "איזה מפתח תרצה לייצא?"
+   },
+   "key_export_dialog_title": {
+      "description": "Title of export key dialog.",
+      "message": "ייצא מפתח"
+   },
+   "key_export_filename": {
+      "description": "Label of filename input.",
+      "message": "שם קובץ"
+   },
+   "key_export_header": {
+      "description": "Export key dialog header.",
+      "message": "ייצא מפתח"
+   },
+   "key_export_warning_private": {
+      "description": "Key export warning.",
+      "message": "קובץ זה מכיל גם מפתחות פרטיים. שמור את הקובץ במקום בטוח ואל תשתף אותו עם אחרים."
+   },
+   "key_gen_advanced_btn": {
+      "description": "Advanced key generation settings.",
+      "message": "מתקדם"
+   },
+   "key_gen_another": {
+      "description": "Key import button",
+      "message": "חולל נוסף…"
+   },
+   "key_gen_demail": {
+      "description": "De-Mail address name.",
+      "message": "כתובת De-Mail"
+   },
+   "key_gen_error": {
+      "description": "Key generation error message",
+      "message": "שגיאה בעת חוללות מפתח."
+   },
+   "key_gen_experimental": {
+      "description": "A key algorithm is flagged as experimental",
+      "message": "ניסיוני"
+   },
+   "key_gen_expiration": {
+      "description": "Key expiration date",
+      "message": "תאריך תפוגת מפתח"
+   },
+   "key_gen_future_default": {
+      "description": "Key generation algorithm, the future supported standard.",
+      "message": "ברירת מחדל עתידית"
+   },
+   "key_gen_generate": {
+      "description": "Key generate button label",
+      "message": "חולל"
+   },
+   "key_gen_invalid_email": {
+      "description": "Error message.",
+      "message": "כתובת דוא״ל בלתי תקפה"
+   },
+   "key_gen_key_size": {
+      "description": "Advanced key generation settings: Key size",
+      "message": "גודל מפתח"
+   },
+   "key_gen_name_help": {
+      "description": "Help text for name field.",
+      "message": "שם מלא של בעל המפתח"
+   },
+   "key_gen_pwd": {
+      "description": "Label for passphrase input field",
+      "message": "הכנס סיסמה"
+   },
+   "key_gen_pwd_empty": {
+      "description": "Passphrase input field status",
+      "message": "שדה הסיסמה ריק"
+   },
+   "key_gen_pwd_match": {
+      "description": "Passphrase input field status",
+      "message": "הסיסמאות תואמות"
+   },
+   "key_gen_pwd_reenter": {
+      "description": "Label for passphrase input field",
+      "message": "הכנס שוב סיסמה"
+   },
+   "key_gen_pwd_unequal": {
+      "description": "Passphrase input field status",
+      "message": "הסיסמאות אינן תואמות"
+   },
+   "key_gen_success": {
+      "description": "Key generation success message",
+      "message": "מפתח חדש התחולל ויובא לתוך מחזיק מפתחות"
+   },
+   "key_gen_upload": {
+      "description": "Upload key to Mailvelope key server checkbox",
+      "message": "העלה קובץ ציבורי אל שרת המפתחות של Mailvelope (הוא יכול להימחק בכל עת)"
+   },
+   "key_gen_wait_header": {
+      "description": "Wait dialog header",
+      "message": "חוללות מפתח בתהליך…"
+   },
+   "key_gen_wait_info": {
+      "description": "Wait dialog info message",
+      "message": "אנא המתן. חוללות מפתח יכולה לקחת עד מספר דקות ומשך הזמן תלוי בגורמים שונים, כגון גודל המפתח."
+   },
+   "key_import_bulk_success": {
+      "description": "Import success message for more than 5 keys",
+      "message": "מפתחות יובאו/עודכנו בהצלחה."
+   },
+   "key_import_contacts_import_btn": {
+      "description": "Contact import button label on key import page.",
+      "message": "ייבא מפתחות"
+   },
+   "key_import_default_description": {
+      "description": "Key import dialog description.",
+      "message": "לאחר אישור, מפתח זה יועבר אל מחזיק המפתחות המקומי:"
+   },
+   "key_import_default_description_plural": {
+      "description": "Key import dialog description.",
+      "message": "לאחר אישור, מפתחות אלו יועברו אל מחזיק המפתחות המקומי:"
+   },
+   "key_import_default_headline": {
+      "description": "Key import dialog header.",
+      "message": "אשר מפתח"
+   },
+   "key_import_dialog_header": {
+      "description": "Key import dialog header.",
+      "message": "הוסף מפתח אל מחזיק מפתחות"
+   },
+   "key_import_error": {
+      "description": "Import error alert.",
+      "message": "שגיאת יבוא."
+   },
+   "key_import_error_no_uid": {
+      "description": "Import error no user id found.",
+      "message": "זהות משתמש תקפה לא נמצאה במפתח $1"
+   },
+   "key_import_error_parse": {
+      "description": "Import parse error.",
+      "message": "שגיאה בקריאת מפתח PGP משוריין: $1"
+   },
+   "key_import_exception": {
+      "description": "Import error alert.",
+      "message": "שגיאה התרחשה במהלך עיבוד המפתחות"
+   },
+   "key_import_file_label": {
+      "description": "File selection label.",
+      "message": "בחר קבצים"
+   },
+   "key_import_from_text_btn": {
+      "description": "Import keys from clipboard button label on key import page.",
+      "message": "ייבא מפתח מלוח הגזירה"
+   },
+   "key_import_from_text_label": {
+      "description": "Import keys from clipboard textarea label on key import page.",
+      "message": "טקסט מלוח הגזירה"
+   },
+   "key_import_invalid_text": {
+      "description": "Import error alert.",
+      "message": "טקסט תקף של מפתח לא נמצא"
+   },
+   "key_import_invalidated_description": {
+      "description": "",
+      "message": "אזהרה: המפתח עבור איש הקשר הזה פג. תקשורת מוצפנת עם $1 אינה אפשרית יותר. אתה צריך להשיג את המפתח הנוכחי מאיש הקשר הזה."
+   },
+   "key_import_number_of_failed": {
+      "description": "Error message with number of failed imports.",
+      "message": "מפתח לא היה ניתן ליבוא עקב שגיאות."
+   },
+   "key_import_number_of_failed_plural": {
+      "description": "Error message with number of failed imports.",
+      "message": "$1 מפתחות לא היו ניתנים ליבוא עקב שגיאות."
+   },
+   "key_import_private_exists": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "חלק של מפתח פרטי קיים התואם אל המפתח הציבורי $1 של המשתמש $2 יובא לתוך מחזיק מפתחות"
+   },
+   "key_import_private_read": {
+      "description": "Import error message. $1: error message",
+      "message": "לא היה ניתן לקרוא מפתח פרטי: $1"
+   },
+   "key_import_private_success": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "המפתח הפרטי $1 של המשתמש $2 יובא לתוך מחזיק מפתחות"
+   },
+   "key_import_private_update": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "המפתח הפרטי $1 של המשתמש $2 עודכן"
+   },
+   "key_import_public_read": {
+      "description": "Import error message. $1: error message",
+      "message": "לא היה ניתן לקרוא מפתח ציבורי: $1"
+   },
+   "key_import_public_success": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "המפתח הציבורי $1 של המשתמש $2 יובא לתוך מחזיק מפתחות"
+   },
+   "key_import_public_update": {
+      "description": "Import success message: $1: keyid, $2: userid.",
+      "message": "המפתח הציבורי $1 של המשתמש $2 עודכן"
+   },
+   "key_import_rotation_add": {
+      "description": "Key import rotation add button.",
+      "message": "הוסף אל מחזיק מפתחות"
+   },
+   "key_import_rotation_cancel": {
+      "description": "Key import rotation cancel button.",
+      "message": "לא עכשיו"
+   },
+   "key_import_rotation_description": {
+      "description": "Key import dialog description.",
+      "message": "אם תמשיך להשתמש במפתח הישן, ייתכן שהשולח לא יוכל לפענח את ההודעות שלך. אם אתה חשדן, בקש מהשולח לאשר את השינוי בערוץ תקשורת אחר. אתה יכול להוסיף או להסיר את המפתח מאוחר יותר."
+   },
+   "key_import_rotation_headline": {
+      "description": "Key import rotation dialog header.",
+      "message": "השולח חתם על הודעה זו עם מפתח חדש."
+   },
+   "key_import_search_btn": {
+      "description": "Key search input button.",
+      "message": "חפש"
+   },
+   "key_import_search_disabled": {
+      "description": "Key search disabled warning.",
+      "message": "חיפוש מושבת."
+   },
+   "key_import_search_disabled_descr": {
+      "description": "Key search disabled warning description.",
+      "message": "Activate at least one key source in the settings."
+   },
+   "key_import_search_found": {
+      "description": "Key search found label.",
+      "message": "מפתח נמצא ב:"
+   },
+   "key_import_search_found_modified": {
+      "description": "Key search found label.",
+      "message": "last modified on:"
+   },
+   "key_import_search_found_source": {
+      "description": "Key search found label.",
+      "message": "מקור:"
+   },
+   "key_import_search_invalid": {
+      "description": "Key search input has invalid content.",
+      "message": "הכנס כתובת דוא״ל תקפה, זהות מפתח תקפה (16 ספרות) או טביעת אצבע תקפה (40 ספרות)"
+   },
+   "key_import_search_not_found": {
+      "description": "Key search found no result error message.",
+      "message": "Key is not available in any of the searched key directories."
+   },
+   "key_import_search_not_found_header": {
+      "description": "Key search found no result header.",
+      "message": "מפתח לא נמצא."
+   },
+   "key_import_search_ph": {
+      "description": "Key search input place holder.",
+      "message": "כתובת דוא״ל / זהות מפתח / טביעת אצבע"
+   },
+   "key_import_textarea": {
+      "description": "Key import box.",
+      "message": "ייבא מפתח בתור טקסט"
+   },
+   "key_import_too_big": {
+      "description": "Import error alert.",
+      "message": "טקסט המפתח שניסית לייבא ארוך מדי מכדי לטפל בו. נסה להוסיף אותו בחלקים קטנים יותר."
+   },
+   "key_import_unable": {
+      "description": "Import error message: $1: error message.",
+      "message": "לא היה ניתן לייבא מפתח עקב חריגה: $1"
+   },
+   "key_keyserver_mod": {
+      "description": "Local key data differs from Mailvelope key server",
+      "message": "נתוני המפתח על שרת המפתחות של Mailvelope אינם עדכניים עוד."
+   },
+   "key_keyserver_not": {
+      "description": "Key is not on the the Mailvelope server",
+      "message": "המפתח אינו מסונכרן עם שרת המפתחות של Mailvelope."
+   },
+   "key_keyserver_remove": {
+      "description": "A deletion request has been sent to the Mailvelope key server",
+      "message": "דוא״ל אישור נשלח אל כל זהויות המשתמש למען הסרה סופית משרת המפתחות של Mailvelope."
+   },
+   "key_keyserver_remove_btn": {
+      "description": "Key server remove existing key button label",
+      "message": "הסר את כל זהויות המשתמש"
+   },
+   "key_keyserver_resend_btn": {
+      "description": "Key server send again button label",
+      "message": "שלח מחדש"
+   },
+   "key_keyserver_sync": {
+      "description": "Key data is synchronized with the Mailvelope key server",
+      "message": "נתוני המפתח על שרת המפתחות של Mailvelope עדכניים."
+   },
+   "key_keyserver_update": {
+      "description": "An update request has been sent to the Mailvelope key server",
+      "message": "נתוני המפתח עודכנו על שרת המפתחות של Mailvelope."
+   },
+   "key_keyserver_update_btn": {
+      "description": "Key server update button label",
+      "message": "עדכן"
+   },
+   "key_keyserver_upload": {
+      "description": "An upload request has been sent to the Mailvelope key server",
+      "message": "דוא״ל אישור נשלח אל כל זהויות המשתמש כדי להסתנכרן עם שרת המפתחות של Mailvelope."
+   },
+   "key_keyserver_upload_btn": {
+      "description": "Key server upload button label",
+      "message": "סנכרן"
+   },
+   "key_recovery_failed": {
+      "description": "",
+      "message": "השבת מפתח מגיבוי נכשלה."
+   },
+   "key_remove_btn": {
+      "description": "Remove key button label",
+      "message": "הסר"
+   },
+   "key_remove_btn_title": {
+      "description": "Title for remove key button",
+      "message": "הסר מפתח ממחזיק מפתחות"
+   },
+   "key_remove_dialog_title": {
+      "description": "Title of delete key dialog.",
+      "message": "הסר מפתח"
+   },
+   "key_revoke_btn": {
+      "description": "Revoke key button label",
+      "message": "שלול"
+   },
+   "key_revoke_btn_title": {
+      "description": "Title for revoke key button",
+      "message": "שלול מפתח"
+   },
+   "key_revoke_dialog_confirm": {
+      "description": "Confirmation question of revoke key dialog.",
+      "message": "האם אתה עדיין רוצה לשלול את המפתח?"
+   },
+   "key_revoke_dialog_description": {
+      "description": "Text of revoke key dialog.",
+      "message": "לאחר שלילה, המפתח יהיה בלתי שמיש לצמיתות."
+   },
+   "key_revoke_dialog_title": {
+      "description": "Title of revoke key dialog.",
+      "message": "שלול מפתח"
+   },
+   "key_set_as_default": {
+      "description": "Set as default key for the keyring button",
+      "message": "קבע כברירת מחדל"
+   },
+   "keybackup_failed": {
+      "description": "",
+      "message": "יצירת גיבוי מפתח נכשלה."
+   },
+   "keybackup_restore_dialog_button": {
+      "description": "",
+      "message": "שחזר גיבוי"
+   },
+   "keybackup_restore_dialog_description": {
+      "description": "",
+      "message": "צור גיליון השבה חדש כאן אם:"
+   },
+   "keybackup_restore_dialog_headline": {
+      "description": "",
+      "message": "המלצה: צור גיבוי"
+   },
+   "keybackup_restore_dialog_list_1": {
+      "description": "",
+      "message": "איבדת את גיליון ההשבה."
+   },
+   "keybackup_restore_dialog_list_2": {
+      "description": "",
+      "message": "גיליון השבה חדש חייב להיווצר בגין סיבות אבטחה."
+   },
+   "keybackup_setup_dialog_button": {
+      "description": "",
+      "message": "צור גיבוי"
+   },
+   "keybackup_setup_dialog_description": {
+      "description": "",
+      "message": "הגיבוי דרוש כדי להבטיח שהתקשורת המוצפנת שלך:"
+   },
+   "keybackup_setup_dialog_headline": {
+      "description": "",
+      "message": "המלצה: הגדר גיבוי"
+   },
+   "keybackup_setup_dialog_list_1": {
+      "description": "In order to restore your encrypted communication in case of data loss.",
+      "message": "על מנת לשחזר אותה במקרה של אובדן נתונים"
+   },
+   "keybackup_setup_dialog_list_2": {
+      "description": "In order to transfer your encrypted communication to other devices.",
+      "message": "על מנת להעביר אותה אל מכשירים אחרים"
+   },
+   "keybackup_waiting_description": {
+      "description": "",
+      "message": "מסמך עם קוד ההשבה שלך נמצא בהכנה."
+   },
+   "keybackup_waiting_headline": {
+      "description": "",
+      "message": "יוצר גיבוי!"
+   },
+   "keydetails_change_exp_date_dialog_note": {
+      "description": "Important note in change expiration date dialog.",
+      "message": "תאריך התפוגה משתנה גם עבור כל תת־המפתחות. תת־מפתחות בלתי תקפים או תת־מפתחות שפגו כבר נשארים בלתי מושפעים."
+   },
+   "keydetails_change_exp_date_dialog_title": {
+      "description": "Title of change expiration date dialog.",
+      "message": "שנה תאריך תפוגה"
+   },
+   "keydetails_change_pwd_dialog_old": {
+      "description": "Old password input label",
+      "message": "סיסמה ישנה"
+   },
+   "keydetails_change_pwd_dialog_title": {
+      "description": "Title of change password dialog.",
+      "message": "שנה סיסמה"
+   },
+   "keydetails_creation_date": {
+      "description": "Creation date of a PGP key.",
+      "message": "נוצר"
+   },
+   "keydetails_expiration_date": {
+      "description": "Expiration date of a PGP key.",
+      "message": "פג"
+   },
+   "keydetails_key_not_expire": {
+      "description": "Expiration date of a PGP key not set.",
+      "message": "אף פעם"
+   },
+   "keydetails_password": {
+      "description": "Password of a PGP key.",
+      "message": "סיסמה"
+   },
+   "keydetails_title": {
+      "description": "Title of the key details panel",
+      "message": "פרטי מפתח"
+   },
+   "keygen_dialog_password_error_length": {
+      "description": "",
+      "message": "סיסמה דורשת לפחות $1 תווים"
+   },
+   "keygen_dialog_password_placeholder": {
+      "description": "",
+      "message": "לפחות 4 תווים"
+   },
+   "keygen_dialog_prolog": {
+      "description": "",
+      "message": "אנא הקצה סיסמה עבור המפתח שלך כדי להגן על התקשורת המוצפנת שלך:"
+   },
+   "keygen_waiting_description": {
+      "description": "",
+      "message": "תהליך זה יכול לקחת מספר דקות. הדפדפן שלך עשוי להיות חסר תגובתי. אנא הייה סבלני."
+   },
+   "keygen_waiting_headline": {
+      "description": "",
+      "message": "תיצוּר תקשורת מוצפנת"
+   },
+   "keygrid_algorithm": {
+      "description": "Public-key algorithm of a PGP key.",
+      "message": "אלגוריתם"
+   },
+   "keygrid_all_keys": {
+      "description": "Selection of key type.",
+      "message": "הכל"
+   },
+   "keygrid_creation_date": {
+      "description": "Creation date of a PGP key.",
+      "message": "תאריך יצירה"
+   },
+   "keygrid_creation_date_short": {
+      "description": "Short creation date of a PGP key. Max. width: 90px",
+      "message": "נוצר"
+   },
+   "keygrid_default_key": {
+      "description": "Default key in the keyring.",
+      "message": "מפתח ברירת מחדל"
+   },
+   "keygrid_default_label": {
+      "description": "Label for the default key",
+      "message": "ברירת מחדל"
+   },
+   "keygrid_delete": {
+      "description": "Max. 6 characters.",
+      "message": "מחק"
+   },
+   "keygrid_delete_confirmation": {
+      "description": "Delete confirmation dialog.",
+      "message": "האם אתה בטוח שאתה רוצה להסיר מפתח זה?"
+   },
+   "keygrid_display_all_keys": {
+      "description": "Export key menu.",
+      "message": "הצג את כל המפתחות"
+   },
+   "keygrid_display_priv_key": {
+      "description": "Export key menu.",
+      "message": "הצג מפתח פרטי"
+   },
+   "keygrid_display_pub_key": {
+      "description": "Export key menu.",
+      "message": "הצג מפתח ציבורי"
+   },
+   "keygrid_expiration_date": {
+      "description": "Expiration date of a PGP key.",
+      "message": "תאריך תפוגה"
+   },
+   "keygrid_export": {
+      "description": "Export key.",
+      "message": "ייצא"
+   },
+   "keygrid_export_title": {
+      "description": "Title for Export key button.",
+      "message": "ייצא את כל המפתחות ברשימה זו אל קובץ"
+   },
+   "keygrid_generate_title": {
+      "description": "Title for generate key button",
+      "message": "חולל מפתח"
+   },
+   "keygrid_import_search_title": {
+      "description": "Title for Search key button.",
+      "message": "חפש מפתחות ציבוריים במקורות חיצוניים"
+   },
+   "keygrid_import_title": {
+      "description": "Title for Import key button.",
+      "message": "ייבא מפתח"
+   },
+   "keygrid_invalid_userid": {
+      "description": "User ID invalid.",
+      "message": "זהות משתמש בלתי תקפה"
+   },
+   "keygrid_key_fingerprint": {
+      "description": "Unique string identifier for a PGP key.",
+      "message": "טביעת אצבע PGP"
+   },
+   "keygrid_key_length": {
+      "description": "Key length of a PGP key.",
+      "message": "אורך"
+   },
+   "keygrid_key_not_expire": {
+      "description": "Expiration date of a PGP key not set.",
+      "message": "מפתח זה אינו פג"
+   },
+   "keygrid_keyid": {
+      "description": "Key ID of a PGP key.",
+      "message": "זהות מפתח"
+   },
+   "keygrid_primary_key": {
+      "description": "Main key in the PGP key.",
+      "message": "מפתח ראשי"
+   },
+   "keygrid_private_keys": {
+      "description": "Selection of key type.",
+      "message": "מפתחות פרטיים"
+   },
+   "keygrid_public_keys": {
+      "description": "Selection of key type.",
+      "message": "מפתחות ציבוריים"
+   },
+   "keygrid_refresh": {
+      "description": "Refresh keygrid component.",
+      "message": "רענן"
+   },
+   "keygrid_refresh_title": {
+      "description": "Title for button to refresh keygrid component.",
+      "message": "טען מחדש את מחזיק המפתחות"
+   },
+   "keygrid_send_pub_key": {
+      "description": "Export key menu.",
+      "message": "שלח מפתח ציבורי באמצעות דוא״ל"
+   },
+   "keygrid_signer_name": {
+      "description": "User ID of signer.",
+      "message": "חותם"
+   },
+   "keygrid_signer_unknown": {
+      "description": "Key of signer not available.",
+      "message": "חותם בלתי ידוע"
+   },
+   "keygrid_sort_type": {
+      "description": "Key grid sort selector.",
+      "message": "מסננים"
+   },
+   "keygrid_status_expired": {
+      "description": "Validity status of a PGP key.",
+      "message": "פג"
+   },
+   "keygrid_status_invalid": {
+      "description": "Validity status of a PGP key.",
+      "message": "בלתי תקף"
+   },
+   "keygrid_status_revoked": {
+      "description": "Validity status of a PGP key.",
+      "message": "נשלל"
+   },
+   "keygrid_status_valid": {
+      "description": "Validity status of a PGP key.",
+      "message": "תקף"
+   },
+   "keygrid_subkey": {
+      "description": "Subkey of a PGP key.",
+      "message": "תת־מפתח"
+   },
+   "keygrid_subkeys": {
+      "description": "Subkeys of a PGP key.",
+      "message": "תת־מפתחות"
+   },
+   "keygrid_user_email": {
+      "description": "Email address in User ID of a PGP key.",
+      "message": "דוא״ל"
+   },
+   "keygrid_user_ids": {
+      "description": "User IDs of a PGP key.",
+      "message": "זהויות משתמש"
+   },
+   "keygrid_user_name": {
+      "description": "Name in User ID of a PGP key.",
+      "message": "שם"
+   },
+   "keygrid_user_primary": {
+      "description": "Primary status of User ID of a PGP key",
+      "message": "עיקרי"
+   },
+   "keygrid_userid_signatures": {
+      "description": "Signatures on User ID of a PGP key.",
+      "message": "חתימות"
+   },
+   "keygrid_validity_status": {
+      "description": "Validity status of a PGP key.",
+      "message": "מעמד"
+   },
+   "keyring_available_settings": {
+      "description": "Text introducing the availability of further settings.",
+      "message": "ראה הגדרות זמינות ב:"
+   },
+   "keyring_backup": {
+      "description": "Title of keyring backup view",
+      "message": "גיבוי מחזיק מפתחות"
+   },
+   "keyring_confirm_deletion": {
+      "description": "Confirmation message prompted when a keyring is deleted",
+      "message": "האם אתה רוצה למחוק את מחזיק המפתחות עם הזהות: $1?"
+   },
+   "keyring_confirm_keys": {
+      "description": "Tab of keyring to import keys.",
+      "message": "אשר מפתח ליבוא"
+   },
+   "keyring_confirm_keys_plural": {
+      "description": "Tab of keyring to import keys.",
+      "message": "אשר $1 מפתחות ליבוא"
+   },
+   "keyring_export_keys": {
+      "description": "Tab of keyring to export keys.",
+      "message": "ייצא מחזיק מפתחות"
+   },
+   "keyring_generate_key": {
+      "description": "Tab of keyring to generate key.",
+      "message": "חולל מפתח"
+   },
+   "keyring_header": {
+      "description": "Header of the key ring.",
+      "message": "ניהול מפתחות"
+   },
+   "keyring_import_description": {
+      "description": "Description of key import for import tab of keyring import.",
+      "message": "אתה יכול להוסיף מפתחות כקובץ או כטקסט מתוך לוח הגזירה."
+   },
+   "keyring_import_keys": {
+      "description": "Tab of keyring to import keys.",
+      "message": "ייבא מפתחות"
+   },
+   "keyring_import_search_description": {
+      "description": "Description of key search for search tab of keyring import.",
+      "message": "Find public keys to add to your keyring. Mailvelope scans multiple key directories and suggests the public key that is most likely in use."
+   },
+   "keyring_import_search_keys": {
+      "description": "Tab of keyring to search keys.",
+      "message": "חפש מפתחות"
+   },
+   "keyring_main": {
+      "description": "Label for the main keyring",
+      "message": "מחזיק מפתחות ראשי"
+   },
+   "keyring_private": {
+      "description": "private key type",
+      "message": "פרטי"
+   },
+   "keyring_public": {
+      "description": "public key type",
+      "message": "ציבורי"
+   },
+   "keyring_public_private": {
+      "description": "public and private key types",
+      "message": "זוגות מפתחות"
+   },
+   "keyring_remove_dialog_title": {
+      "description": "Title of delete keyring dialog.",
+      "message": "מחק מחזיק מפתחות"
+   },
+   "keyring_setup": {
+      "description": "Setup keyring for mail provider.",
+      "message": "תצורה"
+   },
+   "keyring_setup_generate_key": {
+      "description": "Generate key",
+      "message": "חולל מפתח"
+   },
+   "keyring_setup_generate_key_explanation": {
+      "description": "Generate key",
+      "message": "אם אתה משתמש בהרחבה זו בפעם הראשונה ואין לך זוג מפתחות עדיין, אנא חולל אחד עכשיו."
+   },
+   "keyring_setup_import_key": {
+      "description": "Import key",
+      "message": "ייבא מפתח"
+   },
+   "keyring_setup_import_key_explanation": {
+      "description": "Import key",
+      "message": "יש לך כבר זוג מפתחות על מכשיר אחר? אתה יכול לייבא את המפתחות הקיימים שלך. פשוט ייבא את זוג המפתחות מהמכשיר האחר ואז ייבא אותם כאן."
+   },
+   "keyring_setup_no_keypair": {
+      "description": "Setup text if no keypair available",
+      "message": "זוג מפתחות דרוש כדי להצפין ולפענח הודעות וגם כדי להזמין את אנשי הקשר שלך אל תקשורת מוצפנת מקצה־אל־קצה."
+   },
+   "keyring_setup_no_keypair_heading": {
+      "description": "Setup heading if no keypair available",
+      "message": "מחזיק מפתחות זה אינו מכיל עדיין זוג מפתחות."
+   },
+   "keyserver_additionals_label": {
+      "description": "Label for configuration of additional key sources",
+      "message": "מקורות מפתח נוספים"
+   },
+   "keyserver_autocrypt_lookup": {
+      "description": "Enable Looking Up Keys Via Autocrypt",
+      "message": "השתמש במפתחות מכותרות עליונות Autocrypt של דוא״ל נכנס"
+   },
+   "keyserver_key_binding_header": {
+      "description": "Header for key binding feature",
+      "message": "זיהוי מפתח"
+   },
+   "keyserver_key_binding_label": {
+      "description": "Label for key binding feature",
+      "message": "קבע מפתח נוכחי של אנשי קשר ובצע באופן אוטומטי בחירת מפתח"
+   },
+   "keyserver_oks_lookup": {
+      "description": "Enable keys.openpgp.org Auto Lookup",
+      "message": "חפש באופן אוטומטי מפתחות על \u003C0>keys.openpgp.org\u003C/0>"
+   },
+   "keyserver_tofu_lookup": {
+      "description": "Enable Mailvelope Key Server Auto Lookup",
+      "message": "השתמש בשרת המפתחות של Mailvelope"
+   },
+   "keyserver_verifying_servers": {
+      "description": "Label for verifying key servers.",
+      "message": "שרת מפתחות עם וידוא דוא״ל"
+   },
+   "keyserver_wkd_lookup": {
+      "description": "Enable Web Key Directory Auto Lookup",
+      "message": "מפתחות שאילתה מספק הדוא״ל הנמענים (סיפריית מפתח רשת)"
+   },
+   "keyusers_add_btn": {
+      "description": "Add user button label",
+      "message": "הוסף חדש"
+   },
+   "keyusers_add_btn_title": {
+      "description": "Add user button title",
+      "message": "הוסף זהות משתמש חדשה"
+   },
+   "keyusers_keyserver": {
+      "description": "Label of key server column key users table",
+      "message": "שרת מפתחות"
+   },
+   "keyusers_keyserver_not": {
+      "description": "User ID not synchronized with key server label text",
+      "message": "אינו מסונכרן"
+   },
+   "keyusers_keyserver_sync": {
+      "description": "User ID synchronized with key server label text",
+      "message": "מסונכרן"
+   },
+   "keyusers_keyserver_unverified": {
+      "description": "User ID key server not verified label text",
+      "message": "בלתי מוודא"
+   },
+   "keyusers_title": {
+      "description": "Title of the key users panel",
+      "message": "זהויות משתמש מוקצים"
+   },
+   "learn_more_link": {
+      "description": "Text of a link to a learn-more resource",
+      "message": "למד עוד"
+   },
+   "message_no_keys": {
+      "description": "Decrypt error message.",
+      "message": "מפתח פרטי לא נמצא עבור הודעה זו. זהויות דרושות של מפתח פרטי: $1"
+   },
+   "message_read_error": {
+      "description": "Message read error message: $1: error message.",
+      "message": "לא היה ניתן לפענח הודעה זו: $1"
+   },
+   "nameaddrinput_error_email_exists": {
+      "description": "Error message for email input field.",
+      "message": "כתובת הדוא״ל נמצאת כבר בשימוש"
+   },
+   "nameaddrinput_error_name_empty": {
+      "description": "Error message for name input field.",
+      "message": "אנא הכנס שם"
+   },
+   "notification_text_copy_to_clipboard": {
+      "description": "Copy to clipboard toast message.",
+      "message": "טקסט הועתק אל לוח הגזירה."
+   },
+   "options_docu": {
+      "description": "Options navigation: Documentation.",
+      "message": "תיעוד"
+   },
+   "options_home": {
+      "description": "Options navigation: Home.",
+      "message": "אפשרויות"
+   },
+   "options_settings": {
+      "description": "Options header: Settings.",
+      "message": "הגדרות"
+   },
+   "options_title": {
+      "description": "Title of options page.",
+      "message": "אפשרויות Mailvelope"
+   },
+   "paragraph_analyticsconsent_modal": {
+      "description": "p modal analytics consent",
+      "message": "You can opt out at any time from settings."
+   },
+   "preferred": {
+      "description": "Indicates if a keyring is preferred",
+      "message": "מתועדף"
+   },
+   "provider_gmail_auth": {
+      "description": "Authorizations",
+      "message": "אשרות"
+   },
+   "provider_gmail_auth_cancel_btn": {
+      "description": "Cancel authorization button",
+      "message": "בטל אשרה"
+   },
+   "provider_gmail_auth_readonly": {
+      "description": "Readonly authorization",
+      "message": "קרא דוא״ל"
+   },
+   "provider_gmail_auth_send": {
+      "description": "Send authorization",
+      "message": "שלח דוא״ל"
+   },
+   "provider_gmail_auth_table_title": {
+      "description": "Title for authorization table.",
+      "message": "אשרות API של Google"
+   },
+   "provider_gmail_dialog_auth_google_signin": {
+      "description": "Text Google sign in button",
+      "message": "התחבר עם Google"
+   },
+   "provider_gmail_dialog_auth_intro": {
+      "description": "Intro text for GMAIL OAuth dialog.",
+      "message": "על מנת להשתמש בשילוב Gmail עבור \u003C0>\u003C/0>, ההרשאות הבאות חייבות להיענק אל Mailvelope:"
+   },
+   "provider_gmail_dialog_auth_outro": {
+      "description": "Outro text for GMAIL OAuth dialog.",
+      "message": "אם תלחץ על הכפתור התחבר, חלון אשרה של Google ייפתח. בחר את חשבון Gmail שלך עבור כתובת הדוא״ל \u003C0>\u003C/0> ועקוב אחר ההוראות."
+   },
+   "provider_gmail_dialog_description": {
+      "description": "Leading text for GMAIL API dialog.",
+      "message": "שימוש ב־API של Google מרחיב את התפקודיות של Mailvelope עם Gmail ומפשיט שליחה וקריאה של דוא״לים מוצפנים וצרופות."
+   },
+   "provider_gmail_dialog_gsuite_alert": {
+      "description": "Alert text for GSuite Users in GMAIL API dialog.",
+      "message": "This feature is free for Gmail accounts. If you are part of a Google Workspace (\u003C0>workspace.google.com\u003C/0>) organization, you will need to purchase a license from the \u003C1>Mailvelope website\u003C/1>."
+   },
+   "provider_gmail_dialog_privacy_policy": {
+      "description": "Privacy policy link.",
+      "message": "אנא קרא את מדיניות הפרטיות שלנו"
+   },
+   "provider_gmail_dialog_title": {
+      "description": "Title of GMAIL API dialog.",
+      "message": "שימוש ב־API של Gmail"
+   },
+   "provider_gmail_integration": {
+      "description": "Label for Gmail integration option.",
+      "message": "שילוב API של Gmail"
+   },
+   "provider_gmail_integration_info": {
+      "description": "Info message for Gmail integration option",
+      "message": "Mailvelope דורש הרשאות נוספות כדי להשיג גישה אל API של Gmail. ברגע שתשתמש בתפקודי ההצפנה של Mailvelope ב־Gmail, תודרך באמצעות תהליך אשרה. התהליך דורש שתתחבר אל חשבון Google שלך."
+   },
+   "provider_gmail_integration_warning": {
+      "description": "Warning message, when Gmail is not authorized",
+      "message": "Gmail אינו מורשה עם דפוס החיפוש \u003C0>\u003C/0>. אנא בדוק את ההגדרות ב\u003C1>\u003C/1>."
+   },
+   "provider_gmail_licensing_dialog_business_btn_info": {
+      "description": "Info text on Business button ",
+      "message": "התקשרות מאובטחת עם ארגונים ברחבי העולם"
+   },
+   "provider_gmail_licensing_dialog_business_btn_price_info": {
+      "description": "Info text for price label of Business button",
+      "message": "למשתמש/חודש"
+   },
+   "provider_gmail_licensing_dialog_deactivate_btn": {
+      "description": "Gmail API deactivate button in licensing dialog",
+      "message": "המשך בלי API של Gmail"
+   },
+   "provider_gmail_licensing_dialog_para_1": {
+      "description": "Text of Gmail API licensing dialog first paragraph.",
+      "message": "Use of the Gmail API within Google Workspace organizations is \u003C0>subject to a fee\u003C/0>."
+   },
+   "provider_gmail_licensing_dialog_para_2": {
+      "description": "Text of Gmail API licensing dialog second paragraph.",
+      "message": "אתה יכול להמשיך להשתמש ב־Mailvelope עם Gmail בחינם, אבל \u003C0>עם API, זרימת העבודה שלך\u003C/0> עבור כתיבה וקריאה של דוא״לים מוצפנים והצרופות שלהם תהיה \u003C1>הרבה יותר מהירה וקלה\u003C/1>."
+   },
+   "provider_gmail_licensing_dialog_para_3": {
+      "description": "Text of Gmail API licensing dialog third paragraph.",
+      "message": "בחן את Mailvelope Business עם API מופעל של Gmail \u003C0>במשך 14 ימים בחינם\u003C/0>:"
+   },
+   "provider_gmail_licensing_dialog_test_btn": {
+      "description": "Gmail API test button in licensing dialog",
+      "message": "בחן API של Gmail בחינם"
+   },
+   "provider_gmail_licensing_dialog_title": {
+      "description": "Title of GMAIL API licensing dialog.",
+      "message": "רישיון Mailvelope Business דרוש"
+   },
+   "provider_gmail_licensing_table_caption": {
+      "description": "Caption for G Suite licensing table.",
+      "message": "Licenses to use the Gmail API integration within Google Workspace (\u003C0>workspace.google.com\u003C/0>) can be purchased from the \u003C1>Mailvelope website\u003C/1>."
+   },
+   "provider_gmail_licensing_table_title": {
+      "description": "Title for G Suite licensing table.",
+      "message": "רישיון Mailvelope"
+   },
+   "provider_gmail_secure_forward_btn": {
+      "description": "Secure forward button title/tooltip",
+      "message": "העבר הלאה באופן מאובטח"
+   },
+   "provider_gmail_secure_replyAll_btn": {
+      "description": "Secure reply all button title/tooltip",
+      "message": "השב לכל באופן מאובטח"
+   },
+   "provider_gmail_secure_reply_btn": {
+      "description": "Secure reply button title/tooltip",
+      "message": "השב באופן מאובטח"
+   },
+   "pwd_dialog_cache_pwd": {
+      "description": "Checkbox label for remembering of the password.",
+      "message": "זכור סיסמה באופן זמני"
+   },
+   "pwd_dialog_cancel": {
+      "description": "User canceled key unlock dialog.",
+      "message": "ביטול נעילה של מפתחות בוטל."
+   },
+   "pwd_dialog_header": {
+      "description": "Header of the password dialog.",
+      "message": "הכנס סיסמת מפתח"
+   },
+   "pwd_dialog_pwd_please": {
+      "description": "Placeholder for password.",
+      "message": "אנא הכנס את הסיסמה שלך"
+   },
+   "pwd_dialog_reason_add_user": {
+      "description": "",
+      "message": "אנא הכנס את סיסמת המפתח שלך כדי ליצור את זהות המשתמש."
+   },
+   "pwd_dialog_reason_create_backup": {
+      "description": "",
+      "message": "אנא הכנס את סיסמת המפתח שלך כדי ליצור גיליון השבה."
+   },
+   "pwd_dialog_reason_create_draft": {
+      "description": "",
+      "message": "הכנס סיסמת מפתח כדי לשמור את הטיוטה."
+   },
+   "pwd_dialog_reason_decrypt": {
+      "description": "",
+      "message": "אנא הכנס את סיסמת המפתח שלך כדי לפענח הודעה זו."
+   },
+   "pwd_dialog_reason_editor": {
+      "description": "",
+      "message": "אנא הכנס את סיסמת המפתח שלך כדי לעדכן הגדרות עבור תקשורת מוצפנת."
+   },
+   "pwd_dialog_reason_revoke": {
+      "description": "",
+      "message": "אנא הכנס את סיסמת המפתח שלך כדי לשלול מפתח זה."
+   },
+   "pwd_dialog_reason_revoke_user": {
+      "description": "",
+      "message": "אנא הכנס את סיסמת המפתח שלך כדי לשלול את זהות המשתמש."
+   },
+   "pwd_dialog_reason_set_exdate": {
+      "description": "",
+      "message": "אנא הכנס את סיסמת המפתח שלך כדי להגדיר תאריך תפוגה חדש עבור המפתח."
+   },
+   "pwd_dialog_reason_sign": {
+      "description": "",
+      "message": "אנא הכנס את סיסמת המפתח שלך כדי להחתים הודעה זו."
+   },
+   "pwd_dialog_title": {
+      "description": "Title of the password dialog.",
+      "message": "הכנס סיסמה | Mailvelope"
+   },
+   "pwd_dialog_userid": {
+      "description": "Label for user ID.",
+      "message": "זהות משתמש:"
+   },
+   "pwd_dialog_wrong_pwd": {
+      "description": "Password error message.",
+      "message": "סיסמה שגויה"
+   },
+   "recovery_sheet_backup_data": {
+      "description": "",
+      "message": "גבה את הנתונים שלך"
+   },
+   "recovery_sheet_backup_local": {
+      "description": "",
+      "message": "אם אתה רוצה לשמור באופן בלעדי את הנתונים שלך באופן מקומי על המחשב שלך, תמצא אפשרות זו בהגדרות התקשורת המוצפנת של חשבון $1 שלך."
+   },
+   "recovery_sheet_backup_server": {
+      "description": "",
+      "message": "כדי לגבות נתונים שהם חשובים עבור תקשורת מוצפנת (למשל מפתח סיסמה), הנתונים יישמרו מוצפנים על שרתי $1 שלנו ע״י שותף האבטחה שלנו Mailvelope."
+   },
+   "recovery_sheet_be_aware": {
+      "description": "Label",
+      "message": "אנא הייה מודע"
+   },
+   "recovery_sheet_check_settings": {
+      "description": "",
+      "message": "אנא בדוק את ההגדרות בחשבון שלך תחת:"
+   },
+   "recovery_sheet_creation_date": {
+      "description": "Label for recovery sheet creation date",
+      "message": "תאריך יצירה:"
+   },
+   "recovery_sheet_data_lost": {
+      "description": "",
+      "message": "בלי גיבוי, ההודעות המוצפנות שלך אינן יכולות להתפענח שוב במקרה שתאבד את סיסמת המפתח שלך או במקרה של מכשיר פגום או בעיות עם הרחבת הדפדפן!"
+   },
+   "recovery_sheet_encryption_note": {
+      "description": "Sub title",
+      "message": "עצות לגבי תקשורת מוצפנת עם $1"
+   },
+   "recovery_sheet_enter_code": {
+      "description": "Label for navigation path",
+      "message": "עבור התקנה על מחשבים אחרים, הכנס את קוד ההשבה בהגדרות תחת:"
+   },
+   "recovery_sheet_explain_pgp": {
+      "description": "",
+      "message": "תקשורת מוצפנת עם $1 היא הליך מבוסס PGP. היא מאפשרת לך לשלוח דוא״לים מוצפנים ובאותו הזמן מבטיחה שרק אתה והנמען יכולים לקרוא אותם."
+   },
+   "recovery_sheet_extension_problems": {
+      "description": "List item",
+      "message": "בגלל בעיות עם הרחבת הדפדפן"
+   },
+   "recovery_sheet_forgot_password": {
+      "description": "List item",
+      "message": "מאחר ששכחת את הסיסמה למפתח שלך"
+   },
+   "recovery_sheet_further_info": {
+      "description": "",
+      "message": "אתה יכול למצוא עוד מידע ואפשרויות הגדרה בחשבון $1 שלך תחת"
+   },
+   "recovery_sheet_header": {
+      "description": "Title of recovery sheet.",
+      "message": "מידע חשוב!"
+   },
+   "recovery_sheet_in_general": {
+      "description": "Label",
+      "message": "באופן כללי, זה חשוב"
+   },
+   "recovery_sheet_invite_contacts": {
+      "description": "",
+      "message": "בהגדרות התקשורת המוצפנת של חשבון $1 שלך, יש לך את האפשרות להזמין אנשי קשר נוספים להשתמש בתקשורת מוצפנת באמצעות PGP. אנשי קשר שהוזמנו כבר בהצלחה יכולים להיות מזוהים ע״י איקון המנעול ליד כתובת הדוא״ל."
+   },
+   "recovery_sheet_keep_safe": {
+      "description": "",
+      "message": "אחסן תדפיס של מסמך זה במקום בטוח ווודא שלאף אחד אחר אין גישה אל קוד ההשבה."
+   },
+   "recovery_sheet_key_server": {
+      "description": "",
+      "message": "משתמשי $1 אחרים שמשתמשים בהליך PGP של GMX יכולים להימצא ישירות בסיפרייה מרכזית של חשבון $1 שלך. אם אתה לא רוצה שיהיו לך כניסות כלשהן בסיפרייה זו, אנא בטל הפעלה של תפקוד זה בהגדרות חשבון $1 שלך."
+   },
+   "recovery_sheet_mobile_devices": {
+      "description": "",
+      "message": "על מכשירים ניידים"
+   },
+   "recovery_sheet_not_working": {
+      "description": "Label for list",
+      "message": "אם התקשורת המוצפנת שלך אינה עובדת עוד, כגון:"
+   },
+   "recovery_sheet_other_computer": {
+      "description": "",
+      "message": "על מחשב אחר"
+   },
+   "recovery_sheet_other_contacts": {
+      "description": "",
+      "message": "תקשורת מוצפנת עם אנשי קשר אחרים"
+   },
+   "recovery_sheet_other_devices": {
+      "description": "Sub title",
+      "message": "תקשורת מוצפנת על מכשירים אחרים"
+   },
+   "recovery_sheet_other_devices_setup": {
+      "description": "",
+      "message": "תיצוּר תקשורת מוצפנת על מכשירים אחרים"
+   },
+   "recovery_sheet_other_problems": {
+      "description": "List item",
+      "message": "מסיבות אחרות"
+   },
+   "recovery_sheet_pgp_compat": {
+      "description": "",
+      "message": "אתה יכול לתקשר באופן מאובטח עם אנשי קשר אחרים אם הם משתמשים בתקשורת מוצפנת (PGP)."
+   },
+   "recovery_sheet_print_block": {
+      "description": "Sub title of recovery sheet.",
+      "message": "אנא אחסן מסמך זה במקום בטוח!"
+   },
+   "recovery_sheet_print_button": {
+      "description": "",
+      "message": "הדפס"
+   },
+   "recovery_sheet_print_notice": {
+      "description": "Sub title of recovery sheet.",
+      "message": "אנא הדפס מסמך זה ושמור אותו במקום בטוח!"
+   },
+   "recovery_sheet_provider_communication": {
+      "description": "",
+      "message": "תקשורת מוצפנת"
+   },
+   "recovery_sheet_provider_inbox": {
+      "description": "",
+      "message": "תיבת דואר נכנס"
+   },
+   "recovery_sheet_provider_security": {
+      "description": "",
+      "message": "אבטחה"
+   },
+   "recovery_sheet_provider_settings": {
+      "description": "",
+      "message": "הגדרות"
+   },
+   "recovery_sheet_qr_code": {
+      "description": "",
+      "message": "סרוק את קוד ה־QR עם המכשיר הנייד שלך."
+   },
+   "recovery_sheet_recommendation": {
+      "description": "",
+      "message": "המלצה"
+   },
+   "recovery_sheet_recover_data": {
+      "description": "Sub title",
+      "message": "משיב נתונים"
+   },
+   "recovery_sheet_recovery_code": {
+      "description": "",
+      "message": "קוד השבה"
+   },
+   "recovery_sheet_subtitle_receipt": {
+      "description": "Sub title of recovery sheet.",
+      "message": "גיליון השבה עבור תקשורת מוצפנת"
+   },
+   "recovery_sheet_subtitle_recover": {
+      "description": "Sub title",
+      "message": "השב תקשורת מוצפנת"
+   },
+   "recovery_sheet_trusted_contacts": {
+      "description": "",
+      "message": "עם אנשי קשר GMX אתה יכול להיות בטוח שהמשתמשים המוצגים הם משתמשים תקפים. אתה אמור, עם זאת, לוודא תמיד את הזהות של אנשי קשר עם כתובת דוא״ל מספק דוא״ל שונה."
+   },
+   "recovery_sheet_unknown_third": {
+      "description": "",
+      "message": "תצר רק תקשורת מוצפנת על מכשירים מאובטחים שאינם נגישים ע״י זרים."
+   },
+   "recovery_sheet_unlock_backup": {
+      "description": "",
+      "message": "גיבוי הנתונים שלך יכול להתפענח רק עם העזרה של קוד ההשבה על גיליון השבה זה."
+   },
+   "reload_tab": {
+      "description": "Info message.",
+      "message": "אנא טען מחדש את הדפים המתאימים כדי שההגדרות ייכנסו לתוקף."
+   },
+   "restore_backup_dialog_button": {
+      "description": "",
+      "message": "אשר"
+   },
+   "restore_backup_dialog_headline": {
+      "description": "",
+      "message": "אנא הכנס את קוד ההשבה שלך:"
+   },
+   "restore_password_dialog_button": {
+      "description": "",
+      "message": "הראה"
+   },
+   "restore_password_dialog_headline": {
+      "description": "",
+      "message": "סיסמת המפתח שלך:"
+   },
+   "security_background_color_text": {
+      "description": "Security background select color text",
+      "message": "2. כעת בחר צבע שאתה אוהב"
+   },
+   "security_background_icons_text": {
+      "description": "Security background select icon text",
+      "message": "1. בחר איקון שאתה אוהב"
+   },
+   "security_background_text": {
+      "description": "Security background text",
+      "message": "רקע האבטחה שלך מוצג מאחורי כל דוא״ל מוצפן. כדי להפוך אותו לבטוח יותר, אתה צריך להתאים אותו אישית. כך אתה מבטיח שאף אחד אינו יכול לבנות מחדש את ממשק Mailvelope כדי להשיג גישה אל הנתונים האישיים שלך."
+   },
+   "security_cache_header": {
+      "description": "Password cache header",
+      "message": "זכור סיסמאות עבור שיח זה של דפדפן."
+   },
+   "security_cache_help": {
+      "description": "Help text for cache time.",
+      "message": "חייב להיות מספר בין 1-999"
+   },
+   "security_cache_off": {
+      "description": "Don't store password.",
+      "message": "לא."
+   },
+   "security_cache_on": {
+      "description": "Store password in memory for $1 minutes.",
+      "message": "כן, שמור בזיכרון למשך"
+   },
+   "security_cache_time": {
+      "description": "Store password in memory for $1 minutes.",
+      "message": "דקות."
+   },
+   "security_display_decrypted": {
+      "description": "Label for display options",
+      "message": "איפה ההודעות המוצפנות מוצגות?"
+   },
+   "security_display_inline": {
+      "description": "Decrypted message display option",
+      "message": "על הדף של ספק הדוא״ל."
+   },
+   "security_display_popup": {
+      "description": "Decrypted message display option",
+      "message": "בחלון קופץ נפרד של Mailvelope."
+   },
+   "security_hide_armored_head": {
+      "description": "Hide header infos in armored messages",
+      "message": "הסתר גרסת Mailvelope והערה בהודעות PGP."
+   },
+   "security_log_action": {
+      "description": "Title of the action column of the security log table.",
+      "message": "פעולה"
+   },
+   "security_log_add_attachment": {
+      "description": "A click on the attachment upload button as an event type",
+      "message": "כפתור הוסף צרופה נלחץ"
+   },
+   "security_log_attachment_download": {
+      "description": "Attachment downloaded as an event source",
+      "message": "צרופה ירדה"
+   },
+   "security_log_backup_create": {
+      "description": "",
+      "message": "לחץ כדי ליצור גיבוי"
+   },
+   "security_log_backup_restore": {
+      "description": "",
+      "message": "לחץ כדי לשחזר גיבוי"
+   },
+   "security_log_content_copy": {
+      "description": "",
+      "message": "העתק בדו־שיח וידוא"
+   },
+   "security_log_decrypt_ui": {
+      "description": "",
+      "message": "פענח"
+   },
+   "security_log_decryption_operation": {
+      "description": "",
+      "message": "הודעה פוענחה עם: $1"
+   },
+   "security_log_dialog_cancel": {
+      "description": "",
+      "message": "לחץ כדי לבטל בדו־שיח"
+   },
+   "security_log_dialog_encrypt": {
+      "description": "",
+      "message": "לחץ כדי להצפין בדו־שיח"
+   },
+   "security_log_dialog_ok": {
+      "description": "",
+      "message": "לחץ כדי לאשר בדו־שיח"
+   },
+   "security_log_dialog_sign": {
+      "description": "",
+      "message": "לחץ כדי לחתום בדו־שיח"
+   },
+   "security_log_editor": {
+      "description": "Message editor container as an event source",
+      "message": "עורך Mailvelope"
+   },
+   "security_log_email_viewer": {
+      "description": "Email decryption container as an event source",
+      "message": "דוא״ל PGP מפוענח"
+   },
+   "security_log_encrypt_dialog": {
+      "description": "Encrypt dialog as an event source",
+      "message": "דו־שיח הצפנה"
+   },
+   "security_log_encrypt_form": {
+      "description": "Encrypt form as an event source",
+      "message": "טופס הצפנה"
+   },
+   "security_log_encrypt_ui": {
+      "description": "",
+      "message": "הצפן"
+   },
+   "security_log_encryption_operation": {
+      "description": "",
+      "message": "הודעה הוצפנה עבור: $1"
+   },
+   "security_log_import_dialog": {
+      "description": "Key import dialog as an event source",
+      "message": "דו־שיח יבוא"
+   },
+   "security_log_key_backup": {
+      "description": "Message keybackup container as an event source",
+      "message": "גיבוי מפתח"
+   },
+   "security_log_key_generator": {
+      "description": "Key generator container as an event source",
+      "message": "מחולל מפתחות"
+   },
+   "security_log_password_click": {
+      "description": "",
+      "message": "לחיצה בדו־שיח סיסמה"
+   },
+   "security_log_password_dialog": {
+      "description": "Password dialog as an event source",
+      "message": "דו־שיח סיסמה"
+   },
+   "security_log_password_input": {
+      "description": "",
+      "message": "קלט בדו־שיח סיסמה"
+   },
+   "security_log_remove_attachment": {
+      "description": "A click on the attachment remove button as event type",
+      "message": "צרופה הוסרה"
+   },
+   "security_log_restore_backup_click": {
+      "description": "",
+      "message": "לחיצה בדו־שיח שחזור גיבוי"
+   },
+   "security_log_sign_operation": {
+      "description": "",
+      "message": "הודעה נחתמה עם מפתח: $1"
+   },
+   "security_log_signature_modal_close": {
+      "description": "",
+      "message": "לחץ כדי לסגור את דוח־שיח החתימה"
+   },
+   "security_log_signature_modal_open": {
+      "description": "",
+      "message": "לחץ כדי לפתוח את דו־שיח החתימה"
+   },
+   "security_log_source": {
+      "description": "Title of the source column of the security log table.",
+      "message": "מקור"
+   },
+   "security_log_text": {
+      "description": "Text explaining the purpose of the security log",
+      "message": "יומן האבטחה מראה פעולות משתמש בכל הרכיבים של Mailvelope."
+   },
+   "security_log_text_input": {
+      "description": "User clicked in text area",
+      "message": "קלט בשדה טקסט"
+   },
+   "security_log_textarea_click": {
+      "description": "User clicked in text area",
+      "message": "לחיצה באזור טקסט"
+   },
+   "security_log_textarea_input": {
+      "description": "User clicked in text area",
+      "message": "יבוא באזור קלט"
+   },
+   "security_log_textarea_select": {
+      "description": "Selection of the text area as an event type",
+      "message": "בחירה באזור טקסט"
+   },
+   "security_log_timestamp": {
+      "description": "Title of the timestamp column of the security log table.",
+      "message": "חותמת זמן"
+   },
+   "security_log_verify_dialog": {
+      "description": "Verify dialog as an event source",
+      "message": "וודא דו־שיח"
+   },
+   "security_log_viewer": {
+      "description": "Message viewer as an event source",
+      "message": "מציג Mailvelope"
+   },
+   "security_openpgp_header": {
+      "description": "OpenPGP settings header",
+      "message": "הגדרות OpenPGP"
+   },
+   "settings_analytics": {
+      "description": "Tab for deciding whether or not to share analytics data.",
+      "message": "אנליטיקה"
+   },
+   "settings_backup": {
+      "description": "Tab allowing to backup and restore the settings.",
+      "message": "גיבוי"
+   },
+   "settings_general": {
+      "description": "Tab of options to display general settings.",
+      "message": "כללי"
+   },
+   "settings_keyserver": {
+      "description": "Tab of options to display key server settings.",
+      "message": "Key Directories"
+   },
+   "settings_provider": {
+      "description": "Tab of options to display provider (Gmail) settings.",
+      "message": "API של Gmail"
+   },
+   "settings_security": {
+      "description": "Tab of options to display security settings.",
+      "message": "אבטחה"
+   },
+   "settings_security_background": {
+      "description": "Security background header",
+      "message": "רקע אבטחה"
+   },
+   "settings_security_log": {
+      "description": "Tab of options to display security log.",
+      "message": "יומן אבטחה"
+   },
+   "settings_watchlist": {
+      "description": "Tab of options to display list of authorized domains.",
+      "message": "תחומים מורשים"
+   },
+   "sign_dialog_header": {
+      "description": "Header of sign dialog. Choose the person you want to sign the message with.",
+      "message": "חתום הודעות בתור:"
+   },
+   "sign_error": {
+      "description": "Error during signing process.",
+      "message": "לא היה ניתן להחתים הודעה זו: $1"
+   },
+   "signer_unknown": {
+      "description": "Name of unknown signer.",
+      "message": "בלתי ידוע"
+   },
+   "text_decrypt_button": {
+      "description": "Button label for decrypting the message",
+      "message": "פענח"
+   },
+   "text_decrypting": {
+      "description": "Navigation link to text decryption feature",
+      "message": "פענוח טקסט"
+   },
+   "text_encrypting": {
+      "description": "Navigation link to text encryption feature",
+      "message": "הצפנת טקסט"
+   },
+   "upload_aborting_warning": {
+      "description": "A warning for the aborting of the file upload.",
+      "message": "העלאת קובץ תתבטל."
+   },
+   "upload_attachment": {
+      "description": "Text in the upload attachment button of the message editor dialog",
+      "message": "הוסף קובץ"
+   },
+   "upload_drop": {
+      "description": "Text in file drop overlay area",
+      "message": "זרוק את הקובץ באזור זה כדי לצרף אותו"
+   },
+   "upload_help": {
+      "description": "Text in file upload area. Sentence continues with: Upload File (Button).",
+      "message": "גרור קובץ אל חלון זה או"
+   },
+   "upload_quota_exceeded_warning": {
+      "description": "A warning shown when the attachments upload quota is exceeded.",
+      "message": "גודל צרופה מותר:"
+   },
+   "upload_quota_warning_headline": {
+      "description": "",
+      "message": "הצרופה גדולה מדי"
+   },
+   "user_create_btn": {
+      "description": "Create user button label",
+      "message": "צור"
+   },
+   "user_create_title": {
+      "description": "Title of create user page",
+      "message": "צור זהות משתמש"
+   },
+   "user_keyserver_not": {
+      "description": "User ID is not synchronized with Mailvelope key server",
+      "message": "זהות המשתמש אינה מסונכרנת עם שרת המפתחות של Mailvelope."
+   },
+   "user_keyserver_remove": {
+      "description": "A remove request has been sent to the Mailvelope key server",
+      "message": "לצורך הסרה סופית משרת המפתחות של Mailvelope דוא״ל אישור נשלח אל $1."
+   },
+   "user_keyserver_remove_btn": {
+      "description": "Remove user ID button label text",
+      "message": "הסר זהות משתמש"
+   },
+   "user_keyserver_resend_confirmation_btn": {
+      "description": "Resend confirmation button label text",
+      "message": "שלח מחדש אישור"
+   },
+   "user_keyserver_sync": {
+      "description": "User ID is synchronised with the Mailvelope key server",
+      "message": "זהות המשתמש מסונכרנת עם שרת המפתחות של Mailvelope."
+   },
+   "user_keyserver_unverified": {
+      "description": "User ID Mailvelope key server not verified",
+      "message": "אנא אשר את זהות המשתמש כדי לסנכרן אותה עם שרת המפתחות של Mailvelope."
+   },
+   "user_keyserver_upload": {
+      "description": "An upload request has been sent to the Mailvelope key server",
+      "message": "כדי לסנכרן עם שרת המפתחות של Mailvelope, דוא״ל אישור נשלח אל $1."
+   },
+   "user_remove_btn": {
+      "description": "Remove user button label",
+      "message": "הסר"
+   },
+   "user_remove_btn_title": {
+      "description": "Remove user button title",
+      "message": "הסר זהות משתמש"
+   },
+   "user_remove_dialog_confirmation": {
+      "description": "Confirmation question in remove user dialog.",
+      "message": "האם אתה רוצה להסיר זהות משתמש זו מהמפתח שלך?"
+   },
+   "user_remove_dialog_keyserver_warning": {
+      "description": "Warning message, that key will be deleted from keyserver",
+      "message": "זהות משתמש גם מוסרת משרת המפתחות של Mailvelope."
+   },
+   "user_remove_dialog_title": {
+      "description": "Title of remove user dialog.",
+      "message": "הסר זהות משתמש"
+   },
+   "user_revoke_btn": {
+      "description": "Revoke user button label",
+      "message": "שלול"
+   },
+   "user_revoke_btn_title": {
+      "description": "Revoke user button title",
+      "message": "שלול זהות משתמש"
+   },
+   "user_revoke_dialog_confirmation": {
+      "description": "Confirmation question in revoke user dialog.",
+      "message": "האם אתה עדיין רוצה לשלול?"
+   },
+   "user_revoke_dialog_description": {
+      "description": "Description in revoke user dialog.",
+      "message": "לאחר שלילה, זהות המשתמש עבור מפתח זה תישאר בלתי יציבה לצמיתות."
+   },
+   "user_revoke_dialog_title": {
+      "description": "Title of revoke user dialog.",
+      "message": "שלול זהות משתמש"
+   },
+   "user_title": {
+      "description": "Title of user page",
+      "message": "זהות משתמש"
+   },
+   "usersignatures_title": {
+      "description": "Title of signatures panel in user.",
+      "message": "וידואים"
+   },
+   "verify_error": {
+      "description": "Error during verification process.",
+      "message": "לא היה ניתן לוודא הודעה זו: $1"
+   },
+   "verify_frame_help_text": {
+      "description": "Help text on verify frame.",
+      "message": "לחץ כדי לוודא חתימה"
+   },
+   "waiting_dialog_decryption_failed": {
+      "description": "Error message in the waiting dialog after failing to decrypt a message",
+      "message": "הצפנה נכשלה."
+   },
+   "watchlist_command_create": {
+      "description": "Create entry in watchlist.",
+      "message": "הוסף כניסה חדשה"
+   },
+   "watchlist_command_edit": {
+      "description": "Edit entry in watchlist.",
+      "message": "ערוך"
+   },
+   "watchlist_delete_confirmation": {
+      "description": "Message in the watchlist delete confirmation dialog.",
+      "message": "האם אתה באמת רוצה להסיר אתר זה מהרשימה של התחומים המורשים?"
+   },
+   "watchlist_expose_api": {
+      "description": "Expose API to Webmailer.",
+      "message": "API"
+   },
+   "watchlist_record_title": {
+      "description": "Title of the watchlist editor dialog.",
+      "message": "תחום מורשה"
+   },
+   "watchlist_remove_dialog_title": {
+      "description": "Title of delete watchlist dialog.",
+      "message": "הסר תחום"
+   },
+   "watchlist_title_active": {
+      "description": "Entry in watchlist is active.",
+      "message": "מאופשר"
+   },
+   "watchlist_title_frame": {
+      "description": "Web domain URL match pattern of site in watchlist.",
+      "message": "דפוס תחום"
+   },
+   "watchlist_title_https_only": {
+      "description": "Only allow URLs with HTTPS scheme in watchlist.",
+      "message": "HTTPS בלבד"
+   },
+   "watchlist_title_scan": {
+      "description": "Scan status of site in watchlist.",
+      "message": "מאופשר"
+   },
+   "watchlist_title_site": {
+      "description": "Site in watchlist.",
+      "message": "אתר"
+   },
+   "word_or": {
+      "description": "Separate list of elements.",
+      "message": "או"
+   },
+   "wrong_restore_code": {
+      "description": "",
+      "message": "קוד השבה בלתי תקף"
+   }
+}

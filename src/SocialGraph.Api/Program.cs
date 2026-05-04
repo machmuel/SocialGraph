@@ -4,6 +4,8 @@ using SocialGraph.Application.Services;
 using SocialGraph.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 var storageOptions = new GraphStorageOptions();
 var configuredStoragePath = Environment.GetEnvironmentVariable("SOCIALGRAPH_DATA_PATH")
@@ -37,6 +39,7 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+app.MapGet("/favicon.ico", () => Results.NoContent());
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.MapGet("/api/graph", async (string? entityId, GraphService service, CancellationToken cancellationToken) =>
@@ -64,9 +67,9 @@ app.MapGet("/api/entities/{id}", async (string id, EntityService service, Cancel
     return entity is null ? Results.NotFound() : Results.Ok(entity);
 });
 
-app.MapPost("/api/entities", async (UpsertEntityRequest request, EntityService service, CancellationToken cancellationToken) =>
+app.MapPost("/api/entities", async (UpsertEntityRequest request, HttpRequest httpRequest, EntityService service, CancellationToken cancellationToken) =>
 {
-    var result = await service.CreateAsync(request, cancellationToken);
+    var result = await service.CreateAsync(request, GetCurrentUserId(httpRequest), cancellationToken);
     if (result.Error is not null)
     {
         return Results.BadRequest(new { error = result.Error });
@@ -75,21 +78,30 @@ app.MapPost("/api/entities", async (UpsertEntityRequest request, EntityService s
     return Results.Created($"/api/entities/{result.Entity!.Id}", result.Entity);
 });
 
-app.MapPut("/api/entities/{id}", async (string id, UpsertEntityRequest request, EntityService service, CancellationToken cancellationToken) =>
+app.MapPut("/api/entities/{id}", async (string id, UpsertEntityRequest request, HttpRequest httpRequest, EntityService service, CancellationToken cancellationToken) =>
 {
-    var result = await service.UpdateAsync(id, request, cancellationToken);
+    var result = await service.UpdateAsync(id, request, GetCurrentUserId(httpRequest), cancellationToken);
     if (result.Error is not null)
     {
-        return Results.BadRequest(new { error = result.Error });
+        return IsForbidden(result.Error)
+            ? Forbidden(result.Error)
+            : Results.BadRequest(new { error = result.Error });
     }
 
     return result.Entity is null ? Results.NotFound() : Results.Ok(result.Entity);
 });
 
-app.MapDelete("/api/entities/{id}", async (string id, EntityService service, CancellationToken cancellationToken) =>
+app.MapDelete("/api/entities/{id}", async (string id, HttpRequest httpRequest, EntityService service, CancellationToken cancellationToken) =>
 {
-    var deleted = await service.DeleteAsync(id, cancellationToken);
-    return deleted ? Results.NoContent() : Results.NotFound();
+    var result = await service.DeleteAsync(id, GetCurrentUserId(httpRequest), cancellationToken);
+    if (result.Error is not null)
+    {
+        return IsForbidden(result.Error)
+            ? Forbidden(result.Error)
+            : Results.BadRequest(new { error = result.Error });
+    }
+
+    return result.Deleted ? Results.NoContent() : Results.NotFound();
 });
 
 app.MapGet("/api/relationship-edges", async (string? entityId, RelationshipEdgeService service, CancellationToken cancellationToken) =>
@@ -114,11 +126,16 @@ app.MapGet("/api/relationships/{id}", async (string id, RelationshipEdgeService 
     return relationshipEdge is null ? Results.NotFound() : Results.Ok(relationshipEdge);
 });
 
-app.MapPost("/api/relationship-edges", async (UpsertRelationshipEdgeRequest request, RelationshipEdgeService service, CancellationToken cancellationToken) =>
+app.MapPost("/api/relationship-edges", async (UpsertRelationshipEdgeRequest request, HttpRequest httpRequest, RelationshipEdgeService service, CancellationToken cancellationToken) =>
 {
-    var result = await service.CreateAsync(request, cancellationToken);
+    var result = await service.CreateAsync(request, GetCurrentUserId(httpRequest), cancellationToken);
     if (result.Error is not null)
     {
+        if (IsForbidden(result.Error))
+        {
+            return Forbidden(result.Error);
+        }
+
         if (result.Error == RelationshipEdgeService.DuplicateRelationshipError)
         {
             return Results.Conflict(new { error = result.Error });
@@ -129,11 +146,16 @@ app.MapPost("/api/relationship-edges", async (UpsertRelationshipEdgeRequest requ
 
     return Results.Created($"/api/relationship-edges/{result.Edge!.Id}", result.Edge);
 });
-app.MapPost("/api/relationships", async (UpsertRelationshipEdgeRequest request, RelationshipEdgeService service, CancellationToken cancellationToken) =>
+app.MapPost("/api/relationships", async (UpsertRelationshipEdgeRequest request, HttpRequest httpRequest, RelationshipEdgeService service, CancellationToken cancellationToken) =>
 {
-    var result = await service.CreateAsync(request, cancellationToken);
+    var result = await service.CreateAsync(request, GetCurrentUserId(httpRequest), cancellationToken);
     if (result.Error is not null)
     {
+        if (IsForbidden(result.Error))
+        {
+            return Forbidden(result.Error);
+        }
+
         if (result.Error == RelationshipEdgeService.DuplicateRelationshipError)
         {
             return Results.Conflict(new { error = result.Error });
@@ -145,11 +167,16 @@ app.MapPost("/api/relationships", async (UpsertRelationshipEdgeRequest request, 
     return Results.Created($"/api/relationships/{result.Edge!.Id}", result.Edge);
 });
 
-app.MapPut("/api/relationship-edges/{id}", async (string id, UpsertRelationshipEdgeRequest request, RelationshipEdgeService service, CancellationToken cancellationToken) =>
+app.MapPut("/api/relationship-edges/{id}", async (string id, UpsertRelationshipEdgeRequest request, HttpRequest httpRequest, RelationshipEdgeService service, CancellationToken cancellationToken) =>
 {
-    var result = await service.UpdateAsync(id, request, cancellationToken);
+    var result = await service.UpdateAsync(id, request, GetCurrentUserId(httpRequest), cancellationToken);
     if (result.Error is not null)
     {
+        if (IsForbidden(result.Error))
+        {
+            return Forbidden(result.Error);
+        }
+
         if (result.Error == RelationshipEdgeService.DuplicateRelationshipError)
         {
             return Results.Conflict(new { error = result.Error });
@@ -160,11 +187,16 @@ app.MapPut("/api/relationship-edges/{id}", async (string id, UpsertRelationshipE
 
     return result.Edge is null ? Results.NotFound() : Results.Ok(result.Edge);
 });
-app.MapPut("/api/relationships/{id}", async (string id, UpsertRelationshipEdgeRequest request, RelationshipEdgeService service, CancellationToken cancellationToken) =>
+app.MapPut("/api/relationships/{id}", async (string id, UpsertRelationshipEdgeRequest request, HttpRequest httpRequest, RelationshipEdgeService service, CancellationToken cancellationToken) =>
 {
-    var result = await service.UpdateAsync(id, request, cancellationToken);
+    var result = await service.UpdateAsync(id, request, GetCurrentUserId(httpRequest), cancellationToken);
     if (result.Error is not null)
     {
+        if (IsForbidden(result.Error))
+        {
+            return Forbidden(result.Error);
+        }
+
         if (result.Error == RelationshipEdgeService.DuplicateRelationshipError)
         {
             return Results.Conflict(new { error = result.Error });
@@ -176,17 +208,38 @@ app.MapPut("/api/relationships/{id}", async (string id, UpsertRelationshipEdgeRe
     return result.Edge is null ? Results.NotFound() : Results.Ok(result.Edge);
 });
 
-app.MapDelete("/api/relationship-edges/{id}", async (string id, RelationshipEdgeService service, CancellationToken cancellationToken) =>
+app.MapDelete("/api/relationship-edges/{id}", async (string id, HttpRequest httpRequest, RelationshipEdgeService service, CancellationToken cancellationToken) =>
 {
-    var deleted = await service.DeleteAsync(id, cancellationToken);
-    return deleted ? Results.NoContent() : Results.NotFound();
+    var result = await service.DeleteAsync(id, GetCurrentUserId(httpRequest), cancellationToken);
+    if (result.Error is not null)
+    {
+        return IsForbidden(result.Error)
+            ? Forbidden(result.Error)
+            : Results.BadRequest(new { error = result.Error });
+    }
+
+    return result.Deleted ? Results.NoContent() : Results.NotFound();
 });
-app.MapDelete("/api/relationships/{id}", async (string id, RelationshipEdgeService service, CancellationToken cancellationToken) =>
+app.MapDelete("/api/relationships/{id}", async (string id, HttpRequest httpRequest, RelationshipEdgeService service, CancellationToken cancellationToken) =>
 {
-    var deleted = await service.DeleteAsync(id, cancellationToken);
-    return deleted ? Results.NoContent() : Results.NotFound();
+    var result = await service.DeleteAsync(id, GetCurrentUserId(httpRequest), cancellationToken);
+    if (result.Error is not null)
+    {
+        return IsForbidden(result.Error)
+            ? Forbidden(result.Error)
+            : Results.BadRequest(new { error = result.Error });
+    }
+
+    return result.Deleted ? Results.NoContent() : Results.NotFound();
 });
 
 app.Run();
+
+static string GetCurrentUserId(HttpRequest request) =>
+    request.Headers["X-SocialGraph-UserId"].ToString().Trim();
+
+static bool IsForbidden(string error) => error.StartsWith("forbidden:", StringComparison.OrdinalIgnoreCase);
+
+static IResult Forbidden(string error) => Results.Json(new { error }, statusCode: StatusCodes.Status403Forbidden);
 
 public partial class Program;

@@ -4,24 +4,95 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SocialGraph Workbench</title>
-  <link rel="stylesheet" href="/app.css">
-  <script src="/app.js" defer></script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23106d80'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/app.css?v=entity-type-colors-1">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "/vendor/three/build/three.module.js",
+        "three/addons/": "/vendor/three/examples/jsm/",
+        "d3-force-3d": "/vendor/d3-force-3d/src/index.js",
+        "d3-binarytree": "/vendor/d3-binarytree/src/index.js",
+        "d3-dispatch": "/vendor/d3-dispatch/src/index.js",
+        "d3-octree": "/vendor/d3-octree/src/index.js",
+        "d3-quadtree": "/vendor/d3-quadtree/src/index.js",
+        "d3-timer": "/vendor/d3-timer/src/index.js"
+      }
+    }
+  </script>
+  <script type="module" src="/app.js?v=ambient-motion-1"></script>
 </head>
 <body>
   <main class="shell">
-    <section class="panel">
+    <section id="leftPanel" class="panel left-column">
       <div class="panel-header">
         <div>
-          <span class="eyebrow">Entity Workbench</span>
+          <span class="eyebrow">Employee Workbench</span>
           <h1>SocialGraph</h1>
         </div>
-        <div id="entitiesLoading" class="spinner" hidden aria-hidden="true"></div>
+        <div class="panel-tools">
+          <div id="entitiesLoading" class="spinner" hidden aria-hidden="true"></div>
+          <button id="toggleLeftPanel" class="ghost collapse-toggle" type="button" aria-controls="leftPanel" aria-expanded="true" aria-label="Collapse employee panel">&lt;</button>
+        </div>
       </div>
-      <p class="muted">Create, edit, delete, and focus entities without leaving the graph surface.</p>
+
+      <label class="inline-grid">
+        <span>Demo user</span>
+        <select id="demoUser">
+          <option value="Guido_Machmueller">Guido Machmueller</option>
+          <option value="Daniel_Andersson">Daniel Andersson</option>
+          <option value="Tim_Duerselen">Tim Duerselen</option>
+          <option value="Mike_Herlitschke">Mike Herlitschke</option>
+          <option value="Christian_Jablonski">Christian Jablonski</option>
+          <option value="Sieglinde_Kehl">Sieglinde Kehl</option>
+          <option value="Sachin_Kumar_Sharma">Sachin Kumar Sharma</option>
+          <option value="Sven_Schmidt">Sven Schmidt</option>
+          <option value="Andreas_Klingstedt">Andreas Klingstedt</option>
+          <option value="Dennis_Nord">Dennis Nord</option>
+          <option value="Klaus_Schneider">Klaus Schneider</option>
+          <option value="Marcus_Zurhorst">Marcus Zurhorst</option>
+          <option value="Sebastian_Raffel">Sebastian Raffel</option>
+        </select>
+      </label>
+
+      <form id="profileForm" class="context-card">
+        <div class="context-card-header">
+          <div>
+            <span class="eyebrow">My profile</span>
+            <h2 id="profileTitle">Profile</h2>
+          </div>
+          <span id="profileModeTag" class="tag">Editable</span>
+        </div>
+        <label class="inline-grid">
+          <span>Name</span>
+          <input id="profileName" required maxlength="120">
+        </label>
+        <label class="inline-grid">
+          <span>Note</span>
+          <textarea id="profileNote" placeholder="What should others know about your work?"></textarea>
+        </label>
+        <label class="inline-grid">
+          <span>Department</span>
+          <input id="profileDepartment" list="departmentOptions" placeholder="Engineering">
+          <datalist id="departmentOptions"></datalist>
+        </label>
+        <label class="inline-grid">
+          <span>Skills</span>
+          <input id="profileSkills" placeholder="Three.js, .NET, Facilitation">
+        </label>
+        <label class="inline-grid">
+          <span>Interests and topics</span>
+          <input id="profileTopics" placeholder="Knowledge Graphs, Mentoring">
+        </label>
+        <div class="actions">
+          <button id="profileSubmit" type="submit">Save profile</button>
+          <button id="focusMine" class="ghost" type="button">Focus mine</button>
+        </div>
+      </form>
 
       <label class="inline-grid">
         <span>Search entities</span>
-        <input id="entitySearch" type="search" placeholder="Filter by name">
+        <input id="entitySearch" type="search" placeholder="Filter by name, type, or note">
       </label>
 
       <section class="context-card">
@@ -49,18 +120,30 @@
       </p>
       <div id="entityList" class="entity-list" aria-live="polite" aria-describedby="entityExplorerHint"></div>
 
-      <form id="entityForm" class="inline-grid">
-        <h2 id="entityFormTitle">Create entity</h2>
-        <label class="inline-grid">
-          <span>Name</span>
-          <input id="entityName" name="name" required maxlength="120" placeholder="Ada Lovelace">
-        </label>
+      <form id="entityForm" class="inline-grid admin-form">
+        <h2 id="entityFormTitle">Create topic node</h2>
+        <div class="two-up">
+          <label class="inline-grid">
+            <span>Name</span>
+            <input id="entityName" name="name" required maxlength="120" placeholder="Accessibility">
+          </label>
+          <label class="inline-grid">
+            <span>Type</span>
+            <select id="entityType" name="type">
+              <option value="topic">Topic</option>
+              <option value="skill">Skill</option>
+              <option value="department">Department</option>
+              <option value="interest">Interest</option>
+              <option value="employee">Employee</option>
+            </select>
+          </label>
+        </div>
         <label class="inline-grid">
           <span>Note</span>
-          <textarea id="entityNote" name="note" placeholder="Key skills, context, or achievements"></textarea>
+          <textarea id="entityNote" name="note" placeholder="Context or description"></textarea>
         </label>
         <div class="actions">
-          <button id="entitySubmit" type="submit">Create entity</button>
+          <button id="entitySubmit" type="submit">Create node</button>
           <button id="entityReset" class="ghost" type="button">Clear form</button>
           <button id="entityDelete" class="danger" type="button" hidden>Delete selected</button>
         </div>
@@ -71,7 +154,7 @@
       <div class="panel-header">
         <div>
           <span class="eyebrow">Focused Exploration</span>
-          <h2>Graph canvas</h2>
+          <h2>Three.js graph canvas</h2>
         </div>
         <div id="graphLoading" class="spinner" hidden aria-hidden="true"></div>
       </div>
@@ -103,54 +186,66 @@
 
       <div class="graph-toolbar">
         <div class="graph-meta">
-          <span id="statusSummary">Loading graph…</span>
+          <span id="statusSummary">Loading graph...</span>
           <span id="focusTag" class="tag" hidden></span>
           <span id="spotlightTag" class="tag" hidden></span>
         </div>
         <div class="actions">
-          <button id="graphZoomIn" class="ghost" type="button" aria-label="Zoom in on graph">Zoom in</button>
-          <button id="graphZoomOut" class="ghost" type="button" aria-label="Zoom out on graph">Zoom out</button>
+          <button id="graphZoomIn" class="ghost icon-button" type="button" aria-label="Zoom in on graph">+</button>
+          <button id="graphZoomOut" class="ghost icon-button" type="button" aria-label="Zoom out on graph">-</button>
           <button id="graphResetView" class="ghost" type="button">Reset view</button>
           <button id="graphFitView" class="ghost" type="button">Fit graph</button>
           <button id="focusSelected" class="ghost" type="button" disabled>Focus selected</button>
-          <button id="showFullGraph" class="ghost" type="button" disabled>Show full graph</button>
+          <button id="showFullGraph" class="ghost" type="button" disabled>Reset expansion</button>
           <button id="reloadAll" class="textual" type="button">Reload everything</button>
         </div>
       </div>
+      <section class="filter-stack graph-filter-panel" aria-labelledby="graphFilterTitle">
+        <div class="filter-header">
+          <div>
+            <span class="eyebrow">Graph filters</span>
+            <h3 id="graphFilterTitle">Vertex types</h3>
+          </div>
+          <span id="graphFilterSummary" class="muted">Top 10 weighted employees</span>
+        </div>
+        <div id="graphTypeFilters" class="graph-type-grid"></div>
+      </section>
       <p id="graphInteractionHint" class="muted">
-        Select a node or relationship to inspect it locally. Drag empty graph space to pan. Use zoom controls, double-click a node, press F on a focused node, or use Focus controls to refetch the one-hop graph.
+        Select a node or relationship to inspect it locally. Drag empty graph space to pan. Double-click a node to expand or collapse its connected nodes.
       </p>
 
       <div id="graphFrame" class="graph-frame">
-        <svg
+        <canvas
           id="graph"
           role="group"
           aria-label="SocialGraph relationship graph"
-          aria-describedby="graphInteractionHint"></svg>
+          aria-describedby="graphInteractionHint"></canvas>
+        <div id="graphLabels" class="graph-label-layer" aria-hidden="true"></div>
+        <div id="graphTooltip" class="graph-tooltip" hidden role="tooltip"></div>
       </div>
     </section>
 
-    <section class="panel right-column">
+    <section id="rightPanel" class="panel right-column">
       <div class="panel-header">
         <div>
           <span class="eyebrow">Relationship Explorer</span>
           <h2>Browse and inspect</h2>
         </div>
-        <div id="relationshipsLoading" class="spinner" hidden aria-hidden="true"></div>
+        <div class="panel-tools">
+          <button id="toggleRightPanel" class="ghost collapse-toggle" type="button" aria-controls="rightPanel" aria-expanded="true" aria-label="Collapse relationship panel">&gt;</button>
+          <div id="relationshipsLoading" class="spinner" hidden aria-hidden="true"></div>
+        </div>
       </div>
       <p id="selectionSummary" class="muted">Browse all relationships or narrow the list around a selected entity.</p>
 
       <div class="filter-stack">
         <div class="filter-header">
           <span id="relationshipModeTag" class="tag">Global browse</span>
-          <span id="relationshipResultsSummary" class="muted">Loading relationships…</span>
+          <span id="relationshipResultsSummary" class="muted">Loading relationships...</span>
         </div>
         <label class="inline-grid">
           <span>Filter relationships</span>
-          <input
-            id="relationshipSearch"
-            type="search"
-            placeholder="Search by id, endpoints, kind, or note">
+          <input id="relationshipSearch" type="search" placeholder="Search by endpoints, kind, or note">
         </label>
         <div class="two-up">
           <label class="inline-grid">
@@ -180,7 +275,7 @@
 
       <form id="relationshipForm" class="inline-grid">
         <h3 id="relationshipFormTitle">Relationship inspector</h3>
-        <p id="relationshipInspectorMeta" class="muted">Select a relationship from the list or graph to edit it. Clear the selection to create a new one.</p>
+        <p id="relationshipInspectorMeta" class="muted">Select a relationship from the list or graph to edit it. Relationships must start at your employee profile.</p>
         <div id="relationshipFocusNotice" class="notice" hidden></div>
         <div class="two-up">
           <label class="inline-grid">
@@ -194,7 +289,12 @@
         </div>
         <label class="inline-grid">
           <span>Kind</span>
-          <input id="relationshipKind" name="kind" required maxlength="120" placeholder="mentors">
+          <select id="relationshipKind" name="kind" required>
+            <option value="has-skill">has-skill</option>
+            <option value="in-department">in-department</option>
+            <option value="interested-in">interested-in</option>
+            <option value="related-to">related-to</option>
+          </select>
         </label>
         <label class="inline-grid">
           <span>Note</span>

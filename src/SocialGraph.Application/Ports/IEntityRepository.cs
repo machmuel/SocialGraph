@@ -8,9 +8,22 @@ public interface IEntityRepository
 
     Task<EntityRecord?> GetAsync(string id, CancellationToken cancellationToken);
 
-    Task<EntityRecord> CreateAsync(string name, string note, CancellationToken cancellationToken);
+    Task<EntityRecord> CreateAsync(
+        string name,
+        string note,
+        string type,
+        string ownerUserId,
+        string createdByUserId,
+        CancellationToken cancellationToken);
 
-    Task<EntityRecord?> UpdateAsync(string id, string name, string note, CancellationToken cancellationToken);
+    Task<EntityRecord?> UpdateAsync(
+        string id,
+        string name,
+        string note,
+        string type,
+        string ownerUserId,
+        string createdByUserId,
+        CancellationToken cancellationToken);
 
     Task<bool> DeleteAsync(string id, CancellationToken cancellationToken);
 }

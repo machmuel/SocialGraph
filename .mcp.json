@@ -3,6 +3,10 @@
     "guido": {
       "type": "http",
       "url": "https://mcp-guido.stephan-derkowski.de/"
+    },
+    "localhost": {
+      "type": "http",
+      "url": "http://localhost:5000/"
     }
   }
 }

@@ -3,4 +3,7 @@ namespace SocialGraph.Application.Contracts;
 public sealed record GraphNodeDto(
     string Id,
     string Label,
-    string Note);
+    string Note,
+    string Type,
+    string OwnerUserId,
+    string CreatedByUserId);

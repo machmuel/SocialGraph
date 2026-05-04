@@ -105,8 +105,16 @@ Neo4j remains a reasonable later adapter if traversal/query complexity outgrows 
 
 ## Verification
 
+If the local API is running from `bin/Release`, stop it before building. The running process locks Release DLLs and causes MSB3026/MSB3027 copy failures. Preferred all-in-one flow:
+
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-socialgraph-release.ps1`
+
+Manual flow:
+
+- stop only the SocialGraph API process whose command line contains `SocialGraph.Api.dll`
 - `dotnet build SocialGraph.sln -c Release`
 - `dotnet test SocialGraph.sln -c Release --no-build`
+- restart the API with `scripts\run-socialgraph-api.cmd`
 
 Manual smoke flow:
 

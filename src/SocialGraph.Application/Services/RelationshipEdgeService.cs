@@ -24,9 +24,10 @@ public sealed class RelationshipEdgeService(
 
     public async Task<(RelationshipEdgeDto? Edge, string? Error)> CreateAsync(
         UpsertRelationshipEdgeRequest request,
+        string currentUserId,
         CancellationToken cancellationToken)
     {
-        var normalized = await NormalizeAndValidateAsync(request, cancellationToken);
+        var normalized = await NormalizeAndValidateAsync(request, currentUserId, cancellationToken);
         if (normalized.Error is not null)
         {
             return (null, normalized.Error);
@@ -54,6 +55,7 @@ public sealed class RelationshipEdgeService(
     public async Task<(RelationshipEdgeDto? Edge, string? Error)> UpdateAsync(
         string id,
         UpsertRelationshipEdgeRequest request,
+        string currentUserId,
         CancellationToken cancellationToken)
     {
         var existingEdge = await relationshipEdges.GetAsync(id, cancellationToken);
@@ -62,7 +64,7 @@ public sealed class RelationshipEdgeService(
             return (null, null);
         }
 
-        var normalized = await NormalizeAndValidateAsync(request, cancellationToken);
+        var normalized = await NormalizeAndValidateAsync(request, currentUserId, cancellationToken);
         if (normalized.Error is not null)
         {
             return (null, normalized.Error);
@@ -99,17 +101,50 @@ public sealed class RelationshipEdgeService(
         return edge is null ? (null, null) : (ToDto(edge), null);
     }
 
-    public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken) =>
-        relationshipEdges.DeleteAsync(id, cancellationToken);
+    public async Task<(bool Deleted, string? Error)> DeleteAsync(
+        string id,
+        string currentUserId,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(currentUserId))
+        {
+            return (false, "validation:user is required");
+        }
+
+        var existingEdge = await relationshipEdges.GetAsync(id, cancellationToken);
+        if (existingEdge is null)
+        {
+            return (false, null);
+        }
+
+        var sourceEntity = await entities.GetAsync(existingEdge.SourceEntityId, cancellationToken);
+        if (sourceEntity is null)
+        {
+            return (false, "validation:sourceEntityId does not exist");
+        }
+
+        if (!CanUserMutateRelationshipSource(sourceEntity, currentUserId))
+        {
+            return (false, "forbidden:relationship must start at your employee profile");
+        }
+
+        return (await relationshipEdges.DeleteAsync(id, cancellationToken), null);
+    }
 
     private async Task<NormalizedRelationshipEdgeRequest> NormalizeAndValidateAsync(
         UpsertRelationshipEdgeRequest request,
+        string currentUserId,
         CancellationToken cancellationToken)
     {
         var sourceEntityId = (request.SourceEntityId ?? string.Empty).Trim();
         var targetEntityId = (request.TargetEntityId ?? string.Empty).Trim();
         var kind = (request.Kind ?? request.Type ?? request.Label ?? string.Empty).Trim();
         var note = (request.Note ?? string.Empty).Trim();
+
+        if (string.IsNullOrWhiteSpace(currentUserId))
+        {
+            return NormalizedRelationshipEdgeRequest.Invalid("validation:user is required");
+        }
 
         if (string.IsNullOrWhiteSpace(sourceEntityId))
         {
@@ -126,7 +161,13 @@ public sealed class RelationshipEdgeService(
             return NormalizedRelationshipEdgeRequest.Invalid("validation:kind is required");
         }
 
-        if (await entities.GetAsync(sourceEntityId, cancellationToken) is null)
+        if (!GraphTaxonomy.IsRelationshipKindAllowed(kind))
+        {
+            return NormalizedRelationshipEdgeRequest.Invalid("validation:kind is not allowed");
+        }
+
+        var sourceEntity = await entities.GetAsync(sourceEntityId, cancellationToken);
+        if (sourceEntity is null)
         {
             return NormalizedRelationshipEdgeRequest.Invalid("validation:sourceEntityId does not exist");
         }
@@ -136,8 +177,17 @@ public sealed class RelationshipEdgeService(
             return NormalizedRelationshipEdgeRequest.Invalid("validation:targetEntityId does not exist");
         }
 
+        if (!CanUserMutateRelationshipSource(sourceEntity, currentUserId))
+        {
+            return NormalizedRelationshipEdgeRequest.Invalid("forbidden:relationship must start at your employee profile");
+        }
+
         return new NormalizedRelationshipEdgeRequest(sourceEntityId, targetEntityId, kind, note, null);
     }
+
+    private static bool CanUserMutateRelationshipSource(EntityRecord sourceEntity, string currentUserId) =>
+        sourceEntity.Type == GraphTaxonomy.Employee &&
+        string.Equals(sourceEntity.OwnerUserId, currentUserId.Trim(), StringComparison.OrdinalIgnoreCase);
 
     private static RelationshipEdgeDto ToDto(RelationshipEdgeRecord record) =>
         new(record.Id, record.SourceEntityId, record.TargetEntityId, record.Kind, record.Kind, record.Kind, record.Note);
